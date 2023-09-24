@@ -1,0 +1,9 @@
+#+title: Index
+
+*  Overview
+
+This is my first website built with Org-Mode!
+
+* Links
+
+- [[https://github.com/doomemacs/doomemacs][Doom Emacs]] [[./doom-emacs.org][configuration file]]

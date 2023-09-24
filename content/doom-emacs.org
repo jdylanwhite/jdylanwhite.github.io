@@ -1,0 +1,376 @@
+#+title: Doom Emacs Configuration
+#+author: J. Dylan White
+#+PROPERTY: header-args:elisp :tangle ~/.config/doom/config.el :mkdirp yes
+
+* Things to add
+
+** TODO SystemCrafters OrgRoam features
+** TODO Structure templates for source code blocks
+** TODO Auto-tangle dotfiles
+** TODO Visual-fill mode
+** TODO Switch fonts to using doom-font
+
+* Introduction
+
+This is my [[https://github.com/doomemacs/doomemacs][Doom Emacs]] configuration. To update the configuration file at =./.doom.d/config.el=, modify this file and use =M-x org-babel-tangle= to send the code blocks here to the configuration file.
+
+Whenever you reconfigure a package, make sure to wrap your config in an =after!= block, otherwise Doom's defaults may override your settings. For example,
+
+#+begin_example elisp
+
+(after! PACKAGE
+  (setq x y))
+  
+#+end_example
+
+The exceptions to this rule:
+
+  - Setting file/directory variables (like =org-directory=)
+  - Setting variables which explicitly tell you to set them before their package is loaded (see =C-h v VARIABLE= to look up their documentation).
+  - Setting doom variables (which start with =doom-= or =+=).
+
+Here are some additional functions/macros that will help you configure Doom:
+
+  - =load!= for loading external =*.el= files relative to =~/.doom.d/config.el=
+  - =use-package!= for configuring packages
+  - =after!= for running code after a package has loaded
+  - =add-load-path!= for adding directories to the =load-path=, relative to this file. Emacs searches the =load-path= when you load packages with =require= or =use-package=.
+  - =map!= for binding new keys
+
+To get information about any of these functions/macros, move the cursor over the highlighted symbol at press 'K' (non-evil users must press =C-c c k=). This will open documentation for it, including demos of how they are used. Alternatively, use =C-h o= to look up a symbol (functions, variables, faces, etc). You can also try =gd= (or =C-c c d=) to jump to their definition and see how they are implemented.
+
+* File Header Stuff
+
+** Lexical Binding
+
+This must be at the top of the config file to enable [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html
+][lexical binding]] for Emacs.
+
+#+begin_src elisp
+
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+#+end_src
+
+** Config File Notes
+
+#+begin_src elisp
+
+;; This is your private configuration file! Changes to this file should be made 
+;; using the Org file ~/.dotfiles/doom-emacs.org. Remember, you do not need to
+;; run 'doom sync' after modifying this file!
+                
+#+end_src
+
+* Basic UI Stuff
+
+** Set User Info
+
+Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets. It is optional.
+
+#+begin_src elisp
+
+;; Specify user information
+(setq user-full-name "J. Dylan White"
+      user-mail-address "jdylanwhite5@gmail.com")
+
+#+end_src
+
+** Font Configuration
+
+Doom exposes five (optional) variables for controlling fonts in Doom:
+
+  - =doom-font=: the primary font to use
+  - =doom-variable-pitch-font=: a non-monospace font (where applicable)
+  - =doom-big-font=: used for `doom-big-font-mode'; use this for presentations or streaming.
+  - =doom-unicode-font=: for unicode glyphs
+  - =doom-serif-font=: for the `fixed-pitch-serif' face
+
+See =C-h v doom-font= for documentation and more examples of what they accept. If you or Emacs can't find your font, use =M-x describe-font= to look them up, =M-x eval-region= to execute elisp code, and =M-x doom/reload-font= to refresh your font settings. If Emacs still can't find your font, it likely wasn't installed correctly. Font issues are rarely Doom issues!
+
+#+begin_src elisp
+
+;; Set primary font
+(set-face-attribute 'default nil
+  :font "Fira Code Retina"
+  :height 110
+  :weight 'medium)
+
+;; Set non-monospace font
+(set-face-attribute 'variable-pitch nil
+  :font "Fira Code Retina"
+  :height 120
+  :weight 'medium)
+  
+;; Set monospace font 
+(set-face-attribute 'fixed-pitch nil
+  :font "Fira Code Retina"
+  :height 110
+  :weight 'medium)
+  
+;; Makes commented text and keywords italics.
+;; This is working in emacsclient but not emacs.
+;; Your font must have an italic face available.
+(set-face-attribute 'font-lock-comment-face nil
+  :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+  :slant 'italic)
+
+;; Uncomment the following line if line spacing needs adjusting.
+(setq-default line-spacing 0.12)
+
+;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+(add-to-list 'default-frame-alist '(font . "Fira Code Retina-11"))
+
+;; Changes certain keywords to symbols, such as lamda!
+(setq global-prettify-symbols-mode t)
+
+#+end_src
+
+** Apply a Theme
+
+There are two ways to load a theme. Both assume the theme is installed and available. You can either set =doom-theme= or manually load a theme with the =load-theme= function.
+
+#+begin_src elisp
+
+(setq doom-theme 'doom-tomorrow-night)
+
+#+end_src
+
+** Other Basic UI Setup
+
+#+begin_src elisp
+
+;; Add frame transparency
+;; (add-to-list 'default-frame-alist '(alpha . 90))
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
+(setq doom-modeline-icon nil)
+
+#+end_src
+
+* Org Mode
+
+#+begin_src elisp
+
+;; Point to the location of Org Mode files
+(setq org-directory "~/Documents/Org/")
+
+;; Configure Org
+(after! org
+  (setq
+
+    ;; Specify where to load org agenda
+    org-agenda-files '("~/Documents/Org")
+
+    ;; Default file for notes
+    org-default-notes-file (expand-file-name "notes.org" org-directory)
+
+    ;; Change how some symbols appear
+    org-ellipsis " ▼ "
+    org-superstar-headline-bullets-list '("◉" "●" "○" "◆" "●" "○" "◆")
+    org-superstar-item-bullet-alist '((?+ . ?➤) (?- . ?✦)) ; changes +/- symbols in item lists
+    org-hide-emphasis-markers 1
+
+    ;; Add timestamp to org DONE entries
+    org-log-done 'time
+
+    ;; Upper bound to table conversions, useful for babel results
+    org-table-convert-region-max-lines 20000
+
+    ;; Set up to do keywords
+    org-todo-keywords        ; This overwrites the default Doom org-todo-keywords
+      '((sequence
+         "TODO(t)"           ; A task that is ready to be tackled
+         "PROJ(p)"           ; A project that contains other tasks
+         "WAIT(w)"           ; Something is holding up this task
+         "|"                 ; The pipe necessary to separate "active" states and "inactive" states
+         "DONE(d)"           ; Task has been completed
+         "CANCELLED(c)" ))   ; Task has been cancelled
+
+    ;; Customize tags
+    org-tag-alist
+      '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("music" .?m)
+       ("game" .?g)
+       ("chore" .?c)
+       ("idea" . ?i))
+
+    ;; Only one space after a tag
+    org-tags-column 0
+
+    ;; Some basic UI flags
+    org-src-fontify-natively t
+    org-src-tab-acts-natively t
+    org-confirm-babel-evaluate nil
+    org-edit-src-content-indentation 0))
+
+#+end_src
+
+** Center Org Buffers
+
+We use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.  This is really a matter of personal preference so you can remove the block below if you don't like the behavior.
+
+#+begin_src elisp
+
+  ;; ;; Specify visual-fill centering settings
+  ;; (defun my/org-mode-visual-fill ()
+  ;;   (setq visual-fill-column-width 100
+  ;;         visual-fill-column-center-text t)
+  ;;   (visual-fill-column-mode 1))
+
+  ;; ;; Use visual-fill-column to center org-mode buffers
+  ;; (use-package! visual-fill-column
+  ;;   :after org
+  ;;   :hook (org-mode . my/org-mode-visual-fill))
+
+#+end_src
+
+#+RESULTS:
+
+** Structure Templates
+
+Org Mode's [[https://orgmode.org/manual/Structure-Templates.html][structure templates]] feature enables you to quickly insert code blocks into your Org files in combination with =org-tempo= by typing =<= followed by the template name like =el= or =py= and then press =TAB=.  For example, to insert an empty =elisp= block below, you can type =<el= and press =TAB= to expand into such a block.
+
+You can add more =src= block templates below by copying one of the lines and changing the two strings at the end, the first to be the template name and the second to contain the name of the language [[https://orgmode.org/worg/org-contrib/babel/languages.html][as it is known by Org Babel]].
+
+#+begin_src elisp
+
+  ;; Apply structure templates to quickly insert code blocks in org files
+  (use-package! org-tempo
+    :after org
+    :config
+    (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+    (add-to-list 'org-structure-template-alist '("el" . "src elisp"))
+    (add-to-list 'org-structure-template-alist '("py" . "src python"))
+    (add-to-list 'org-structure-template-alist '("r" . "src R"))
+    (add-to-list 'org-structure-template-alist '("lua" . "src lua")))
+
+#+end_src
+
+* Auto-tangle Configuration Files
+
+This snippet adds a hook to =org-mode= buffers so that =my/org-babel-tangle-config= gets executed each time such a buffer gets saved.  This function checks to see if the file being saved is in the directory =~/.dotfiles/=, and if so, tangles the file to the file path specified in the header arguments for the code block to tangle.
+
+#+begin_src elisp
+
+  ;; Automatically tangle our Emacs.org config file when we save it
+  (defun my/org-babel-tangle-config ()
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name "~/.dotfiles/"))
+
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  ;; Add the function after saving an org-mode file
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
+
+#+end_src
+
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'my/org-babel-tangle-config)) | er/add-org-mode-expansions | org-tempo-setup | +lookup--init-org-mode-handlers-h | (closure ((hook . org-mode-hook) (--dolist-tail--) t) (&rest _) (add-hook 'before-save-hook 'org-encrypt-entries nil t)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (closure ((mode . org-mode-hook) (--dolist-tail--) t) nil (display-line-numbers-mode 0)) | doom-disable-show-paren-mode-h | doom-isable-show-trailing-whitespace-h | +org-enable-auto-reformat-tables-h | +org-enable-auto-update-cookies-h | +org-make-last-point-visible-h | org-fancy-priorities-mode | org-superstar-mode | evil-org-mode | toc-org-enable | embrace-org-mode-hook | org-eldoc-load |
+
+** Org-Roam
+
+[[https://www.orgroam.com/][Org-Roam]] is a plain text personal knowledge management system. To use it, you must specify so in the =~/.doom.d/init.el= file.
+
+#+begin_src elisp
+
+;; Set location of Org-Roam files
+(setq org-roam-directory "~/Documents/org/OrgRoam")
+
+#+end_src
+
+*** Org-Roam-UI
+
+[[https://github.com/org-roam/org-roam-ui][Org-Roam-UI]] is a graphical front-end showing linkages for the Org-Roam files you've made.
+
+#+begin_src elisp                
+
+;; ;; Load websocket, a dependency for Org-Roam-UI
+;; (use-package! websocket
+;;   :after org-roam)
+
+;; ;; Load and configure Org-Roam-UI
+;; (use-package! org-roam-ui
+;;   :after org-roam
+;;   :config
+;;   (setq org-roam-ui-sync-theme t
+;;         org-roam-ui-follow t
+;;         org-roam-ui-update-on-save t
+;;         org-roam-ui-open-on-start t))
+
+#+end_src
+
+* Anaconda
+
+I use [[https://docs.conda.io/en/latest/miniconda.html][Miniconda]] for my Python environment and package management. To integrate it with Emacs, we can use the [[https://github.com/necaris/conda.el][conda]] package.
+
+#+begin_src elisp
+
+;; Configure conda
+(after! conda
+  (setq conda-anaconda-home (expand-file-name "~/miniconda"))
+  (setq conda-env-home-directory (expand-file-name "~/miniconda/")))
+
+#+end_src
+  
+* Projectile
+
+[[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs.
+
+#+begin_src elisp
+
+;; Specify where to search for projects
+(setq projectile-project-search-path '("~/Documents/Projects/" "~/Documents"))
+
+#+end_src
+
+* Key Bindings
+
+#+begin_src elisp
+
+;; Tangle files with org-babel-tangle
+(map! :leader
+      :desc "Org babel tangle" "m B" #'org-babel-tangle)
+
+#+end_src
+
+* Window's Subsystem for Linux (WSL)
+
+Using Emacs on WSL can be annoying. For example, opening a link while running Emacs on Linux /should/ be as easy as =C-c C-o=, but of course that isn't the case. This changes that, all thanks to [[https://hungyi.net/posts/browse-emacs-urls-wsl/][this helpful post]] by Hung-Yi.
+
+#+begin_src elisp
+
+;; When we're using WSL, change how we open links
+(when (and (eq system-type 'gnu/linux)
+           (string-match
+            "Linux.*Microsoft.*Linux"
+            (shell-command-to-string "uname -a")))
+  (setq
+   browse-url-generic-program  "/mnt/c/Windows/System32/cmd.exe"
+   browse-url-generic-args     '("/c" "start")
+   browse-url-browser-function #'browse-url-generic))
+
+#+end_src
