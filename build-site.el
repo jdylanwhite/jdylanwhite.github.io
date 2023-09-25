@@ -34,17 +34,17 @@
 (setq org-publish-project-alist
       (list
        (list "website"
-               :recursive t
-               :base-directory "./content"
-               :base-extension "org"
-               :publishing-directory "./public"
-               :publishing-function 'org-html-publish-to-html
-               :with-author nil
-               :with-title nil
-               :with-creator t
-               :with-toc nil
-               :section-numbers nil
-               :time-stamp-file nil)))
+             :recursive t
+             :base-directory "./content"
+             :base-extension "org"
+             :publishing-directory "./public"
+             :publishing-function 'org-html-publish-to-html
+             :with-author nil
+             :with-title nil
+             :with-creator t
+             :with-toc nil
+             :section-numbers nil
+             :time-stamp-file nil)))
 
 ;; Generate the site output
 (org-publish-all t)
