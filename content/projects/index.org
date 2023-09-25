@@ -1,9 +1,0 @@
-#+title: Projects
-
-* Introduction
-
-This page is a glimpse of my personal projects. My projects mostly focus on my interests in atmospheric science, running, and cycling, but I occasionally explore some other fun projects.
-
-* Tropical Cyclone Classification
-
-In this project, I explore image classification of imagery from [[https://www.nesdis.noaa.gov/current-satellite-missions/currently-flying/geostationary-satellites][NOAA's geospatial satellites]] to identify tropical cyclones in the imagery. Learn more about this project [[./projects/tcclassifier.org][here]].
