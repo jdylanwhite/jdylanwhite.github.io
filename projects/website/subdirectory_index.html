@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Subdirectory index</title>
+<meta name="generator" content="Org mode" />
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+</head>
+<body>
+<div id="content">
+
+<div id="outline-container-org94b0537" class="outline-2">
+<h2 id="org94b0537">Dealing with Subdirectory Index Files</h2>
+<div class="outline-text-2" id="text-org94b0537">
+<p>
+Recently, David Wilson hosted a <a href="https://www.youtube.com/watch?v=atKDa510qaM">live stream</a> covering how he rebuilt the <a href="https://systemcrafters.net">SystemCrafters website</a> using Org Mode's publishing capabilities.  This is very timely for me building this page. He discussed working on a series for building a website using Org Mode, but that was over a year ago. Thankfully, he covered a lot of very helpful stuff that I'll definitely be using to build out this site.
+</p>
+
+<p>
+Somewhat following his lead, I started building out my simple site so far in a similar structure to how David built the SystemCrafters site. Currently, my <code>content</code> directory for the site is structured as such:
+</p>
+
+<pre class="example">
+
++-- index.org
++-- dotfiles.org
++-- projects.org
++-- dotfiles
+¦   +-- doom-emacs.org
+¦   +-- emacs.org
++-- projects
+¦   +-- website.org
+¦   +-- website
+¦       +-- hosting_on_github.org
+¦       +-- initial_build.org
+
+</pre>
+
+<p>
+The front page of the site is <code>index.org</code>, and then at the top level are two other documents, along with their accompanying subdirectories. A problem this presents though, is when a user tries to visit the directory level, say <code>./projects/website</code>, they aren't greeted with the content of <code>./projects/website.org</code> but rather a site-map of all of the files sitting in <code>./projects/website</code>. In order to see this content, they of course need to go to <code>./projects/website.html</code>. This is not really ideal.
+</p>
+
+<p>
+For some reason, David's solution was to modify the existing <code>org-html-publish-to-html</code> function as such:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">org-html-publish-to-html</span> (plist filename pub-dir)
+  <span style="font-style: italic;">"Publish an org file to HTML, using the FILENAME as the output directory."</span>
+  (<span style="font-weight: bold;">let</span> ((article-path (get-article-output-path filename pub-dir)))
+    (<span style="font-weight: bold;">cl-letf</span> (((symbol-function 'org-export-output-file-name)
+               (<span style="font-weight: bold;">lambda</span> (extension <span style="font-weight: bold; text-decoration: underline;">&amp;optional</span> subtreep pub-dir)
+                 <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">The 404 page is a special case, it must be named "404.html"</span>
+                 (concat article-path
+                         (<span style="font-weight: bold;">if</span> (string= (file-name-nondirectory filename) <span style="font-style: italic;">"404.org"</span>) <span style="font-style: italic;">"404"</span> <span style="font-style: italic;">"index"</span>)
+                         extension))))
+      (org-publish-org-to 'site-html
+                          filename
+                          (concat <span style="font-style: italic;">"."</span> (<span style="font-weight: bold;">or</span> (plist-get plist <span style="font-weight: bold;">:html-extension</span>)
+                                          <span style="font-style: italic;">"html"</span>))
+                          plist
+                          article-path))))
+
+</pre>
+</div>
+
+<p>
+That's a great solution. And I was going to implement it as I kind of like that approach. However, one that works just as well is to move copy each <code>./&lt;topic&gt;.org</code> as <code>./&lt;topic&gt;/index.org</code>. At first, I thought this wasn't as clean as didn't like that it didn't mimic how I'd organically write my content, but I think I prefer this. It's parallel in structure to the <code>./index.org</code> and doesn't require any workarounds.
+</p>
+
+<p>
+I did still wanted to discuss this here though, because there may be some reason in the future to need to employ this solution.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p>
+</div>
+</body>
+</html>
