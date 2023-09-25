@@ -1,0 +1,51 @@
+#+title: Subdirectory index
+
+* Dealing with Subdirectory Index Files
+
+Recently, David Wilson hosted a [[https://www.youtube.com/watch?v=atKDa510qaM][live stream]] covering how he rebuilt the [[https://systemcrafters.net][SystemCrafters website]] using Org Mode's publishing capabilities.  This is very timely for me building this page. He discussed working on a series for building a website using Org Mode, but that was over a year ago. Thankfully, he covered a lot of very helpful stuff that I'll definitely be using to build out this site.
+
+Somewhat following his lead, I started building out my simple site so far in a similar structure to how David built the SystemCrafters site. Currently, my =content= directory for the site is structured as such:
+
+#+begin_example
+
++-- index.org
++-- dotfiles.org
++-- projects.org
++-- dotfiles
+¦   +-- doom-emacs.org
+¦   +-- emacs.org
++-- projects
+¦   +-- website.org
+¦   +-- website
+¦       +-- hosting_on_github.org
+¦       +-- initial_build.org
+
+#+end_example
+
+The front page of the site is =index.org=, and then at the top level are two other documents, along with their accompanying subdirectories. A problem this presents though, is when a user tries to visit the directory level, say =./projects/website=, they aren't greeted with the content of =./projects/website.org= but rather a site-map of all of the files sitting in =./projects/website=. In order to see this content, they of course need to go to =./projects/website.html=. This is not really ideal.
+
+For some reason, David's solution was to modify the existing =org-html-publish-to-html= function as such:
+
+#+begin_src elisp
+
+(defun org-html-publish-to-html (plist filename pub-dir)
+  "Publish an org file to HTML, using the FILENAME as the output directory."
+  (let ((article-path (get-article-output-path filename pub-dir)))
+    (cl-letf (((symbol-function 'org-export-output-file-name)
+               (lambda (extension &optional subtreep pub-dir)
+                 ;; The 404 page is a special case, it must be named "404.html"
+                 (concat article-path
+                         (if (string= (file-name-nondirectory filename) "404.org") "404" "index")
+                         extension))))
+      (org-publish-org-to 'site-html
+                          filename
+                          (concat "." (or (plist-get plist :html-extension)
+                                          "html"))
+                          plist
+                          article-path))))
+
+#+end_src
+
+That's a great solution. And I was going to implement it as I kind of like that approach. However, one that works just as well is to move copy each =./<topic>.org= as =./<topic>/index.org=. At first, I thought this wasn't as clean as didn't like that it didn't mimic how I'd organically write my content, but I think I prefer this. It's parallel in structure to the =./index.org= and doesn't require any workarounds.
+
+I did still wanted to discuss this here though, because there may be some reason in the future to need to employ this solution.

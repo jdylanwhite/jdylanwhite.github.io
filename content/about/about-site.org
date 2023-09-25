@@ -1,0 +1,9 @@
+#+title: About This Site
+
+* Introduction
+
+I created this site as a portfolio for my various projects, but it's also a space for me to blog, learn more about maintaining my own website, and explore minor web development. I don't have a particular audience for any of this, but I find I understand things better when I have to explain concepts, so I already write out projects in a way that lends itself well to a website anyways.
+
+* How This Site Was Built
+
+This site is published on [[https://pages.github.com/][GitHub Pages]] using [[https://www.gnu.org/software/emacs/][GNU Emacs]], [[https://orgmode.org/][Org Mode]], and [[https://jekyllrb.com][Jekyll]]. The source code for this site can be found in this [[https://github.com/jdylanwhite/jdylanwhite.github.io][GitHub repository]]. I use Emacs and Org Mode to write most of the actual content of the site. Jekyll helps with everything else, such as headers, navigation, and footers. I'll also convert [[https://jupyter.org/][Jupyter Notebooks]] to be used on this site as well.

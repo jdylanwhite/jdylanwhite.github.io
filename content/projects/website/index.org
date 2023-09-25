@@ -1,0 +1,17 @@
+#+title: Index
+
+* Introduction
+
+I wanted to document the process of building this website. I didn't just sit down and start writing raw HTML. Do people even do that any more?
+
+When I work on projects, I already prefer to write up the code, document, or Jupyter notebook as if I am telling a story. This helps me better understand that concepts I am covering, makes me write more clearly and explain to myself what I did when I inevitably revisit a notebook. If that's how I write, why not try to turn all of that into a personal website, project portfolio, and learning space for web development skills?
+
+My goal was to take the stuff I was already doing and turn it into a website, and thankfully, that isn't too difficult!
+
+* Developing This Website
+
+I'm building this website slowly and incrementally making changes to it in balance with wanting to work on other projects. I still want to document those incremental changes (when the increment or sum of smaller increments warrants it) here.
+
+1. [[./initial_build.org][Starting the initial build using Emacs and Org Mode to publish]]
+2. [[./hosting_on_github.org][Hosting the initial build on GitHub Pages]]
+3. [[./subdirectory_index.org][Dealing with Subdirectory Index Pages]]

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Initial Build</title>
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+</head>
+<body>
+<div id="content" class="content">
+
+<div id="outline-container-orgdb5cbe0" class="outline-2">
+<h2 id="orgdb5cbe0">Introduction</h2>
+<div class="outline-text-2" id="text-orgdb5cbe0">
+<p>
+This is the first step in building my website. Looking forward, I want to rely on typing the content of my page using <a href="https://orgmode.org/">Org Mode</a>. This is a sort of markdown that comes built into <a href="https://www.gnu.org/software/emacs/">Emacs</a> that really goes far beyond a "sort of markdown" that I unfairly stated. It's pretty awesome and has more functionality that I could begin to imagine, let along describe. I also want to be able to convert <a href="https://jupyter.org/">Jupyter Notebooks</a>, but I'm going to figure that part out later. The output here will be far from a finished product, but this is a solid first step.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgce20942" class="outline-2">
+<h2 id="orgce20942">Setting Up Emacs and Org Mode Publishing</h2>
+<div class="outline-text-2" id="text-orgce20942">
+<p>
+Following this guide, <a href="https://www.youtube.com/watch?v=AfkrzFodoNw">Build Your Website with Org Mode</a> by <a href="https://systemcrafters.net/">SystemCrafters</a>, it's easy to get started. The idea here is that you write each of your site's pages as individual Org Mode documents, and then you use Org Mode's publishing system to convert those documents into individual HTML files in a stucture that mirrors the Org Mode content.
+</p>
+</div>
+
+<div id="outline-container-orgf2ff778" class="outline-3">
+<h3 id="orgf2ff778">Creating the Build Site Script</h3>
+<div class="outline-text-3" id="text-orgf2ff778">
+<p>
+We start off by building the Elisp script that we will run with base Emacs (no configuration loaded). This is built to be used anywhere by anyone with Emacs 25 or higher installed. This is important because later, we'll use a virtual machine to run our script from scratch each time we push a commit. This section won't be vastly different from David's very helpful SystemCrafters video, but I want to include it because it's where I am starting, and I'll on from there quite a bit.
+</p>
+
+<p>
+We start off our build script, <code>build-site.el</code>, by loading the Org Mode publishing system, <code>ox-publish</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Load the publishing system</span>
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">This generates the HTML output from org-mode documents</span>
+(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">ox-publish</span>)
+
+</pre>
+</div>
+
+<p>
+Next, we need to install some additional dependencies. Initially, we'll just install <code>htmlize</code>. Without it, code blocks, such as the ones on this page, do not show up with any syntax highlighting. Most posts on this site are going to have code blocks, so I definitely want to include syntax hightlighting! First though, we need to add the MELPA package repository and refresh the contents of that repository so we can install the dependencies.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set the package installation directory so that packages aren't stored in</span>
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">the ~/.emacs.d/elpa path.</span>
+(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">package</span>)
+(<span style="font-weight: bold;">setq</span> package-user-dir (expand-file-name <span style="font-style: italic;">"./.packages"</span>))
+(<span style="font-weight: bold;">setq</span> package-archives '((<span style="font-style: italic;">"melpa"</span> . <span style="font-style: italic;">"https://melpa.org/packages/"</span>)
+                         (<span style="font-style: italic;">"elpa"</span> . <span style="font-style: italic;">"https://elpa.gnu.org/packages/"</span>)))
+
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Initialize the package system</span>
+(package-initialize)
+(<span style="font-weight: bold;">unless</span> package-archive-contents
+  (package-refresh-contents))
+
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Install dependencies - htmlize is needed for code syntax highlighting</span>
+(package-install 'htmlize)
+
+</pre>
+</div>
+
+<p>
+Now, we'll customize some of the HTML output by changing a few variables associated with Org Mode's publisher. When the Org documents are exported to HTML, they include a few things I don't want on my site, such as a HTML validation link and some default JavaScript and styling. We can also point to a specific style sheet here.
+</p>
+
+<p>
+<b>Note</b>: This is useful for now, but later, we'll change this. These variables all impact the header and footer of the site, but later we'll only use Org Mode to publish the <i>body</i> of the content and let Jekyll handle the rest of the content.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Customize the HTML output</span>
+(<span style="font-weight: bold;">setq</span>
+ <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't add the HTML Validate link at the bottom of our published page</span>
+ org-html-validation-link nil
+ <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't add the default JavaScript</span>
+ org-html-head-include-scripts nil
+ <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't use the default styles</span>
+ org-html-head-include-default-style nil
+ <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Use a pre-built CSS</span>
+ org-html-head <span style="font-style: italic;">"&lt;link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" /&gt;"</span>)
+
+</pre>
+</div>
+
+<p>
+We need to tell Org Mode what exactly we want to publish and where to publish it to. For now, the website root directory is <code>website</code>, all of my Org Mode documents are in a subdirectory called <code>base-directory</code>, and I want to send my exported HTML files to a subdirectory called <code>public</code>. We can also handle a few other items here, such as turning off the Table of Contents, author name, and time stamp.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set the project to publish upon running this script as well as how</span>
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">to publish them</span>
+(<span style="font-weight: bold;">setq</span> org-publish-project-alist
+      (list
+       (list <span style="font-style: italic;">"website"</span>
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Publish all files in the base directory</span>
+             <span style="font-weight: bold;">:recursive</span> t
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Where the org-mode files are located</span>
+             <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./content"</span>
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Where the HTML files are generated</span>
+             <span style="font-weight: bold;">:publishing-directory</span> <span style="font-style: italic;">"./public"</span>
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Function to convert org-mode to desired format</span>
+             <span style="font-weight: bold;">:publishing-function</span> 'org-html-publish-to-html
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't show the author in the footer</span>
+             <span style="font-weight: bold;">:with-author</span> nil
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Add that site was generated with Emacs org-mode in footer</span>
+             <span style="font-weight: bold;">:with-creator</span> t
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't add the table of contents</span>
+             <span style="font-weight: bold;">:with-toc</span> nil
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't add section numbers in the headings</span>
+             <span style="font-weight: bold;">:section-numbers</span> nil
+             <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Don't include a time-stamp in the file</span>
+             <span style="font-weight: bold;">:time-stamp-file</span> nil)))
+</pre>
+</div>
+
+<p>
+Finally, we'll tell Org Mode to regenerate the entire list of projects listed above each time we run the build script.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Generate the site output</span>
+(org-publish-all t)
+</pre>
+</div>
+
+<p>
+And then, just as a sanity check, we'll print a message letting us know we made it to the end.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-elisp">
+(message <span style="font-style: italic;">"Build complete!"</span>)
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org92f0130" class="outline-3">
+<h3 id="org92f0130">Calling the Build Script</h3>
+<div class="outline-text-3" id="text-org92f0130">
+<p>
+Lastly, we just need to call Emacs to run this script in the shell. That's pretty quickly done in one line in a shell script, <code>build.sh</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">
+emacs -Q --script build-site.el
+
+</pre>
+</div>
+
+<p>
+Here, the <code>-Q</code> flag tells Emacs not to load any configuration, splash screens, or anything else, and <code>--script</code> tells Emacs to run the Elisp script file we specify. Next, we can make the command executable by running
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">
+chmod +x build.sh
+
+</pre>
+</div>
+
+<p>
+and finally, run the shell script that runs Emacs and the build script using
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">
+./build.sh
+
+</pre>
+</div>
+
+<p>
+And now, barring any errors in performing the export, all of our Org Mode documents should have been exported to HTML files in the <code>public</code> subdirectory.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 30.0.50 (<a href="https://orgmode.org">Org</a> mode 9.6.8)</p>
+</div>
+</body>
+</html>
