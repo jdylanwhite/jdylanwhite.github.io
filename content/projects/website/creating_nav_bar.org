@@ -1,0 +1,14 @@
+#+title: Creating the Navigation Bar
+
+#+begin_src elisp
+
+(defun jdw/site-header ()
+  (list `(header (@ (class "site-header"))
+    (div (@ (class "site-masthead"))
+      (div (@ (class "container"))
+        (nav (@ (class "nav"))
+          (a (@ (class "nav-link") (href "/")) "Home") " "
+          (a (@ (class "nav-link") (href "/dotfiles/")) "Dotfiles") " "
+          (a (@ (class "nav-link") (href "/projects/")) "Projects") " "))))))
+
+#+end_src

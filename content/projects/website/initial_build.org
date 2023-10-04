@@ -1,6 +1,8 @@
 #+title: Initial Build
+#+author: J. Dylan white
+#+date: <2023-09-23 Sat>
 
-* Introduction
+* Initial Build of a Minimal Site
 
 This is the first step in building my website. Looking forward, I want to rely on typing the content of my page using [[https://orgmode.org/][Org Mode]]. This is a sort of markdown that comes built into [[https://www.gnu.org/software/emacs/][Emacs]] that really goes far beyond a "sort of markdown" that I unfairly stated. It's pretty awesome and has more functionality that I could begin to imagine, let along describe. I also want to be able to convert [[https://jupyter.org/][Jupyter Notebooks]], but I'm going to figure that part out later. The output here will be far from a finished product, but this is a solid first step.
 

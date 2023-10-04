@@ -1,5 +1,6 @@
 #+title: Doom Emacs Configuration
 #+author: J. Dylan White
+#+date: <2023-09-25 Mon>
 #+PROPERTY: header-args:elisp :tangle ~/.config/doom/config.el :mkdirp yes
 
 * Things to add
@@ -65,7 +66,7 @@ This must be at the top of the config file to enable [[https://www.gnu.org/softw
 * Basic UI Stuff
 
 ** Set User Info
-
+ ss
 Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets. It is optional.
 
 #+begin_src elisp
@@ -204,16 +205,16 @@ We use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]
 
 #+begin_src elisp
 
-  ;; Specify visual-fill centering settings
-  (defun my/org-mode-visual-fill ()
-    (setq visual-fill-column-width 100
-          visual-fill-column-center-text t
-          visual-fill-column-mode 1))
+  ;; ;; Specify visual-fill centering settings
+  ;; (defun my/org-mode-visual-fill ()
+  ;;   (setq visual-fill-column-width 100
+  ;;         visual-fill-column-center-text t
+  ;;         visual-fill-column-mode 1))
 
-  ;; Use visual-fill-column to center org-mode buffers
-  (use-package! visual-fill-column
-    :after org
-    :hook (org-mode . my/org-mode-visual-fill))
+  ;; ;; Use visual-fill-column to center org-mode buffers
+  ;; (after! org
+  ;;   (use-package! visual-fill-column
+  ;;       :hook (org-mode . my/org-mode-visual-fill))
 
 #+end_src
 

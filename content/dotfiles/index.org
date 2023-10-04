@@ -6,7 +6,6 @@ As I build out my various configuration files for my workflow and preferences, I
 
 Currently, I am split in a few different directions. I am using [[https://github.com/doomemacs/doomemacs][Doom Emacs]], vanilla Emacs, and [[https://code.visualstudio.com/][Visual Studio Code]]. Ideally, I'd like to only use one of these, preferably my own personally configured vanilla Emacs. Eventually I plan to get there, but for now I'm just trying to use whatever will get the job done the quickest. Here are my current active dotfiles:
 
-- [[./dotfiles/doom-emacs.org][Doom Emacs Configuration]]
-- [[./dotfiles/emacs.org][Vanilla Emacs Configuration]]
+- [[./doom-emacs.org][Doom Emacs Configuration]]
 
 I also keep my configuration files in a [[https://github.com/jdylanwhite/dotfiles][GitHub repository]].

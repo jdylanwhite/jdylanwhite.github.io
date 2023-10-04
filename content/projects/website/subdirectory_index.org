@@ -1,4 +1,6 @@
-#+title: Subdirectory index
+#+title: Subdirectory Index
+#+author: J. Dylan White
+#+date: <2023-09-25 Mon>
 
 * Dealing with Subdirectory Index Files
 

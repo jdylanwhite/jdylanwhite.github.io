@@ -4,6 +4,14 @@
 
 This page is a glimpse of my personal projects. My projects mostly focus on my interests in atmospheric science, running, and cycling, but I occasionally explore some other fun projects.
 
+* Pokedex
+
+As a fun, familiar dataset, I scrape Pokemon data from [[https://pokemondb.net][PokemonDB]] and explore the data and investigate some questions I've always had about the series. Check out this project [[file:pokedex/index.org][here]].
+
 * Tropical Cyclone Classification
 
-In this project, I explore image classification of imagery from [[https://www.nesdis.noaa.gov/current-satellite-missions/currently-flying/geostationary-satellites][NOAA's geospatial satellites]] to identify tropical cyclones in the imagery. Learn more about this project [[./projects/tcclassifier.org][here]].
+In this project, I explore image classification of imagery from [[https://www.nesdis.noaa.gov/current-satellite-missions/currently-flying/geostationary-satellites][NOAA's geospatial satellites]] to identify tropical cyclones in the imagery. Learn more about this project [[file:tc-finder/index.org][here]].
+
+* Building This Website
+
+Building this website was an exciting learning adventure for me! I took it slowly and built it step-by-step, and I documented the process [[file:website/index.org][here]].

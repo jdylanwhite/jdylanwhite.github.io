@@ -12,6 +12,6 @@ My goal was to take the stuff I was already doing and turn it into a website, an
 
 I'm building this website slowly and incrementally making changes to it in balance with wanting to work on other projects. I still want to document those incremental changes (when the increment or sum of smaller increments warrants it) here.
 
-1. [[./initial_build.org][Starting the initial build using Emacs and Org Mode to publish]]
-2. [[./hosting_on_github.org][Hosting the initial build on GitHub Pages]]
-3. [[./subdirectory_index.org][Dealing with Subdirectory Index Pages]]
+1. [[file:initial_build.org][Starting the initial build using Emacs and Org Mode to publish]]
+2. [[file:hosting_on_github.org][Hosting the initial build on GitHub Pages]]
+3. [[file:subdirectory_index.org][Dealing with Subdirectory Index Pages]]

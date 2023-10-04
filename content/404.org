@@ -1,0 +1,7 @@
+#+title: 404
+
+* Page Not Found
+
+The requested page was not found.
+
+If you you believe this is an error, please send an e-mail to [[mailto:jdylanwhite5@gmail.com][jdylanwhite5@gmail.com]] to let me know!

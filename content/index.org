@@ -1,9 +1,22 @@
-#+title: Index
+#+title: Welcome!
 
-*  Overview
+I'm Dylan, and this page is my personal project portfolio and blogging space.
 
-This is my first website built with Org-Mode!
+I am a data scientist with a background in atmospheric science and various interests:
 
-* Links
+- computer vision
+- remote sensing
+- geophysical fluid dynamics
+- climate science
+- sustainability and urban planning
+- running and cycling
 
-- [[https://github.com/doomemacs/doomemacs][Doom Emacs]] [[./dotfiles/doom-emacs.org][configuration file]]
+I have a Ph.D. in atmospheric science and B.S. in physics and mathematics. I have over eight years of experience with data science with strong skills in:
+
+- data pre-processing
+- statistical analysis
+- data visualization
+- machine learning
+- deep learning
+
+I am very passionate about learning new things, including recent data science methodologies, additional programming languages, and novel applications of techniques.

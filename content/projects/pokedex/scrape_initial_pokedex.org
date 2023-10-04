@@ -1,0 +1,84 @@
+#+title: Scrape Initial Pokedex
+#+date: <2023-10-02 Mon>
+#+PROPERTY: header-args R :session *R*
+
+Before we scrape all of the Pokemon data, let's start by building the table of just Pokemon and their number, again using the [[https://pokemondb.net/][PokemonDB]] site.
+
+* Load Libraries
+
+Again, we'll primarily use the =rvest= package, along with =dplyr= and =tidyr= for some additional common functions.
+
+
+#+begin_src R :results silent
+
+# Load packages
+library(rvest)
+library(dplyr)
+library(tidyr)
+
+#+end_src
+
+* Load National Pokedex Page
+
+Let's load the page data from the [[https://pokemondb.net/pokedex/national][National Pokedex]] page, which has a table of all Pokemon, their number, and a link to their page.
+
+#+begin_src R :results silent
+
+# Set the URL to fetch data from
+url <- "https://pokemondb.net/pokedex/national"
+
+# Read the body from the page
+body <- url %>% read_html() %>% html_nodes("body")
+
+# Get the info cards for each Pokemon
+infocards <- html_nodes(body, "span.infocard-lg-data.text-muted")
+
+#+end_src
+
+* Get the Initial Pokedex Data
+
+Using the tags for each "infocard" which contains the information we want for each Pokemon, get the numbers, names, and URLs for each Pokemon.
+
+#+begin_src R :results silent
+
+# Fetch the Pokemon numbers
+numbers <- infocards %>%
+  html_element("small") %>%
+  html_text()
+
+# Fetch the Pokemon names
+names <- infocards %>%
+  html_element("a") %>%
+  html_text()
+
+# Fetch the Pokemon URLs
+urls <- infocards %>%
+  html_element("a") %>%
+  html_attr("href")
+urls <- paste0("https://pokemondb.net", urls)
+
+#+end_src
+
+* Assemble Initial Pokedex Dataframe
+
+Finally, let's put all of this data into a dataframe.
+
+#+begin_src R :results output
+
+# Create tibble for Pokedex
+data_tbl <- tibble(numbers, names, urls) %>%
+  rename(Number = numbers, Name = names, URLs = urls)
+data_tbl$Number <- substring(data_tbl$Number, 2) %>% as.numeric()
+
+glimpse(data_tbl)
+
+#+end_src
+
+#+RESULTS:
+: Rows: 1,010
+: Columns: 3
+: $ Number <dbl> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, …
+: $ Name   <chr> "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon",…
+: $ URLs   <chr> "https://pokemondb.net/pokedex/bulbasaur", "https://pokemondb.n…
+
+This initial table will serve as the initial table for scraping /all/ of the Pokemon data.
