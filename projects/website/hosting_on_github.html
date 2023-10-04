@@ -1,54 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hosting On Github</title>
-<meta name="generator" content="Org mode" />
-<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
-</head>
-<body>
-<div id="content">
-
-<div id="outline-container-org41581a2" class="outline-2">
-<h2 id="org41581a2">Introduction</h2>
-<div class="outline-text-2" id="text-org41581a2">
+<!-- Generated from 3956d14 on 2023-10-04 @ 12:03 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Hosting On Github - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Hosting On Github</h1><p class="site-post-meta"></p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org15b93a9">
 <p>
-Typically, if you wanted to host something on <a href="https://pages.github.com/">GitHub Pages</a>, you'd create a repository with the name <code>my_github_username.github.io</code>, write your Markdown or HTML documents as pages or posts, and then commit those changes and push them to the repository. When GitHub realizes the repository is a GitHub Pages repository, it runs some site-building procedures using its "continuous integration" (CI) to rebuild your website from those Markdown or HTML pages each time you push a new commit to the remote repository.
+Typically, if you wanted to host something on <a href="https://pages.github.com/">GitHub Pages</a>, you&rsquo;d create a repository with the name <code>my_github_username.github.io</code>, write your Markdown or HTML documents as pages or posts, and then commit those changes and push them to the repository. When GitHub realizes the repository is a GitHub Pages repository, it runs some site-building procedures using its &ldquo;continuous integration&rdquo; (CI) to rebuild your website from those Markdown or HTML pages each time you push a new commit to the remote repository.
 </p>
 
 <p>
-But I'm built different. I am not writing Markdown or HTML documents. I'm writing Org Mode documents and then exporting them to HTML documents. Because the Org Mode documents need to be exported by Emacs in order for GitHub Pages to render them as pages on the site, we need to explicitly tell GitHub pages what to do. Thankfully, <a href="https://systemcrafters.net/">SystemCrafters</a> has a <a href="https://www.youtube.com/watch?v=za99DwdZEyg">video that covers this</a>.
+But I&rsquo;m built different. I am not writing Markdown or HTML documents. I&rsquo;m writing Org Mode documents and then exporting them to HTML documents. Because the Org Mode documents need to be exported by Emacs in order for GitHub Pages to render them as pages on the site, we need to explicitly tell GitHub pages what to do. Thankfully, <a href="https://systemcrafters.net/">SystemCrafters</a> has a <a href="https://www.youtube.com/watch?v=za99DwdZEyg">video that covers this</a>.
 </p>
 </div>
-</div>
 
-<div id="outline-container-org9373889" class="outline-2">
-<h2 id="org9373889">Specifying the Automated Workflow</h2>
-<div class="outline-text-2" id="text-org9373889">
+<h2><a id="specifying-the-automated-workflow" class="anchor" href="#specifying-the-automated-workflow">¶</a>Specifying the Automated Workflow</h2><div class="outline-text-2" id="text-org387e5ef">
 <p>
-What we need to do is provide GitHub's continuous integration the specific steps required to build this site. This is done through the file <code>.github/workflows/publish.yml</code> stored in the repository's root directory.
+What we need to do is provide GitHub&rsquo;s continuous integration the specific steps required to build this site. This is done through the file <code>.github/workflows/publish.yml</code> stored in the repository&rsquo;s root directory.
 </p>
 
 <p>
-With this file, we can specify when want to perform this task. For a static website, I really only need to do this each time I update the remote repository, so we set that as the trigger for the workflow. Additionaly, we need to specify which Git branch triggers this task. In my case, this is <code>master</code>. GitHub is moving away from using <code>master</code> as the default branch name, but the default CI for GitHub pages expects a branch name "master". We aren't using the default CI, so we can actually afford to change this. I'll handle that at a later stage. For now, I just want to make this work.
+With this file, we can specify when want to perform this task. For a static website, I really only need to do this each time I update the remote repository, so we set that as the trigger for the workflow. Additionaly, we need to specify which Git branch triggers this task. In my case, this is <code>master</code>. GitHub is moving away from using <code>master</code> as the default branch name, but the default CI for GitHub pages expects a branch name &ldquo;master&rdquo;. We aren&rsquo;t using the default CI, so we can actually afford to change this. I&rsquo;ll handle that at a later stage. For now, I just want to make this work.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-yaml">
-# Give the job a name
+<pre># Give the job a name
 name: Publish to GitHub Pages
 
 # Specify when to perform this task
 on:
   push:
     branches:
-      - master
-
-</pre>
-</div>
+      - master</pre>
 
 <p>
 Next, we need to specify how to run the workflow. First, we want to run the workflow on a virtual machine running the latest version of Ubuntu, which we accomplish by specifying <code>runs-on</code> as <code>ubuntu-latest</code>. We also need to check out the code for running on the VM, install a minimal Emacs that will run our script, run the build script that we built in <a href="./intial-build.html">the initial build set up</a>, and then publish the pages using a community developed action. This community action will ultimate create a new branch, <code>gh-pages</code>, where our exported pages will live.
@@ -58,9 +36,7 @@ Next, we need to specify how to run the workflow. First, we want to run the work
 <b>Note:</b> These steps will likely change as new steps are added, like Jekyll integration. For now though, this will get our initial site published using GitHub Pages.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-yaml">
-# Specify the steps, in sequential order, to perform
+<pre># Specify the steps, in sequential order, to perform
 jobs:
 
   publish:
@@ -72,34 +48,25 @@ jobs:
 
       # Check out the code to be run on the VM
       - name: Check out
-	uses: actions/checkout@v1
+        uses: actions/checkout@v1
 
       # Install a minimal Emacs
       - name: Install Emacs
-	run: sudo apt install emacs-nox --yes
+        run: sudo apt install emacs-nox --yes
 
       # Run the build script
       - name: Build the site
-	run: ./build.sh
+        run: ./build.sh
 
       # Publish the site using a community deploy action
       - name: Publish generated content to GitHub Pages
-	uses: JamesIves/github-pages-deploy-action@4.1.4
-	with:
-	  branch: gh-pages
-	  folder: public
-
-</pre>
-</div>
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: public</pre>
 
 <p>
-After we push a new commit with this new file added. GitHub will perform these tasks. There's just one more requirement before this produces a published page. On the GitHub repository web page, go to Settings &gt; Pages and then in the "Branch" section, change the branch to <code>gh-pages</code>. After this, the web page should show your published content. It may take a couple minutes to load, though.
+After we push a new commit with this new file added. GitHub will perform these tasks. There&rsquo;s just one more requirement before this produces a published page. On the GitHub repository web page, go to Settings &gt; Pages and then in the &ldquo;Branch&rdquo; section, change the branch to <code>gh-pages</code>. After this, the web page should show your published content. It may take a couple minutes to load, though.
 </p>
 </div>
-</div>
-</div>
-<div id="postamble" class="status">
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p>
-</div>
-</body>
-</html>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

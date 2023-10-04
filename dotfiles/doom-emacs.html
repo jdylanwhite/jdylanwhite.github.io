@@ -1,47 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Doom Emacs Configuration</title>
-<meta name="generator" content="Org mode" />
-<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
-</head>
-<body>
-<div id="content">
+<!-- Generated from 3956d14 on 2023-10-04 @ 12:03 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Doom Emacs Configuration - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Doom Emacs Configuration</h1><p class="site-post-meta">September 25, 2023</p><div id="content">
+<h2><a id="things-to-add" class="anchor" href="#things-to-add">¶</a>Things to add</h2><h3><a id="systemcrafters-orgroam-features" class="anchor" href="#systemcrafters-orgroam-features">¶</a>SystemCrafters OrgRoam features</h3>
+<h3><a id="structure-templates-for-source-code-blocks" class="anchor" href="#structure-templates-for-source-code-blocks">¶</a>Structure templates for source code blocks</h3>
+<h3><a id="auto-tangle-dotfiles" class="anchor" href="#auto-tangle-dotfiles">¶</a>Auto-tangle dotfiles</h3>
+<h3><a id="visual-fill-mode" class="anchor" href="#visual-fill-mode">¶</a>Visual-fill mode</h3>
+<h3><a id="switch-fonts-to-using-doom-font" class="anchor" href="#switch-fonts-to-using-doom-font">¶</a>Switch fonts to using doom-font</h3>
 
-<div id="outline-container-org916b2e5" class="outline-2">
-<h2 id="org916b2e5">Things to add</h2>
-<div class="outline-text-2" id="text-org916b2e5">
-</div>
-<div id="outline-container-orgd730505" class="outline-3">
-<h3 id="orgd730505"><span class="todo TODO">TODO</span> SystemCrafters OrgRoam features</h3>
-</div>
-<div id="outline-container-org5e34151" class="outline-3">
-<h3 id="org5e34151"><span class="todo TODO">TODO</span> Structure templates for source code blocks</h3>
-</div>
-<div id="outline-container-orge8a7f77" class="outline-3">
-<h3 id="orge8a7f77"><span class="todo TODO">TODO</span> Auto-tangle dotfiles</h3>
-</div>
-<div id="outline-container-org537dec4" class="outline-3">
-<h3 id="org537dec4"><span class="todo TODO">TODO</span> Visual-fill mode</h3>
-</div>
-<div id="outline-container-orgda86fc0" class="outline-3">
-<h3 id="orgda86fc0"><span class="todo TODO">TODO</span> Switch fonts to using doom-font</h3>
-</div>
-</div>
-
-<div id="outline-container-orgeaa3084" class="outline-2">
-<h2 id="orgeaa3084">Introduction</h2>
-<div class="outline-text-2" id="text-orgeaa3084">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org62be1de">
 <p>
 This is my <a href="https://github.com/doomemacs/doomemacs">Doom Emacs</a> configuration. To update the configuration file at <code>./.doom.d/config.el</code>, modify this file and use <code>M-x org-babel-tangle</code> to send the code blocks here to the configuration file.
 </p>
 
 <p>
-Whenever you reconfigure a package, make sure to wrap your config in an <code>after!</code> block, otherwise Doom's defaults may override your settings. For example,
+Whenever you reconfigure a package, make sure to wrap your config in an <code>after!</code> block, otherwise Doom&rsquo;s defaults may override your settings. For example,
 </p>
 
 <pre class="example">
@@ -74,71 +45,36 @@ Here are some additional functions/macros that will help you configure Doom:
 </ul>
 
 <p>
-To get information about any of these functions/macros, move the cursor over the highlighted symbol at press 'K' (non-evil users must press <code>C-c c k</code>). This will open documentation for it, including demos of how they are used. Alternatively, use <code>C-h o</code> to look up a symbol (functions, variables, faces, etc). You can also try <code>gd</code> (or <code>C-c c d</code>) to jump to their definition and see how they are implemented.
+To get information about any of these functions/macros, move the cursor over the highlighted symbol at press &rsquo;K&rsquo; (non-evil users must press <code>C-c c k</code>). This will open documentation for it, including demos of how they are used. Alternatively, use <code>C-h o</code> to look up a symbol (functions, variables, faces, etc). You can also try <code>gd</code> (or <code>C-c c d</code>) to jump to their definition and see how they are implemented.
 </p>
 </div>
-</div>
 
-<div id="outline-container-orgda123f2" class="outline-2">
-<h2 id="orgda123f2">File Header Stuff</h2>
-<div class="outline-text-2" id="text-orgda123f2">
-</div>
-<div id="outline-container-org7cfb50a" class="outline-3">
-<h3 id="org7cfb50a">Lexical Binding</h3>
-<div class="outline-text-3" id="text-org7cfb50a">
+<h2><a id="file-header-stuff" class="anchor" href="#file-header-stuff">¶</a>File Header Stuff</h2><h3><a id="lexical-binding" class="anchor" href="#lexical-binding">¶</a>Lexical Binding</h3><div class="outline-text-3" id="text-org0e00f1c">
 <p>
 This must be at the top of the config file to enable <a href="https://www.gnu.org/software/emacs/manual/html_node/elisp/Lexical-Binding.html%20">lexical binding</a> for Emacs.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">$DOOMDIR/config.el -*- lexical-binding: t; -*-</span>
-
-</pre>
-</div>
-</div>
+<pre><span class="org-comment-delimiter">;;; </span><span class="org-comment">$DOOMDIR/config.el -*- lexical-binding: t; -*-</span></pre>
 </div>
 
-<div id="outline-container-orgf51af39" class="outline-3">
-<h3 id="orgf51af39">Config File Notes</h3>
-<div class="outline-text-3" id="text-orgf51af39">
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">This is your private configuration file! Changes to this file should be made </span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">using the Org file ~/.dotfiles/doom-emacs.org. Remember, you do not need to</span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">run 'doom sync' after modifying this file!</span>
-
-</pre>
-</div>
-</div>
-</div>
+<h3><a id="config-file-notes" class="anchor" href="#config-file-notes">¶</a>Config File Notes</h3><div class="outline-text-3" id="text-org0440c54">
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">This is your private configuration file! Changes to this file should be made </span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">using the Org file ~/.dotfiles/doom-emacs.org. Remember, you do not need to</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">run 'doom sync' after modifying this file!</span></pre>
 </div>
 
-<div id="outline-container-orgaa9d493" class="outline-2">
-<h2 id="orgaa9d493">Basic UI Stuff</h2>
-<div class="outline-text-2" id="text-orgaa9d493">
-</div>
-<div id="outline-container-org879e5bc" class="outline-3">
-<h3 id="org879e5bc">Set User Info</h3>
-<div class="outline-text-3" id="text-org879e5bc">
+<h2><a id="basic-ui-stuff" class="anchor" href="#basic-ui-stuff">¶</a>Basic UI Stuff</h2><h3><a id="set-user-info" class="anchor" href="#set-user-info">¶</a>Set User Info</h3><div class="outline-text-3" id="text-org7f756f7">
 <p>
+ ss
 Some functionality uses this to identify you, e.g. GPG configuration, email clients, file templates and snippets. It is optional.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Specify user information</span>
-(<span style="font-weight: bold;">setq</span> user-full-name <span style="font-style: italic;">"J. Dylan White"</span>
-      user-mail-address <span style="font-style: italic;">"jdylanwhite5@gmail.com"</span>)
-
-</pre>
-</div>
-</div>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Specify user information</span>
+(<span class="org-keyword">setq</span> user-full-name <span class="org-string">"J. Dylan White"</span>
+      user-mail-address <span class="org-string">"jdylanwhite5@gmail.com"</span>)</pre>
 </div>
 
-<div id="outline-container-org06331d5" class="outline-3">
-<h3 id="org06331d5">Font Configuration</h3>
-<div class="outline-text-3" id="text-org06331d5">
+<h3><a id="font-configuration" class="anchor" href="#font-configuration">¶</a>Font Configuration</h3><div class="outline-text-3" id="text-org8dc2e92">
 <p>
 Doom exposes five (optional) variables for controlling fonts in Doom:
 </p>
@@ -146,342 +82,234 @@ Doom exposes five (optional) variables for controlling fonts in Doom:
 <ul class="org-ul">
 <li><code>doom-font</code>: the primary font to use</li>
 <li><code>doom-variable-pitch-font</code>: a non-monospace font (where applicable)</li>
-<li><code>doom-big-font</code>: used for `doom-big-font-mode'; use this for presentations or streaming.</li>
+<li><code>doom-big-font</code>: used for `doom-big-font-mode&rsquo;; use this for presentations or streaming.</li>
 <li><code>doom-unicode-font</code>: for unicode glyphs</li>
-<li><code>doom-serif-font</code>: for the `fixed-pitch-serif' face</li>
+<li><code>doom-serif-font</code>: for the `fixed-pitch-serif&rsquo; face</li>
 </ul>
 
 <p>
-See <code>C-h v doom-font</code> for documentation and more examples of what they accept. If you or Emacs can't find your font, use <code>M-x describe-font</code> to look them up, <code>M-x eval-region</code> to execute elisp code, and <code>M-x doom/reload-font</code> to refresh your font settings. If Emacs still can't find your font, it likely wasn't installed correctly. Font issues are rarely Doom issues!
+See <code>C-h v doom-font</code> for documentation and more examples of what they accept. If you or Emacs can&rsquo;t find your font, use <code>M-x describe-font</code> to look them up, <code>M-x eval-region</code> to execute elisp code, and <code>M-x doom/reload-font</code> to refresh your font settings. If Emacs still can&rsquo;t find your font, it likely wasn&rsquo;t installed correctly. Font issues are rarely Doom issues!
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set the doom themes</span>
-(<span style="font-weight: bold;">setq</span> doom-font <span style="font-style: italic;">"Fira Code Retina-11"</span>)
-(<span style="font-weight: bold;">setq</span> doom-unicode-font <span style="font-style: italic;">"Fira Code Retina-11"</span>)
-(<span style="font-weight: bold;">setq</span> doom-variable-pitch-font <span style="font-style: italic;">"Fira Sans 12"</span>)
-
-</pre>
-</div>
-</div>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Set the doom themes</span>
+(<span class="org-keyword">setq</span> doom-font <span class="org-string">"Fira Code Retina-11"</span>)
+(<span class="org-keyword">setq</span> doom-unicode-font <span class="org-string">"Fira Code Retina-11"</span>)
+(<span class="org-keyword">setq</span> doom-variable-pitch-font <span class="org-string">"Fira Sans 12"</span>)</pre>
 </div>
 
-<div id="outline-container-org5765e9c" class="outline-3">
-<h3 id="org5765e9c">Apply a Theme</h3>
-<div class="outline-text-3" id="text-org5765e9c">
+<h3><a id="apply-a-theme" class="anchor" href="#apply-a-theme">¶</a>Apply a Theme</h3><div class="outline-text-3" id="text-orge2c4e44">
 <p>
 There are two ways to load a theme. Both assume the theme is installed and available. You can either set <code>doom-theme</code> or manually load a theme with the <code>load-theme</code> function.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set the theme of doom</span>
-(<span style="font-weight: bold;">setq</span> doom-theme 'doom-tomorrow-night)
-
-</pre>
-</div>
-</div>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Set the theme of doom</span>
+(<span class="org-keyword">setq</span> doom-theme 'doom-tomorrow-night)</pre>
 </div>
 
-<div id="outline-container-orge1f3078" class="outline-3">
-<h3 id="orge1f3078">Other Basic UI Setup</h3>
-<div class="outline-text-3" id="text-orge1f3078">
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Add frame transparency</span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">(add-to-list 'default-frame-alist '(alpha . 90))</span>
+<h3><a id="other-basic-ui-setup" class="anchor" href="#other-basic-ui-setup">¶</a>Other Basic UI Setup</h3><div class="outline-text-3" id="text-orga78bf42">
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Add frame transparency</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(add-to-list 'default-frame-alist '(alpha . 90))</span>
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Disable line numbers for some modes</span>
-(<span style="font-weight: bold;">dolist</span> (mode '(org-mode-hook
+<span class="org-comment-delimiter">;; </span><span class="org-comment">Disable line numbers for some modes</span>
+(<span class="org-keyword">dolist</span> (mode '(org-mode-hook
                 term-mode-hook
                 shell-mode-hook
                 treemacs-mode-hook
                 eshell-mode-hook))
-  (add-hook mode (<span style="font-weight: bold;">lambda</span> () (display-line-numbers-mode 0))))
+  (add-hook mode (<span class="org-keyword">lambda</span> () (display-line-numbers-mode 0))))
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">This determines the style of line numbers in effect. If set to `</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">nil</span><span style="font-weight: bold; font-style: italic;">', line</span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">numbers are disabled. For relative line numbers, set this to `</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">relative</span><span style="font-weight: bold; font-style: italic;">'.</span>
-(<span style="font-weight: bold;">setq</span> display-line-numbers-type t)
-(<span style="font-weight: bold;">setq</span> doom-modeline-icon nil)
-
-</pre>
-</div>
-</div>
-</div>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">This determines the style of line numbers in effect. If set to `</span><span class="org-comment"><span class="org-constant">nil</span></span><span class="org-comment">', line</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">numbers are disabled. For relative line numbers, set this to `</span><span class="org-comment"><span class="org-constant">relative</span></span><span class="org-comment">'.</span>
+(<span class="org-keyword">setq</span> display-line-numbers-type t)
+(<span class="org-keyword">setq</span> doom-modeline-icon nil)</pre>
 </div>
 
-<div id="outline-container-orga842aea" class="outline-2">
-<h2 id="orga842aea">Org Mode</h2>
-<div class="outline-text-2" id="text-orga842aea">
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Point to the location of Org Mode files</span>
-(<span style="font-weight: bold;">setq</span> org-directory <span style="font-style: italic;">"~/Documents/Org/"</span>)
+<h2><a id="org-mode" class="anchor" href="#org-mode">¶</a>Org Mode</h2><div class="outline-text-2" id="text-orga46484b">
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Point to the location of Org Mode files</span>
+(<span class="org-keyword">setq</span> org-directory <span class="org-string">"~/Documents/Org/"</span>)
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Configure Org</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">Configure Org</span>
 (after! org
-  (<span style="font-weight: bold;">setq</span>
+  (<span class="org-keyword">setq</span>
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Specify where to load org agenda</span>
-    org-agenda-files '(<span style="font-style: italic;">"~/Documents/Org"</span>)
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Specify where to load org agenda</span>
+    org-agenda-files '(<span class="org-string">"~/Documents/Org"</span>)
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Default file for notes</span>
-    org-default-notes-file (expand-file-name <span style="font-style: italic;">"notes.org"</span> org-directory)
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Default file for notes</span>
+    org-default-notes-file (expand-file-name <span class="org-string">"notes.org"</span> org-directory)
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Change how some symbols appear</span>
-    org-ellipsis <span style="font-style: italic;">" &#9660; "</span>
-    org-superstar-headline-bullets-list '(<span style="font-style: italic;">"&#9673;"</span> <span style="font-style: italic;">"&#9679;"</span> <span style="font-style: italic;">"&#9675;"</span> <span style="font-style: italic;">"&#9670;"</span> <span style="font-style: italic;">"&#9679;"</span> <span style="font-style: italic;">"&#9675;"</span> <span style="font-style: italic;">"&#9670;"</span>)
-    org-superstar-item-bullet-alist '((?+ . ?&#10148;) (?- . ?&#10022;)) <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">changes +/- symbols in item lists</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Change how some symbols appear</span>
+    org-ellipsis <span class="org-string">" &#9660; "</span>
+    org-superstar-headline-bullets-list '(<span class="org-string">"&#9673;"</span> <span class="org-string">"&#9679;"</span> <span class="org-string">"&#9675;"</span> <span class="org-string">"&#9670;"</span> <span class="org-string">"&#9679;"</span> <span class="org-string">"&#9675;"</span> <span class="org-string">"&#9670;"</span>)
+    org-superstar-item-bullet-alist '((?+ . ?&#10148;) (?- . ?&#10022;)) <span class="org-comment-delimiter">; </span><span class="org-comment">changes +/- symbols in item lists</span>
     org-hide-emphasis-markers 1
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Add timestamp to org DONE entries</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Add timestamp to org DONE entries</span>
     org-log-done 'time
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Upper bound to table conversions, useful for babel results</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Upper bound to table conversions, useful for babel results</span>
     org-table-convert-region-max-lines 20000
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set up to do keywords</span>
-    org-todo-keywords        <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">This overwrites the default Doom org-todo-keywords</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Set up to do keywords</span>
+    org-todo-keywords        <span class="org-comment-delimiter">; </span><span class="org-comment">This overwrites the default Doom org-todo-keywords</span>
       '((sequence
-         <span style="font-style: italic;">"TODO(t)"</span>           <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">A task that is ready to be tackled</span>
-         <span style="font-style: italic;">"PROJ(p)"</span>           <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">A project that contains other tasks</span>
-         <span style="font-style: italic;">"WAIT(w)"</span>           <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Something is holding up this task</span>
-         <span style="font-style: italic;">"|"</span>                 <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">The pipe necessary to separate "active" states and "inactive" states</span>
-         <span style="font-style: italic;">"DONE(d)"</span>           <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Task has been completed</span>
-         <span style="font-style: italic;">"CANCELLED(c)"</span> ))   <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Task has been cancelled</span>
+         <span class="org-string">"TODO(t)"</span>           <span class="org-comment-delimiter">; </span><span class="org-comment">A task that is ready to be tackled</span>
+         <span class="org-string">"PROJ(p)"</span>           <span class="org-comment-delimiter">; </span><span class="org-comment">A project that contains other tasks</span>
+         <span class="org-string">"WAIT(w)"</span>           <span class="org-comment-delimiter">; </span><span class="org-comment">Something is holding up this task</span>
+         <span class="org-string">"|"</span>                 <span class="org-comment-delimiter">; </span><span class="org-comment">The pipe necessary to separate "active" states and "inactive" states</span>
+         <span class="org-string">"DONE(d)"</span>           <span class="org-comment-delimiter">; </span><span class="org-comment">Task has been completed</span>
+         <span class="org-string">"CANCELLED(c)"</span> ))   <span class="org-comment-delimiter">; </span><span class="org-comment">Task has been cancelled</span>
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Customize tags</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Customize tags</span>
     org-tag-alist
-      '((<span style="font-weight: bold;">:startgroup</span>)
-       <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">Put mutually exclusive tags here</span>
-       (<span style="font-weight: bold;">:endgroup</span>)
-       (<span style="font-style: italic;">"@errand"</span> . ?E)
-       (<span style="font-style: italic;">"@home"</span> . ?H)
-       (<span style="font-style: italic;">"@work"</span> . ?W)
-       (<span style="font-style: italic;">"agenda"</span> . ?a)
-       (<span style="font-style: italic;">"planning"</span> . ?p)
-       (<span style="font-style: italic;">"publish"</span> . ?P)
-       (<span style="font-style: italic;">"batch"</span> . ?b)
-       (<span style="font-style: italic;">"note"</span> . ?n)
-       (<span style="font-style: italic;">"music"</span> .?m)
-       (<span style="font-style: italic;">"game"</span> .?g)
-       (<span style="font-style: italic;">"chore"</span> .?c)
-       (<span style="font-style: italic;">"idea"</span> . ?i))
+      '((<span class="org-builtin">:startgroup</span>)
+       <span class="org-comment-delimiter">; </span><span class="org-comment">Put mutually exclusive tags here</span>
+       (<span class="org-builtin">:endgroup</span>)
+       (<span class="org-string">"@errand"</span> . ?E)
+       (<span class="org-string">"@home"</span> . ?H)
+       (<span class="org-string">"@work"</span> . ?W)
+       (<span class="org-string">"agenda"</span> . ?a)
+       (<span class="org-string">"planning"</span> . ?p)
+       (<span class="org-string">"publish"</span> . ?P)
+       (<span class="org-string">"batch"</span> . ?b)
+       (<span class="org-string">"note"</span> . ?n)
+       (<span class="org-string">"music"</span> .?m)
+       (<span class="org-string">"game"</span> .?g)
+       (<span class="org-string">"chore"</span> .?c)
+       (<span class="org-string">"idea"</span> . ?i))
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Only one space after a tag</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Only one space after a tag</span>
     org-tags-column 0
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Some basic UI flags</span>
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Some basic UI flags</span>
     org-src-fontify-natively t
     org-src-tab-acts-natively t
     org-confirm-babel-evaluate nil
-    org-edit-src-content-indentation 0))
-
-</pre>
-</div>
+    org-edit-src-content-indentation 0))</pre>
 </div>
 
-<div id="outline-container-org7cb2359" class="outline-3">
-<h3 id="org7cb2359">Center Org Buffers</h3>
-<div class="outline-text-3" id="text-org7cb2359">
+<h3><a id="center-org-buffers" class="anchor" href="#center-org-buffers">¶</a>Center Org Buffers</h3><div class="outline-text-3" id="text-orgec7c1c2">
 <p>
-We use <a href="https://github.com/joostkremers/visual-fill-column">visual-fill-column</a> to center <code>org-mode</code> buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.  This is really a matter of personal preference so you can remove the block below if you don't like the behavior.
+We use <a href="https://github.com/joostkremers/visual-fill-column">visual-fill-column</a> to center <code>org-mode</code> buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.  This is really a matter of personal preference so you can remove the block below if you don&rsquo;t like the behavior.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Specify visual-fill centering settings</span>
-(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my/org-mode-visual-fill</span> ()
-  (<span style="font-weight: bold;">setq</span> visual-fill-column-width 100
-        visual-fill-column-center-text t
-        visual-fill-column-mode 1))
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">;; Specify visual-fill centering settings</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(defun my/org-mode-visual-fill ()</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">(setq visual-fill-column-width 100</span>
+<span class="org-comment-delimiter">;;         </span><span class="org-comment">visual-fill-column-center-text t</span>
+<span class="org-comment-delimiter">;;         </span><span class="org-comment">visual-fill-column-mode 1))</span>
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Use visual-fill-column to center org-mode buffers</span>
-(use-package! visual-fill-column
-  <span style="font-weight: bold;">:after</span> org
-  <span style="font-weight: bold;">:hook</span> (org-mode . my/org-mode-visual-fill))
-
-</pre>
-</div>
-</div>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">;; Use visual-fill-column to center org-mode buffers</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(after! org</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">(use-package! visual-fill-column</span>
+<span class="org-comment-delimiter">;;       </span><span class="org-comment">:hook (org-mode . my/org-mode-visual-fill))</span></pre>
 </div>
 
-<div id="outline-container-orgdc87e86" class="outline-3">
-<h3 id="orgdc87e86">Structure Templates</h3>
-<div class="outline-text-3" id="text-orgdc87e86">
+<h3><a id="structure-templates" class="anchor" href="#structure-templates">¶</a>Structure Templates</h3><div class="outline-text-3" id="text-org99c6075">
 <p>
-Org Mode's <a href="https://orgmode.org/manual/Structure-Templates.html">structure templates</a> feature enables you to quickly insert code blocks into your Org files in combination with <code>org-tempo</code> by typing <code>&lt;</code> followed by the template name like <code>el</code> or <code>py</code> and then press <code>TAB</code>.  For example, to insert an empty <code>elisp</code> block below, you can type <code>&lt;el</code> and press <code>TAB</code> to expand into such a block.
+Org Mode&rsquo;s <a href="https://orgmode.org/manual/Structure-Templates.html">structure templates</a> feature enables you to quickly insert code blocks into your Org files in combination with <code>org-tempo</code> by typing <code>&lt;</code> followed by the template name like <code>el</code> or <code>py</code> and then press <code>TAB</code>.  For example, to insert an empty <code>elisp</code> block below, you can type <code>&lt;el</code> and press <code>TAB</code> to expand into such a block.
 </p>
 
 <p>
 You can add more <code>src</code> block templates below by copying one of the lines and changing the two strings at the end, the first to be the template name and the second to contain the name of the language <a href="https://orgmode.org/worg/org-contrib/babel/languages.html">as it is known by Org Babel</a>.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Apply structure templates to quickly insert code blocks in org files</span>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Apply structure templates to quickly insert code blocks in org files</span>
 (use-package! org-tempo
-  <span style="font-weight: bold;">:after</span> org
-  <span style="font-weight: bold;">:config</span>
-  (add-to-list 'org-structure-template-alist '(<span style="font-style: italic;">"sh"</span> . <span style="font-style: italic;">"src shell"</span>))
-  (add-to-list 'org-structure-template-alist '(<span style="font-style: italic;">"el"</span> . <span style="font-style: italic;">"src elisp"</span>))
-  (add-to-list 'org-structure-template-alist '(<span style="font-style: italic;">"py"</span> . <span style="font-style: italic;">"src python"</span>))
-  (add-to-list 'org-structure-template-alist '(<span style="font-style: italic;">"r"</span> . <span style="font-style: italic;">"src R"</span>))
-  (add-to-list 'org-structure-template-alist '(<span style="font-style: italic;">"lua"</span> . <span style="font-style: italic;">"src lua"</span>)))
-
-</pre>
-</div>
-</div>
-</div>
+  <span class="org-builtin">:after</span> org
+  <span class="org-builtin">:config</span>
+  (add-to-list 'org-structure-template-alist '(<span class="org-string">"sh"</span> . <span class="org-string">"src shell"</span>))
+  (add-to-list 'org-structure-template-alist '(<span class="org-string">"el"</span> . <span class="org-string">"src elisp"</span>))
+  (add-to-list 'org-structure-template-alist '(<span class="org-string">"py"</span> . <span class="org-string">"src python"</span>))
+  (add-to-list 'org-structure-template-alist '(<span class="org-string">"r"</span> . <span class="org-string">"src R"</span>))
+  (add-to-list 'org-structure-template-alist '(<span class="org-string">"lua"</span> . <span class="org-string">"src lua"</span>)))</pre>
 </div>
 
-<div id="outline-container-orga31ba69" class="outline-2">
-<h2 id="orga31ba69">Auto-tangle Configuration Files</h2>
-<div class="outline-text-2" id="text-orga31ba69">
+<h2><a id="auto-tangle-configuration-files" class="anchor" href="#auto-tangle-configuration-files">¶</a>Auto-tangle Configuration Files</h2><div class="outline-text-2" id="text-orgd441f2f">
 <p>
 This snippet adds a hook to <code>org-mode</code> buffers so that <code>my/org-babel-tangle-config</code> gets executed each time such a buffer gets saved.  This function checks to see if the file being saved is in the directory <code>~/.dotfiles/</code>, and if so, tangles the file to the file path specified in the header arguments for the code block to tangle.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Automatically tangle our Emacs.org config file when we save it</span>
-(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my/org-babel-tangle-config</span> ()
-  (<span style="font-weight: bold;">when</span> (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name <span style="font-style: italic;">"~/.dotfiles/"</span>))
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Automatically tangle our Emacs.org config file when we save it</span>
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-babel-tangle-config</span> ()
+  (<span class="org-keyword">when</span> (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name <span class="org-string">"~/.dotfiles/"</span>))
 
-    <span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Dynamic scoping to the rescue</span>
-    (<span style="font-weight: bold;">let</span> ((org-confirm-babel-evaluate nil))
+    <span class="org-comment-delimiter">;; </span><span class="org-comment">Dynamic scoping to the rescue</span>
+    (<span class="org-keyword">let</span> ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Add the function after saving an org-mode file</span>
-(add-hook 'org-mode-hook (<span style="font-weight: bold;">lambda</span> () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
-
-</pre>
-</div>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">Add the function after saving an org-mode file</span>
+(add-hook 'org-mode-hook (<span class="org-keyword">lambda</span> () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))</pre>
 </div>
 
-<div id="outline-container-org56cbd3a" class="outline-3">
-<h3 id="org56cbd3a">Org-Roam</h3>
-<div class="outline-text-3" id="text-org56cbd3a">
+<h3><a id="org-roam" class="anchor" href="#org-roam">¶</a>Org-Roam</h3><div class="outline-text-3" id="text-org823cdfc">
 <p>
 <a href="https://www.orgroam.com/">Org-Roam</a> is a plain text personal knowledge management system. To use it, you must specify so in the <code>~/.doom.d/init.el</code> file.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Set location of Org-Roam files</span>
-(<span style="font-weight: bold;">setq</span> org-roam-directory <span style="font-style: italic;">"~/Documents/org/OrgRoam"</span>)
-
-</pre>
-</div>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Set location of Org-Roam files</span>
+(<span class="org-keyword">setq</span> org-roam-directory <span class="org-string">"~/Documents/org/OrgRoam"</span>)</pre>
 </div>
 
-<div id="outline-container-org956962d" class="outline-4">
-<h4 id="org956962d">Org-Roam-UI</h4>
-<div class="outline-text-4" id="text-org956962d">
+<h4><a id="org-roam-ui" class="anchor" href="#org-roam-ui">¶</a>Org-Roam-UI</h4><div class="outline-text-4" id="text-orga2d390a">
 <p>
-<a href="https://github.com/org-roam/org-roam-ui">Org-Roam-UI</a> is a graphical front-end showing linkages for the Org-Roam files you've made.
+<a href="https://github.com/org-roam/org-roam-ui">Org-Roam-UI</a> is a graphical front-end showing linkages for the Org-Roam files you&rsquo;ve made.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">;; Load websocket, a dependency for Org-Roam-UI</span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">(use-package! websocket</span>
-<span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">:after org-roam)</span>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">;; Load websocket, a dependency for Org-Roam-UI</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(use-package! websocket</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">:after org-roam)</span>
 
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">;; Load and configure Org-Roam-UI</span>
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">(use-package! org-roam-ui</span>
-<span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">:after org-roam</span>
-<span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">:config</span>
-<span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">(setq org-roam-ui-sync-theme t</span>
-<span style="font-weight: bold; font-style: italic;">;;         </span><span style="font-weight: bold; font-style: italic;">org-roam-ui-follow t</span>
-<span style="font-weight: bold; font-style: italic;">;;         </span><span style="font-weight: bold; font-style: italic;">org-roam-ui-update-on-save t</span>
-<span style="font-weight: bold; font-style: italic;">;;         </span><span style="font-weight: bold; font-style: italic;">org-roam-ui-open-on-start t))</span>
-
-</pre>
-</div>
-</div>
-</div>
-</div>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">;; Load and configure Org-Roam-UI</span>
+<span class="org-comment-delimiter">;; </span><span class="org-comment">(use-package! org-roam-ui</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">:after org-roam</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">:config</span>
+<span class="org-comment-delimiter">;;   </span><span class="org-comment">(setq org-roam-ui-sync-theme t</span>
+<span class="org-comment-delimiter">;;         </span><span class="org-comment">org-roam-ui-follow t</span>
+<span class="org-comment-delimiter">;;         </span><span class="org-comment">org-roam-ui-update-on-save t</span>
+<span class="org-comment-delimiter">;;         </span><span class="org-comment">org-roam-ui-open-on-start t))</span></pre>
 </div>
 
-<div id="outline-container-org1fe176d" class="outline-2">
-<h2 id="org1fe176d">Anaconda</h2>
-<div class="outline-text-2" id="text-org1fe176d">
+<h2><a id="anaconda" class="anchor" href="#anaconda">¶</a>Anaconda</h2><div class="outline-text-2" id="text-org67d8349">
 <p>
 I use <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> for my Python environment and package management. To integrate it with Emacs, we can use the <a href="https://github.com/necaris/conda.el">conda</a> package.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Configure conda</span>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Configure conda</span>
 (after! conda
-  (<span style="font-weight: bold;">setq</span> conda-anaconda-home (expand-file-name <span style="font-style: italic;">"~/miniconda"</span>))
-  (<span style="font-weight: bold;">setq</span> conda-env-home-directory (expand-file-name <span style="font-style: italic;">"~/miniconda/"</span>)))
-
-</pre>
-</div>
-</div>
+  (<span class="org-keyword">setq</span> conda-anaconda-home (expand-file-name <span class="org-string">"~/miniconda"</span>))
+  (<span class="org-keyword">setq</span> conda-env-home-directory (expand-file-name <span class="org-string">"~/miniconda/"</span>)))</pre>
 </div>
 
-<div id="outline-container-org570a5b9" class="outline-2">
-<h2 id="org570a5b9">Projectile</h2>
-<div class="outline-text-2" id="text-org570a5b9">
+<h2><a id="projectile" class="anchor" href="#projectile">¶</a>Projectile</h2><div class="outline-text-2" id="text-org217bd81">
 <p>
 <a href="https://github.com/bbatsov/projectile">Projectile</a> is a project interaction library for Emacs.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Specify where to search for projects</span>
-(<span style="font-weight: bold;">setq</span> projectile-project-search-path '(<span style="font-style: italic;">"~/Documents/Projects/"</span> <span style="font-style: italic;">"~/Documents"</span>))
-
-</pre>
-</div>
-</div>
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Specify where to search for projects</span>
+(<span class="org-keyword">setq</span> projectile-project-search-path '(<span class="org-string">"~/Documents/Projects/"</span> <span class="org-string">"~/Documents"</span>))</pre>
 </div>
 
-<div id="outline-container-org2728868" class="outline-2">
-<h2 id="org2728868">Key Bindings</h2>
-<div class="outline-text-2" id="text-org2728868">
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">Tangle files with org-babel-tangle</span>
-(map! <span style="font-weight: bold;">:leader</span>
-      <span style="font-weight: bold;">:desc</span> <span style="font-style: italic;">"Org babel tangle"</span> <span style="font-style: italic;">"m B"</span> #'org-babel-tangle)
-
-</pre>
-</div>
-</div>
+<h2><a id="key-bindings" class="anchor" href="#key-bindings">¶</a>Key Bindings</h2><div class="outline-text-2" id="text-org051ed43">
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Tangle files with org-babel-tangle</span>
+(map! <span class="org-builtin">:leader</span>
+      <span class="org-builtin">:desc</span> <span class="org-string">"Org babel tangle"</span> <span class="org-string">"m B"</span> #'org-babel-tangle)</pre>
 </div>
 
-<div id="outline-container-org8fa7deb" class="outline-2">
-<h2 id="org8fa7deb">Window's Subsystem for Linux (WSL)</h2>
-<div class="outline-text-2" id="text-org8fa7deb">
+<h2><a id="windowrsquos-subsystem-for-linux-wsl" class="anchor" href="#windowrsquos-subsystem-for-linux-wsl">¶</a>Window&rsquo;s Subsystem for Linux (WSL)</h2><div class="outline-text-2" id="text-orgb6e02d9">
 <p>
-Using Emacs on WSL can be annoying. For example, opening a link while running Emacs on Linux <i>should</i> be as easy as <code>C-c C-o</code>, but of course that isn't the case. This changes that, all thanks to <a href="https://hungyi.net/posts/browse-emacs-urls-wsl/">this helpful post</a> by Hung-Yi.
+Using Emacs on WSL can be annoying. For example, opening a link while running Emacs on Linux <i>should</i> be as easy as <code>C-c C-o</code>, but of course that isn&rsquo;t the case. This changes that, all thanks to <a href="https://hungyi.net/posts/browse-emacs-urls-wsl/">this helpful post</a> by Hung-Yi.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-elisp">
-<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">When we're using WSL, change how we open links</span>
-(<span style="font-weight: bold;">when</span> (<span style="font-weight: bold;">and</span> (eq system-type 'gnu/linux)
+<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">When we're using WSL, change how we open links</span>
+(<span class="org-keyword">when</span> (<span class="org-keyword">and</span> (eq system-type 'gnu/linux)
            (string-match
-            <span style="font-style: italic;">"Linux.*Microsoft.*Linux"</span>
-            (shell-command-to-string <span style="font-style: italic;">"uname -a"</span>)))
-  (<span style="font-weight: bold;">setq</span>
-   browse-url-generic-program  <span style="font-style: italic;">"/mnt/c/Windows/System32/cmd.exe"</span>
-   browse-url-generic-args     '(<span style="font-style: italic;">"/c"</span> <span style="font-style: italic;">"start"</span>)
-   browse-url-browser-function #'browse-url-generic))
-
-</pre>
+            <span class="org-string">"Linux.*Microsoft.*Linux"</span>
+            (shell-command-to-string <span class="org-string">"uname -a"</span>)))
+  (<span class="org-keyword">setq</span>
+   browse-url-generic-program  <span class="org-string">"/mnt/c/Windows/System32/cmd.exe"</span>
+   browse-url-generic-args     '(<span class="org-string">"/c"</span> <span class="org-string">"start"</span>)
+   browse-url-browser-function #'browse-url-generic))</pre>
 </div>
-</div>
-</div>
-</div>
-<div id="postamble" class="status">
-<p class="creator"><a href="https://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="https://orgmode.org">Org</a> mode 9.3)</p>
-</div>
-</body>
-</html>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

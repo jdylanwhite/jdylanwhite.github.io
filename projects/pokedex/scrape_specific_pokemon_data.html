@@ -1,0 +1,242 @@
+<!-- Generated from 3956d14 on 2023-10-04 @ 12:03 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape Specific Pokemon Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape Specific Pokemon Data</h1><p class="site-post-meta">October  1, 2023</p><div id="content"><p>
+On each Pokemon&rsquo;s page (for example, <a href="https://pokemondb.net/pokedex/gengar">Gengar&rsquo;s page</a>), there&rsquo;s a consistent and structured data that we can programmatically scrape. Each page has a table showing the Pokemon&rsquo;s &ldquo;national number&rdquo;, type(s), height, and weight, another table showing base stats for battle such as health points (HP), attack, and defense, and several other tables and information.
+</p>
+
+<p>
+To scrape the data using R, I&rsquo;ll rely on the <code>rvest</code> package to extract data from different parts of the site. Looking at the site&rsquo;s source HTML is a helpful part of this process in knowing what to extract.
+</p>
+
+<h2><a id="load-packages" class="anchor" href="#load-packages">¶</a>Load Packages</h2><div class="outline-text-2" id="text-org41e8f9a">
+<p>
+Let&rsquo;s start by loading all of the packages we&rsquo;ll need.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load packages</span>
+<span class="org-ess-modifiers">library</span>(rvest)
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)
+<span class="org-ess-modifiers">library</span>(tibble)</pre>
+</div>
+
+<h2><a id="specify-parameters" class="anchor" href="#specify-parameters">¶</a>Specify Parameters</h2><div class="outline-text-2" id="text-org2466e60">
+<p>
+Next, we&rsquo;ll specify the Pokemon we want to look up and the URL from which to scrape. Let&rsquo;s stick with Gengar for now.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the name of the Pokemon</span>
+name <span class="org-ess-assignment">&lt;-</span> <span class="org-string">"Gengar"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Convert name to lower case for the URL</span>
+name <span class="org-ess-assignment">&lt;-</span> tolower(name)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Build the URL to fetch Pokemon data</span>
+url <span class="org-ess-assignment">&lt;-</span> paste0(<span class="org-string">"https://pokemondb.net/pokedex/"</span>, name)</pre>
+</div>
+
+<h2><a id="get-tables-from-page" class="anchor" href="#get-tables-from-page">¶</a>Get Tables From Page</h2><div class="outline-text-2" id="text-org1abee6a">
+<p>
+Now that we&rsquo;ve got the URL to scrape, we need to fetch the tables storing the Pokemon&rsquo;s data we want to scrape.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Read the body from the page</span>
+body <span class="org-ess-assignment">&lt;-</span> url <span class="org-ess-XopX">%&gt;%</span> read_html() <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"body"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the tables with the vital information</span>
+vitals_tables <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"table.vitals-table"</span>)
+main_table <span class="org-ess-assignment">&lt;-</span> html_table(vitals_tables[1])[[1]]
+stats_table <span class="org-ess-assignment">&lt;-</span> html_table(vitals_tables[4])[[1]]
+
+glimpse(main_table)</pre>
+
+<pre class="example">
+Rows: 7
+Columns: 2
+$ X1 &lt;chr&gt; "National №", "Type", "Species", "Height", "Weight", "Abilities", "…
+$ X2 &lt;chr&gt; "0094", "Ghost Poison", "Shadow Pokémon", "1.5 m (4′11″)", "40.5 kg…
+</pre>
+
+
+<p>
+This gives a pretty messy table, but it&rsquo;s definitely something we can use.
+</p>
+</div>
+
+<h2><a id="getting-stats-from-the-table" class="anchor" href="#getting-stats-from-the-table">¶</a>Getting Stats From the Table</h2><div class="outline-text-2" id="text-org4b34f9a">
+<p>
+Ultimately, we&rsquo;re going to want to pull all of this data into one structured table, so let&rsquo;s accumulate all of this data into one row. We&rsquo;ll need to tweak the table to make it easier to extract data from, then we&rsquo;ll put together the Pokemon information and base battle stats.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Function to help us turn the first row of our tibble into the header</span>
+<span class="org-function-name">header_from_row</span> <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-keyword">function</span>(df) {
+  names(df) <span class="org-ess-assignment">&lt;-</span> as.character(unlist(df[1, ]))
+  df[-1, ]
+}
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the types, species, height, and weight from the table</span>
+main_tbl <span class="org-ess-assignment">&lt;-</span> main_table <span class="org-ess-XopX">%&gt;%</span>
+  t <span class="org-ess-XopX">%&gt;%</span>
+  as_tibble <span class="org-ess-XopX">%&gt;%</span>
+  header_from_row <span class="org-ess-XopX">%&gt;%</span>
+  select(c(<span class="org-string">"Type"</span>, <span class="org-string">"Species"</span>, <span class="org-string">"Height"</span>, <span class="org-string">"Weight"</span>))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get stats columns</span>
+stats_tbl <span class="org-ess-assignment">&lt;-</span> stats_table <span class="org-ess-XopX">%&gt;%</span>
+  select(c(<span class="org-string">"X1"</span>, <span class="org-string">"X2"</span>)) <span class="org-ess-XopX">%&gt;%</span>
+  t <span class="org-ess-XopX">%&gt;%</span>
+  as_tibble <span class="org-ess-XopX">%&gt;%</span>
+  header_from_row
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Merge the data</span>
+data_tbl <span class="org-ess-assignment">&lt;-</span> cbind(main_tbl, stats_tbl)
+
+glimpse(data_tbl)</pre>
+
+<pre class="example">
+Rows: 1
+Columns: 11
+$ Type      &lt;chr&gt; "Ghost Poison"
+$ Species   &lt;chr&gt; "Shadow Pokémon"
+$ Height    &lt;chr&gt; "1.5 m (4′11″)"
+$ Weight    &lt;chr&gt; "40.5 kg (89.3 lbs)"
+$ HP        &lt;chr&gt; " 60"
+$ Attack    &lt;chr&gt; " 65"
+$ Defense   &lt;chr&gt; " 60"
+$ `Sp. Atk` &lt;chr&gt; "130"
+$ `Sp. Def` &lt;chr&gt; " 75"
+$ Speed     &lt;chr&gt; "110"
+$ Total     &lt;chr&gt; "500"
+</pre>
+
+<p>
+This gives us a little more of a cleaned up table now, but there&rsquo;s still some work to do.
+</p>
+</div>
+
+<h2><a id="clean-up-scraped-data" class="anchor" href="#clean-up-scraped-data">¶</a>Clean Up Scraped Data</h2><div class="outline-text-2" id="text-org0194b93">
+<p>
+One thing I&rsquo;d like to fix at this stage is that there are two different &ldquo;Types&rdquo;, Poison and Ghost, that are getting placed into one column. We want to break this up into multiple columns instead such that &ldquo;Type 1&rdquo; is Ghost and &ldquo;Type 2&rdquo; is Poison. We can do this mostly with <code>strsplit</code> and <code>separate</code> and a little bit of manipulation to make sure we always get up to three different types. No Pokemon so far has more than three types, so this is good for now.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Clean up the types by breaking them into different columns</span>
+num_types <span class="org-ess-assignment">&lt;-</span> data_tbl$Type <span class="org-ess-XopX">%&gt;%</span> strsplit(<span class="org-string">" "</span>) <span class="org-ess-XopX">%&gt;%</span> unlist <span class="org-ess-XopX">%&gt;%</span> length
+col_names <span class="org-ess-assignment">&lt;-</span> paste(<span class="org-string">"Type"</span>, c(1:num_types))
+data_tbl <span class="org-ess-assignment">&lt;-</span> data_tbl <span class="org-ess-XopX">%&gt;%</span>
+  separate(col = <span class="org-string">"Type"</span>, into = col_names)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Ensure columns are fixed. Types sometimes only has 1, but can be up to 3.</span>
+cols <span class="org-ess-assignment">&lt;-</span> c(
+  `Type 1` = <span class="org-ess-constant">NA_character_</span>,
+  `Type 2` = <span class="org-ess-constant">NA_character_</span>,
+  `Type 3` = <span class="org-ess-constant">NA_character_</span>
+)
+data_tbl <span class="org-ess-assignment">&lt;-</span> add_column(data_tbl,
+                       !!!cols[setdiff(names(cols), names(data_tbl))])
+
+glimpse(data_tbl)</pre>
+
+<p>
+And now we have our cleaned up Types in different columns. There&rsquo;s more we could do to clean the data, like only have metric units in the Height and Weight columns, but I&rsquo;ll hold that off until we build the full data frame.
+</p>
+
+<pre class="example">
+Rows: 1
+Columns: 13
+$ `Type 1`  &lt;chr&gt; "Ghost"
+$ `Type 2`  &lt;chr&gt; "Poison"
+$ Species   &lt;chr&gt; "Shadow Pokémon"
+$ Height    &lt;chr&gt; "1.5 m (4′11″)"
+$ Weight    &lt;chr&gt; "40.5 kg (89.3 lbs)"
+$ HP        &lt;chr&gt; " 60"
+$ Attack    &lt;chr&gt; " 65"
+$ Defense   &lt;chr&gt; " 60"
+$ `Sp. Atk` &lt;chr&gt; "130"
+$ `Sp. Def` &lt;chr&gt; " 75"
+$ Speed     &lt;chr&gt; "110"
+$ Total     &lt;chr&gt; "500"
+$ `Type 3`  &lt;chr&gt; NA
+</pre>
+</div>
+
+<h2><a id="add-evolution-data" class="anchor" href="#add-evolution-data">¶</a>Add Evolution Data</h2><div class="outline-text-2" id="text-org977dca8">
+<p>
+Finally, let&rsquo;s add some evolution data to our data row. In particular, let&rsquo;s add the following:
+</p>
+
+<ul class="org-ul">
+<li><code>Has Evolution</code>: a boolean flag for if the Pokemon is part of an evolution chain or is a standalone Pokemon. Gengar is part of an evolution chain.</li>
+<li><code>Evolution Place</code>: an integer stating where in the evolution chain the Pokemon sits. Gengar is the third evolution in its evolution chain.</li>
+<li><code>Maximum Evolution Count</code>: an integer specifying the final step of the Pokemon&rsquo;s evolution chain. Gengar&rsquo;s evolution chain has three different Pokemon.</li>
+<li><code>Evolution Index</code>: a floating point value ranging from 0 to 1 specifying where in the evolution chain the Pokemon sits, <code>Evolution Place/Maximum Evolution Count</code>. Gengar&rsquo;s evolution index is 1.</li>
+</ul>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Look for evolution information</span>
+evo_node <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"div.infocard-list-evo"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Check to see if there was any evolution information</span>
+has_evo <span class="org-ess-assignment">&lt;-</span> length(evo_node) &gt;= 1
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">If there was evolution information, fill out the data</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Otherwise, assume there is not evolution of this Pokemon</span>
+<span class="org-ess-keyword">if</span> (has_evo) {
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get the list of evolutions</span>
+  evo_list <span class="org-ess-assignment">&lt;-</span> evo_node <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"a.ent-name"</span>) <span class="org-ess-XopX">%&gt;%</span> html_text
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get the maximum number of evolutions for this Pokemon's evolution chain</span>
+  max_evo <span class="org-ess-assignment">&lt;-</span> length(unique(evo_list))
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Find out where in the evolution chain this Pokemon sits</span>
+  evo_place <span class="org-ess-assignment">&lt;-</span> which(tolower(evo_list) == name)[1]
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Calculate an evolution index, how far to max evolution the Pokemon is</span>
+  evo_index <span class="org-ess-assignment">&lt;-</span> round(as.double(evo_place) / as.double(max_evo), 2)
+
+} <span class="org-ess-keyword">else</span> {
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Set the evolution information to NA</span>
+  max_evo <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+  evo_place <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+  evo_index <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+
+}
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Append evolution information to the data tibble</span>
+evo_list <span class="org-ess-assignment">&lt;-</span> c(
+  `Has Evolution` = has_evo,
+  `Evolution Place` = evo_place,
+  `Maximum Evolution Count` = max_evo,
+  `Evolution Index` = evo_index
+)
+evo_tbl <span class="org-ess-assignment">&lt;-</span> evo_list <span class="org-ess-XopX">%&gt;%</span> t <span class="org-ess-XopX">%&gt;%</span> as_tibble
+data_tbl <span class="org-ess-assignment">&lt;-</span> cbind(data_tbl, evo_tbl)
+
+glimpse(data_tbl)</pre>
+
+<pre class="example">
+Rows: 1
+Columns: 17
+$ `Type 1`                  &lt;chr&gt; "Ghost"
+$ `Type 2`                  &lt;chr&gt; "Poison"
+$ Species                   &lt;chr&gt; "Shadow Pokémon"
+$ Height                    &lt;chr&gt; "1.5 m (4′11″)"
+$ Weight                    &lt;chr&gt; "40.5 kg (89.3 lbs)"
+$ HP                        &lt;chr&gt; " 60"
+$ Attack                    &lt;chr&gt; " 65"
+$ Defense                   &lt;chr&gt; " 60"
+$ `Sp. Atk`                 &lt;chr&gt; "130"
+$ `Sp. Def`                 &lt;chr&gt; " 75"
+$ Speed                     &lt;chr&gt; "110"
+$ Total                     &lt;chr&gt; "500"
+$ `Type 3`                  &lt;chr&gt; NA
+$ `Has Evolution`           &lt;dbl&gt; 1
+$ `Evolution Place`         &lt;dbl&gt; 3
+$ `Maximum Evolution Count` &lt;dbl&gt; 3
+$ `Evolution Index`         &lt;dbl&gt; 1
+</pre>
+
+<p>
+And that&rsquo;s it! Now we can build on this to create one Pokedex dataframe for all of the different Pokemon on the site.
+</p>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

@@ -1,0 +1,80 @@
+<!-- Generated from 3956d14 on 2023-10-04 @ 12:03 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape Initial Pokedex - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape Initial Pokedex</h1><p class="site-post-meta">October  2, 2023</p><div id="content"><p>
+Before we scrape all of the Pokemon data, let&rsquo;s start by building the table of just Pokemon and their number, again using the <a href="https://pokemondb.net/">PokemonDB</a> site.
+</p>
+
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgd966cea">
+<p>
+Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with <code>dplyr</code> and <code>tidyr</code> for some additional common functions.
+</p>
+
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load packages</span>
+<span class="org-ess-modifiers">library</span>(rvest)
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)</pre>
+</div>
+
+<h2><a id="load-national-pokedex-page" class="anchor" href="#load-national-pokedex-page">¶</a>Load National Pokedex Page</h2><div class="outline-text-2" id="text-orgf745ae4">
+<p>
+Let&rsquo;s load the page data from the <a href="https://pokemondb.net/pokedex/national">National Pokedex</a> page, which has a table of all Pokemon, their number, and a link to their page.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the URL to fetch data from</span>
+url <span class="org-ess-assignment">&lt;-</span> <span class="org-string">"https://pokemondb.net/pokedex/national"</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Read the body from the page</span>
+body <span class="org-ess-assignment">&lt;-</span> url <span class="org-ess-XopX">%&gt;%</span> read_html() <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"body"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the info cards for each Pokemon</span>
+infocards <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"span.infocard-lg-data.text-muted"</span>)</pre>
+</div>
+
+<h2><a id="get-the-initial-pokedex-data" class="anchor" href="#get-the-initial-pokedex-data">¶</a>Get the Initial Pokedex Data</h2><div class="outline-text-2" id="text-orgbde3f85">
+<p>
+Using the tags for each &ldquo;infocard&rdquo; which contains the information we want for each Pokemon, get the numbers, names, and URLs for each Pokemon.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon numbers</span>
+numbers <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+  html_element(<span class="org-string">"small"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  html_text()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon names</span>
+names <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+  html_element(<span class="org-string">"a"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  html_text()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon URLs</span>
+urls <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+  html_element(<span class="org-string">"a"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  html_attr(<span class="org-string">"href"</span>)
+urls <span class="org-ess-assignment">&lt;-</span> paste0(<span class="org-string">"https://pokemondb.net"</span>, urls)</pre>
+</div>
+
+<h2><a id="assemble-initial-pokedex-dataframe" class="anchor" href="#assemble-initial-pokedex-dataframe">¶</a>Assemble Initial Pokedex Dataframe</h2><div class="outline-text-2" id="text-orgeb5544f">
+<p>
+Finally, let&rsquo;s put all of this data into a dataframe.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Create tibble for Pokedex</span>
+data_tbl <span class="org-ess-assignment">&lt;-</span> tibble(numbers, names, urls) <span class="org-ess-XopX">%&gt;%</span>&#22;
+  rename(Number = numbers, Name = names, URLs = urls)
+data_tbl$Number <span class="org-ess-assignment">&lt;-</span> substring(data_tbl$Number, 2) <span class="org-ess-XopX">%&gt;%</span> as.numeric()
+
+glimpse(data_tbl)</pre>
+
+<pre class="example">
+Rows: 1,010
+Columns: 3
+$ Number &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, …
+$ Name   &lt;chr&gt; "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon",…
+$ URLs   &lt;chr&gt; "https://pokemondb.net/pokedex/bulbasaur", "https://pokemondb.n…
+</pre>
+
+
+<p>
+This initial table will serve as the initial table for scraping <i>all</i> of the Pokemon data.
+</p>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
