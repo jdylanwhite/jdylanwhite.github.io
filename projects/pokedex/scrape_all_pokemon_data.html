@@ -1,9 +1,9 @@
-<!-- Generated from a189b65 on 2023-10-23 @ 18:54 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 43d913f on 2023-10-23 @ 19:24 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape All Pokemon Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape All Pokemon Data</h1><p class="site-post-meta">October  3, 2023</p><div id="content"><p>
 Now that we know how to build the initial Pokedex table and then fill out stats for each Pokemon in the initial table, we can build out the full Pokedex!
 </p>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org0374a1e">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgd9092c8">
 <p>
 Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with some other libraries for common functions to help get the Pokedex table.
 </p>
@@ -16,7 +16,7 @@ Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with some
 <span class="org-ess-modifiers">library</span>(stringr)</pre>
 </div>
 
-<h2><a id="read-initial-pokedex" class="anchor" href="#read-initial-pokedex">¶</a>Read Initial Pokedex</h2><div class="outline-text-2" id="text-orge3a4fc6">
+<h2><a id="read-initial-pokedex" class="anchor" href="#read-initial-pokedex">¶</a>Read Initial Pokedex</h2><div class="outline-text-2" id="text-org8e728d5">
 <p>
 Just like before, let&rsquo;s read a table consisting of only Pokemon names, numbers, and the URLs to access each Pokemon&rsquo;s page.
 </p>
@@ -59,7 +59,7 @@ Just like before, let&rsquo;s read a table consisting of only Pokemon names, num
 
 pokedex_tbl <span class="org-ess-assignment">&lt;-</span> fetch_pokedex_data()</pre>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -107,7 +107,7 @@ pokedex_tbl <span class="org-ess-assignment">&lt;-</span> fetch_pokedex_data()</
 <td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 
 <h2><a id="fetch-pokemon-data" class="anchor" href="#fetch-pokemon-data">¶</a>Fetch Pokemon Data</h2><div class="outline-text-2" id="text-fetch-pokemon-data">
@@ -225,7 +225,7 @@ pokemon_tbl <span class="org-ess-assignment">&lt;-</span> apply(pokedex_tbl, 1, 
 <span class="org-comment-delimiter"># </span><span class="org-comment">Merge pokedex_tbl and pokemon_tbl</span>
 pokemon_tbl <span class="org-ess-assignment">&lt;-</span> cbind(pokedex_tbl, pokemon_tbl)</pre>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -409,10 +409,10 @@ pokemon_tbl <span class="org-ess-assignment">&lt;-</span> cbind(pokedex_tbl, pok
 <td class="org-right">0.67</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 
-<h2><a id="clean-data" class="anchor" href="#clean-data">¶</a>Clean Data</h2><div class="outline-text-2" id="text-org6db2dd0">
+<h2><a id="clean-data" class="anchor" href="#clean-data">¶</a>Clean Data</h2><div class="outline-text-2" id="text-org3ff070c">
 <p>
 Clean up the Height and Weight fields to just have the metric units.
 </p>
@@ -435,7 +435,7 @@ Clean up the Height and Weight fields to just have the metric units.
 
 pokemon_tbl <span class="org-ess-assignment">&lt;-</span> clean_pokemon_data(pokemon_tbl)</pre>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
 <colgroup>
@@ -619,10 +619,10 @@ pokemon_tbl <span class="org-ess-assignment">&lt;-</span> clean_pokemon_data(pok
 <td class="org-right">0.67</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 </div>
 
-<h2><a id="write-pokedex-data-to-output-file" class="anchor" href="#write-pokedex-data-to-output-file">¶</a>Write Pokedex Data to Output File</h2><div class="outline-text-2" id="text-org85dedad">
+<h2><a id="write-pokedex-data-to-output-file" class="anchor" href="#write-pokedex-data-to-output-file">¶</a>Write Pokedex Data to Output File</h2><div class="outline-text-2" id="text-org66ca7e4">
 <p>
 Finally, write this data out to a CSV.
 </p>
