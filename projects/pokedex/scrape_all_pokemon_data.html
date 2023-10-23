@@ -1,0 +1,634 @@
+<!-- Generated from 0ee47b0 on 2023-10-23 @ 16:22 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape All Pokemon Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape All Pokemon Data</h1><p class="site-post-meta">October  3, 2023</p><div id="content"><p>
+Now that we know how to build the initial Pokedex table and then fill out stats for each Pokemon in the initial table, we can build out the full Pokedex!
+</p>
+
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgbc9c1dd">
+<p>
+Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with some other libraries for common functions to help get the Pokedex table.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load packages</span>
+<span class="org-ess-modifiers">library</span>(rvest)
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)
+<span class="org-ess-modifiers">library</span>(tibble)
+<span class="org-ess-modifiers">library</span>(stringr)</pre>
+</div>
+
+<h2><a id="read-initial-pokedex" class="anchor" href="#read-initial-pokedex">¶</a>Read Initial Pokedex</h2><div class="outline-text-2" id="text-orge6240a7">
+<p>
+Just like before, let&rsquo;s read a table consisting of only Pokemon names, numbers, and the URLs to access each Pokemon&rsquo;s page.
+</p>
+
+<pre><span class="org-function-name">fetch_pokedex_data</span> <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-keyword">function</span>() {
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Set the URL to fetch data from</span>
+  url <span class="org-ess-assignment">&lt;-</span> <span class="org-string">"https://pokemondb.net/pokedex/national"</span>
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Read the body from the page</span>
+  body <span class="org-ess-assignment">&lt;-</span> url <span class="org-ess-XopX">%&gt;%</span> read_html() <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"body"</span>)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get the info cards for each Pokemon</span>
+  infocards <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"span.infocard-lg-data.text-muted"</span>)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon numbers</span>
+  numbers <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+    html_element(<span class="org-string">"small"</span>) <span class="org-ess-XopX">%&gt;%</span>
+    html_text()
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon names</span>
+  names <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+    html_element(<span class="org-string">"a"</span>) <span class="org-ess-XopX">%&gt;%</span>
+    html_text()
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the Pokemon URLs</span>
+  urls <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-ess-XopX">%&gt;%</span>
+    html_element(<span class="org-string">"a"</span>) <span class="org-ess-XopX">%&gt;%</span>
+    html_attr(<span class="org-string">"href"</span>)
+  urls <span class="org-ess-assignment">&lt;-</span> paste0(<span class="org-string">"https://pokemondb.net"</span>, urls)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Create tibble for Pokedex</span>
+  data_tbl <span class="org-ess-assignment">&lt;-</span> tibble(numbers, names, urls) <span class="org-ess-XopX">%&gt;%</span>
+    rename(Number = numbers, Name = names, URLs = urls)
+  data_tbl$Number <span class="org-ess-assignment">&lt;-</span> substring(data_tbl$Number, 2) <span class="org-ess-XopX">%&gt;%</span> as.numeric()
+
+  <span class="org-ess-keyword">return</span>(data_tbl)
+
+}
+
+pokedex_tbl <span class="org-ess-assignment">&lt;-</span> fetch_pokedex_data()</pre>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Number</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">URLs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Bulbasaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/bulbasaur">https://pokemondb.net/pokedex/bulbasaur</a></td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Ivysaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/ivysaur">https://pokemondb.net/pokedex/ivysaur</a></td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Venusaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/venusaur">https://pokemondb.net/pokedex/venusaur</a></td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Charmander</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmander">https://pokemondb.net/pokedex/charmander</a></td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Charmeleon</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2><a id="fetch-pokemon-data" class="anchor" href="#fetch-pokemon-data">¶</a>Fetch Pokemon Data</h2><div class="outline-text-2" id="text-fetch-pokemon-data">
+<p>
+Loop through each Pokedex row and append additional information, such as height, battle stats, and evolution data. This will take some time, since we&rsquo;re scraping <i>all</i> Pokemon data, and waiting one second between function calls to be avoid the naughty list.
+</p>
+
+<pre><span class="org-function-name">fetch_pokemon_data</span> <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-keyword">function</span>(row) {
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Fetch the name and URL from the Pokedex data</span>
+  name <span class="org-ess-assignment">&lt;-</span> row[2]
+  url <span class="org-ess-assignment">&lt;-</span> row[3]
+  print(paste0(name,<span class="org-string">" "</span>,row[1]))
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Read the body from the page</span>
+  body <span class="org-ess-assignment">&lt;-</span> url <span class="org-ess-XopX">%&gt;%</span> read_html() <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"body"</span>)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get the tables with the vital information</span>
+  vitals_tables <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"table.vitals-table"</span>)
+  main_table <span class="org-ess-assignment">&lt;-</span> html_table(vitals_tables[1])[[1]]
+  stats_table <span class="org-ess-assignment">&lt;-</span> html_table(vitals_tables[4])[[1]]
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Function to help us turn the first row of our tibble into the header</span>
+  <span class="org-function-name">header_from_row</span> <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-keyword">function</span>(df) {
+    names(df) <span class="org-ess-assignment">&lt;-</span> as.character(unlist(df[1, ]))
+    df[-1, ]
+  }
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get the types, species, height, and weight from the table</span>
+  main_tbl <span class="org-ess-assignment">&lt;-</span> main_table <span class="org-ess-XopX">%&gt;%</span>
+    t <span class="org-ess-XopX">%&gt;%</span>
+    as_tibble <span class="org-ess-XopX">%&gt;%</span>
+    header_from_row <span class="org-ess-XopX">%&gt;%</span>
+    select(c(<span class="org-string">"Type"</span>, <span class="org-string">"Species"</span>, <span class="org-string">"Height"</span>, <span class="org-string">"Weight"</span>))
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Get stats columns</span>
+  stats_tbl <span class="org-ess-assignment">&lt;-</span> stats_table <span class="org-ess-XopX">%&gt;%</span>
+    select(c(<span class="org-string">"X1"</span>, <span class="org-string">"X2"</span>)) <span class="org-ess-XopX">%&gt;%</span>
+    t <span class="org-ess-XopX">%&gt;%</span>
+    as_tibble <span class="org-ess-XopX">%&gt;%</span>
+    header_from_row
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Merge the data</span>
+  data_tbl <span class="org-ess-assignment">&lt;-</span> cbind(main_tbl, stats_tbl)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Clean up the types by breaking them into different columns</span>
+  num_types <span class="org-ess-assignment">&lt;-</span> data_tbl$Type <span class="org-ess-XopX">%&gt;%</span> strsplit(<span class="org-string">" "</span>) <span class="org-ess-XopX">%&gt;%</span> unlist <span class="org-ess-XopX">%&gt;%</span> length
+  col_names <span class="org-ess-assignment">&lt;-</span> paste(<span class="org-string">"Type"</span>, c(1:num_types))
+  data_tbl <span class="org-ess-assignment">&lt;-</span> data_tbl <span class="org-ess-XopX">%&gt;%</span>
+    separate(col = <span class="org-string">"Type"</span>, into = col_names)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Ensure columns are fixed. Types sometimes only has 1, but can be up to 3.</span>
+  cols <span class="org-ess-assignment">&lt;-</span> c(
+    `Type 1` = <span class="org-ess-constant">NA_character_</span>,
+    `Type 2` = <span class="org-ess-constant">NA_character_</span>,
+    `Type 3` = <span class="org-ess-constant">NA_character_</span>
+  )
+  data_tbl <span class="org-ess-assignment">&lt;-</span> add_column(data_tbl,
+                         !!!cols[setdiff(names(cols), names(data_tbl))])
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Look for evolution information</span>
+  evo_node <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"div.infocard-list-evo"</span>)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Check to see if there was any evolution information</span>
+  has_evo <span class="org-ess-assignment">&lt;-</span> length(evo_node) &gt;= 1
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">If there was evolution information</span>
+  <span class="org-ess-keyword">if</span> (has_evo) {
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Get the list of evolutions</span>
+    evo_list <span class="org-ess-assignment">&lt;-</span> evo_node <span class="org-ess-XopX">%&gt;%</span> html_nodes(<span class="org-string">"a.ent-name"</span>) <span class="org-ess-XopX">%&gt;%</span> html_text
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Get the maximum number of evolutions for this Pokemon's evolution chain</span>
+    max_evo <span class="org-ess-assignment">&lt;-</span> length(unique(evo_list))
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Find out where in the evolution chain this Pokemon sits</span>
+    evo_place <span class="org-ess-assignment">&lt;-</span> which(tolower(evo_list) == tolower(name))[1]
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Calculate an evolution index, how far to max evolution the Pokemon is</span>
+    evo_index <span class="org-ess-assignment">&lt;-</span> round(as.double(evo_place) / as.double(max_evo), 2)
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Otherwise, assume there is not evolution of this Pokemon</span>
+  } <span class="org-ess-keyword">else</span> {
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Set the evolution information to NA</span>
+    max_evo <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+    evo_place <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+    evo_index <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-constant">NA_integer_</span>
+
+  }
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Append evolution information to the data tibble</span>
+  evo_list <span class="org-ess-assignment">&lt;-</span> c(
+    `Has Evolution` = has_evo,
+    `Evolution Place` = evo_place,
+    `Maximum Evolution Count` = max_evo,
+    `Evolution Index` = evo_index
+  )
+  evo_tbl <span class="org-ess-assignment">&lt;-</span> evo_list <span class="org-ess-XopX">%&gt;%</span>
+    t <span class="org-ess-XopX">%&gt;%</span>
+    as_tibble
+  data_tbl <span class="org-ess-assignment">&lt;-</span> cbind(data_tbl, evo_tbl)
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Add a sleep timer to not overload the system</span>
+  Sys.sleep(1)
+
+  <span class="org-ess-keyword">return</span>(data_tbl)
+
+}
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get Pokemon data</span>
+pokemon_tbl <span class="org-ess-assignment">&lt;-</span> apply(pokedex_tbl, 1, fetch_pokemon_data) <span class="org-ess-XopX">%&gt;%</span>
+  bind_rows()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Merge pokedex_tbl and pokemon_tbl</span>
+pokemon_tbl <span class="org-ess-assignment">&lt;-</span> cbind(pokedex_tbl, pokemon_tbl)</pre>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Number</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">URLs</th>
+<th scope="col" class="org-left">Type 1</th>
+<th scope="col" class="org-left">Type 2</th>
+<th scope="col" class="org-left">Species</th>
+<th scope="col" class="org-left">Height</th>
+<th scope="col" class="org-left">Weight</th>
+<th scope="col" class="org-right">HP</th>
+<th scope="col" class="org-right">Attack</th>
+<th scope="col" class="org-right">Defense</th>
+<th scope="col" class="org-right">Sp. Atk</th>
+<th scope="col" class="org-right">Sp. Def</th>
+<th scope="col" class="org-right">Speed</th>
+<th scope="col" class="org-right">Total</th>
+<th scope="col" class="org-left">Type 3</th>
+<th scope="col" class="org-right">Has Evolution</th>
+<th scope="col" class="org-right">Evolution Place</th>
+<th scope="col" class="org-right">Maximum Evolution Count</th>
+<th scope="col" class="org-right">Evolution Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Bulbasaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/bulbasaur">https://pokemondb.net/pokedex/bulbasaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-left">0.7 m (2′04″)</td>
+<td class="org-left">6.9 kg (15.2 lbs)</td>
+<td class="org-right">45</td>
+<td class="org-right">49</td>
+<td class="org-right">49</td>
+<td class="org-right">65</td>
+<td class="org-right">65</td>
+<td class="org-right">45</td>
+<td class="org-right">318</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Ivysaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/ivysaur">https://pokemondb.net/pokedex/ivysaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-left">1.0 m (3′03″)</td>
+<td class="org-left">13.0 kg (28.7 lbs)</td>
+<td class="org-right">60</td>
+<td class="org-right">62</td>
+<td class="org-right">63</td>
+<td class="org-right">80</td>
+<td class="org-right">80</td>
+<td class="org-right">60</td>
+<td class="org-right">405</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Venusaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/venusaur">https://pokemondb.net/pokedex/venusaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-left">2.0 m (6′07″)</td>
+<td class="org-left">100.0 kg (220.5 lbs)</td>
+<td class="org-right">80</td>
+<td class="org-right">82</td>
+<td class="org-right">83</td>
+<td class="org-right">100</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">525</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1.00</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Charmander</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmander">https://pokemondb.net/pokedex/charmander</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">NA</td>
+<td class="org-left">Lizard Pokémon</td>
+<td class="org-left">0.6 m (2′00″)</td>
+<td class="org-left">8.5 kg (18.7 lbs)</td>
+<td class="org-right">39</td>
+<td class="org-right">52</td>
+<td class="org-right">43</td>
+<td class="org-right">60</td>
+<td class="org-right">50</td>
+<td class="org-right">65</td>
+<td class="org-right">309</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Charmeleon</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">NA</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-left">1.1 m (3′07″)</td>
+<td class="org-left">19.0 kg (41.9 lbs)</td>
+<td class="org-right">58</td>
+<td class="org-right">64</td>
+<td class="org-right">58</td>
+<td class="org-right">80</td>
+<td class="org-right">65</td>
+<td class="org-right">80</td>
+<td class="org-right">405</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2><a id="clean-data" class="anchor" href="#clean-data">¶</a>Clean Data</h2><div class="outline-text-2" id="text-org7e87843">
+<p>
+Clean up the Height and Weight fields to just have the metric units.
+</p>
+
+<pre><span class="org-function-name">clean_pokemon_data</span> <span class="org-ess-assignment">&lt;-</span> <span class="org-ess-keyword">function</span>(data_tbl) {
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Clean up Height field to only show meters</span>
+  data_tbl$Height <span class="org-ess-assignment">&lt;-</span> data_tbl$Height <span class="org-ess-XopX">%&gt;%</span>
+    str_extract(<span class="org-string">"\\d+\\.*\\d*"</span>) <span class="org-ess-XopX">%&gt;%</span>
+    as.numeric
+
+  <span class="org-comment-delimiter"># </span><span class="org-comment">Clean up Weight field to only show kilograms</span>
+  data_tbl$Weight <span class="org-ess-assignment">&lt;-</span> data_tbl$Weight <span class="org-ess-XopX">%&gt;%</span>
+    str_extract(<span class="org-string">"\\d+\\.*\\d*"</span>) <span class="org-ess-XopX">%&gt;%</span>
+    as.numeric
+
+  <span class="org-ess-keyword">return</span>(data_tbl)
+
+}
+
+pokemon_tbl <span class="org-ess-assignment">&lt;-</span> clean_pokemon_data(pokemon_tbl)</pre>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Number</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">URLs</th>
+<th scope="col" class="org-left">Type 1</th>
+<th scope="col" class="org-left">Type 2</th>
+<th scope="col" class="org-left">Species</th>
+<th scope="col" class="org-right">Height</th>
+<th scope="col" class="org-right">Weight</th>
+<th scope="col" class="org-right">HP</th>
+<th scope="col" class="org-right">Attack</th>
+<th scope="col" class="org-right">Defense</th>
+<th scope="col" class="org-right">Sp. Atk</th>
+<th scope="col" class="org-right">Sp. Def</th>
+<th scope="col" class="org-right">Speed</th>
+<th scope="col" class="org-right">Total</th>
+<th scope="col" class="org-left">Type 3</th>
+<th scope="col" class="org-right">Has Evolution</th>
+<th scope="col" class="org-right">Evolution Place</th>
+<th scope="col" class="org-right">Maximum Evolution Count</th>
+<th scope="col" class="org-right">Evolution Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Bulbasaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/bulbasaur">https://pokemondb.net/pokedex/bulbasaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">0.7</td>
+<td class="org-right">6.9</td>
+<td class="org-right">45</td>
+<td class="org-right">49</td>
+<td class="org-right">49</td>
+<td class="org-right">65</td>
+<td class="org-right">65</td>
+<td class="org-right">45</td>
+<td class="org-right">318</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Ivysaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/ivysaur">https://pokemondb.net/pokedex/ivysaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">1.0</td>
+<td class="org-right">13.0</td>
+<td class="org-right">60</td>
+<td class="org-right">62</td>
+<td class="org-right">63</td>
+<td class="org-right">80</td>
+<td class="org-right">80</td>
+<td class="org-right">60</td>
+<td class="org-right">405</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Venusaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/venusaur">https://pokemondb.net/pokedex/venusaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">2.0</td>
+<td class="org-right">100.0</td>
+<td class="org-right">80</td>
+<td class="org-right">82</td>
+<td class="org-right">83</td>
+<td class="org-right">100</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">525</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1.00</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Charmander</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmander">https://pokemondb.net/pokedex/charmander</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">NA</td>
+<td class="org-left">Lizard Pokémon</td>
+<td class="org-right">0.6</td>
+<td class="org-right">8.5</td>
+<td class="org-right">39</td>
+<td class="org-right">52</td>
+<td class="org-right">43</td>
+<td class="org-right">60</td>
+<td class="org-right">50</td>
+<td class="org-right">65</td>
+<td class="org-right">309</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Charmeleon</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">NA</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-right">1.1</td>
+<td class="org-right">19.0</td>
+<td class="org-right">58</td>
+<td class="org-right">64</td>
+<td class="org-right">58</td>
+<td class="org-right">80</td>
+<td class="org-right">65</td>
+<td class="org-right">80</td>
+<td class="org-right">405</td>
+<td class="org-left">NA</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2><a id="write-pokedex-data-to-output-file" class="anchor" href="#write-pokedex-data-to-output-file">¶</a>Write Pokedex Data to Output File</h2><div class="outline-text-2" id="text-orgbeffb0c">
+<p>
+Finally, write this data out to a CSV.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Write data to CSV</span>
+write.table(pokemon_tbl, <span class="org-string">"~/Projects/pokedex/data/pokedex.csv"</span>,
+            sep = <span class="org-string">","</span>, row.names = <span class="org-ess-constant">FALSE</span>)</pre>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

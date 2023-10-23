@@ -1,0 +1,499 @@
+<!-- Generated from 0ee47b0 on 2023-10-23 @ 16:22 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Stats Exploratory Data Analysis - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Stats Exploratory Data Analysis</h1><p class="site-post-meta">October 14, 2023</p><div id="content">
+<h2><a id="initial-exploratory-data-analysis" class="anchor" href="#initial-exploratory-data-analysis">¶</a>Initial Exploratory Data Analysis</h2><div class="outline-text-2" id="text-orge63843a">
+<p>
+Now that we have the data set ready, let&rsquo;s explore the data and answer some key questions.
+</p>
+</div>
+
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org13b5d67">
+<p>
+Start off by loading the libraries we need.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load libraries</span>
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)
+<span class="org-ess-modifiers">library</span>(ggplot2)
+<span class="org-ess-modifiers">library</span>(knitr)</pre>
+</div>
+
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org60b730e">
+<p>
+Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Read the data</span>
+pokedex <span class="org-ess-assignment">&lt;-</span> read.csv(<span class="org-string">'./data/pokedex_ext.csv'</span>,sep=<span class="org-string">','</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Change categorical columns</span>
+pokedex$Generation <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Generation)
+pokedex$Evolution.Place <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Evolution.Place)
+pokedex$Has.Evolution <span class="org-ess-assignment">&lt;-</span> as.logical(pokedex$Has.Evolution)</pre>
+</div>
+
+<h2><a id="show-stats-by-generation" class="anchor" href="#show-stats-by-generation">¶</a>Show Stats by Generation</h2><div class="outline-text-2" id="text-org7fc1702">
+<p>
+First, I&rsquo;m curious if there&rsquo;s any obvious trend on average for each generation. To do so, we group by the <code>Generation</code> column and get the mean for the <code>HP</code>, <code>Attack</code>, <code>Defense</code>, <code>Sp..Atk</code>, <code>Sp..Def</code>, and <code>Speed</code> columns. To plot them easily, we&rsquo;ll pivot the data from wide to long for each stat and specify that the new stat column is a factor.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by generation</span>
+gen_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Generation) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Specify Stat as a factor and set order</span>
+gen_stats$Stat <span class="org-ess-assignment">&lt;-</span> factor(gen_stats$Stat, 
+                         levels=c(<span class="org-string">"HP"</span>,
+                                  <span class="org-string">"Attack"</span>,
+                                  <span class="org-string">"Defense"</span>,
+                                  <span class="org-string">"Sp..Atk"</span>,
+                                  <span class="org-string">"Sp..Def"</span>,
+                                  <span class="org-string">"Speed"</span>))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the generation stats</span>
+ggplot(gen_stats, aes(x=Generation, y=Value, fill=Stat, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(<span class="org-string">"Average Base Stats for Each Generation"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) + 
+  ylab(<span class="org-string">"Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/stats-generation-1.png" alt="stats-generation-1.png" />
+</p>
+</div>
+
+<p>
+While it&rsquo;s not consistently the case for all stats, the mean stats overall appear to increase from generation to generation. Each stat seems to roughly increase with each generation, with the exception of the Special Defense and Speed stats.
+</p>
+
+<p>
+Let&rsquo;s look instead at the total of these stats shown in the <code>Total</code> column.
+</p>
+
+<pre>gen_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Generation) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(Total),mean)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the generation stats</span>
+ggplot(gen_stats, aes(x=Generation, y=Total)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  coord_cartesian(ylim=c(400,450)) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Total Base Stat for Each Generation"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) + 
+  ylab(<span class="org-string">"Total Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/total-stats-generation-1.png" alt="total-stats-generation-1.png" />
+</p>
+</div>
+
+<p>
+We don&rsquo;t have a ton of generations to make this case, but it does seem to be the case that, generally speaking, Pokemon in later generations are stronger than Pokemon in previous generations. Interestingly though, this wasn&rsquo;t the case for the first three generations, and average total stats for generations 4 and 7 were quite high compared to the generations before and after them.
+</p>
+</div>
+
+<h2><a id="show-stats-by-legendary-status" class="anchor" href="#show-stats-by-legendary-status">¶</a>Show Stats by Legendary Status</h2><div class="outline-text-2" id="text-orgfd6b776">
+<p>
+We have four options for the legendary status of Pokemon: non-legendary, sub-legendary, legendary, and mythical. In the games, legendary Pokemon were always a bit over-powered, so I expect the three legendary classes to outshine the non-legendary stats in every category. The mythical Pokemon are usually stronger than non-legendary Pokemon, but I wonder how they will compare to legendary and sub-legendary Pokemon on average.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by legendary status</span>
+legendary_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Legendary.Status) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the legendary status stats</span>
+ggplot(legendary_stats, aes(x=Legendary.Status, y=Value, fill=Stat, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Legendary Status"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) + 
+  ylab(<span class="org-string">"Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/legendary-stats-1.png" alt="legendary-stats-1.png" />
+</p>
+</div>
+
+<p>
+And of course, non-legendary Pokemon (&ldquo;NA&rdquo;) are pretty out-classed by legendary, mythical, and sub-legendary Pokemon. Interestingly, mythical Pokemon like Mew are, on average, comparable to sub-legendary Pokemon, but still get over-powered by legendary Pokemon.
+</p>
+
+<p>
+Next, I want to group all of the different legendary Pokemon categories and compare them against the non-legendary Pokemon average stats. The results here won&rsquo;t be surprising, of course, but I wanted to add it just to further show how out-classed the non-legendary Pokemon are.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Add a column identifying if the Pokemon has a legendary status</span>
+pokedex$Is.Legendary <span class="org-ess-assignment">&lt;-</span> !is.na(pokedex$Legendary.Status)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by legendary status</span>
+legendary_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Is.Legendary) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the legendary status stats</span>
+ggplot(legendary_stats, aes(x=Is.Legendary, y=Value, fill=Stat, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Legendary Status"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) + 
+  ylab(<span class="org-string">"Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/legendary-stats-2-1.png" alt="legendary-stats-2-1.png" />
+</p>
+</div>
+
+<p>
+And again of course, legendary Pokemon way out-shine the non-legendary Pokemon.
+</p>
+</div>
+
+<h2><a id="show-stats-by-evolution-status" class="anchor" href="#show-stats-by-evolution-status">¶</a>Show Stats by Evolution Status</h2><div class="outline-text-2" id="text-org98e9c85">
+<p>
+Next, I wanted to look at the average base stats for Pokemon that are first, second, or third in their evolution status and compare them against Pokemon that don&rsquo;t evolve at all. I&rsquo;m curious how non-evolving Pokemon compare to Pokemon that evolve. Typically, if a Pokemon evolves, it gets stronger with each evolution, and most Pokemon evolve once or twice. I would expect that Pokemon in the third link of the evolution chain would be stronger than Pokemon who don&rsquo;t evolve, but let&rsquo;s have a look.
+</p>
+
+<p>
+Before I do that though, I want to address a mistake when I scraped the data. It&rsquo;s ultimately not a big deal, but it&rsquo;s worth highlighting.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-right">Evolution.Place</th>
+<th scope="col" class="org-right">Maximum.Evolution.Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">133</td>
+<td class="org-left">Eevee</td>
+<td class="org-right">1</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">134</td>
+<td class="org-left">Vaporeon</td>
+<td class="org-right">2</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">135</td>
+<td class="org-left">Jolteon</td>
+<td class="org-right">3</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">136</td>
+<td class="org-left">Flareon</td>
+<td class="org-right">4</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">196</td>
+<td class="org-left">Espeon</td>
+<td class="org-right">6</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">197</td>
+<td class="org-left">Umbreon</td>
+<td class="org-right">7</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">470</td>
+<td class="org-left">Leafeon</td>
+<td class="org-right">9</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">471</td>
+<td class="org-left">Glaceon</td>
+<td class="org-right">10</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">700</td>
+<td class="org-left">Sylveon</td>
+<td class="org-right">12</td>
+<td class="org-right">9</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+When I scraped this data set from <a href="https://pokemondb.net/">PokemonDB</a>, I decided that if the part of the page had an evolution tree, the first Pokemon in the tree was the first of the evolution stage, the next was the second, and so on. This assumption breaks down in rare cases, such as the Pokemon Eevee and its evolutions. Most Pokemon follow a progressive chain of evolution, but Eevee is a Pokemon that can evolve into nine different Pokemon. Between this and inconsistent way this is rendered on the page, my way of scraping Pokemon like Eevee is not so great here. This case is quite rare and won&rsquo;t have much impact, but for
+this reason, I should cut off the plot to only show Pokemon with <code>Evolution.Place &lt;= 3</code>. Also, you can see that <code>Evolution.Place</code> skips 5, 8, and 11. This is because Eevee&rsquo;s evolution chart repeats Eevee in the chain multiple times. Again, this is a weird case, and I won&rsquo;t worry about it.
+</p>
+
+<p>
+Okay, now let&rsquo;s have a look at the stats for Pokemon in the first, second, third, parts of their evolution cycle compared to the stats for Pokemon that don&rsquo;t evolve.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by evolution place</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Exclude any evolution &gt; 3, as most of those were scraped incorrectly</span>
+evolution_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  filter(as.numeric(Evolution.Place) &lt;= 3 | is.na(Evolution.Place)) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Evolution.Place) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the evolution place stats</span>
+ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Evolution Stage"</span>) +
+  xlab(<span class="org-string">"Evolution Stage"</span>) + 
+  ylab(<span class="org-string">"Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/evolution-stats-1.png" alt="evolution-stats-1.png" />
+</p>
+</div>
+
+<p>
+Naturally, Pokemon later in their evolutionary cycle are stronger than Pokemon in earlier cycles. Surprisingly though, non-evolving Pokemon appear to be on par with Pokemon who have evolved twice already. That doesn&rsquo;t match my experience with the games. Pokemon that didn&rsquo;t evolve at all were solid, but often didn&rsquo;t compete with Pokemon who&rsquo;d evolved several times. I wonder if this is because legendary Pokemon typically don&rsquo;t evolve and typically over-power non-evolutionary Pokemon. Let&rsquo;s filter out legendary Pokemon to see if that&rsquo;s the case.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of non-legendary Pokemon by evolution place</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Exclude any evolution &gt; 3, as most of those were scraped incorrectly</span>
+evolution_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  filter(is.na(Legendary.Status)) <span class="org-ess-XopX">%&gt;%</span>
+  filter(as.numeric(Evolution.Place) &lt;= 3 | is.na(Evolution.Place)) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Evolution.Place) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the evolution place stats</span>
+ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) + 
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Evolution Stage"</span>) +
+  xlab(<span class="org-string">"Evolution Stage"</span>) + 
+  ylab(<span class="org-string">"Stat Value"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/non-legendary-evolution-stats-1.png" alt="non-legendary-evolution-stats-1.png" />
+</p>
+</div>
+
+<p>
+The difference isn&rsquo;t terribly dramatic, but it does confirm that, on average, Pokemon in their third evolution stage are stronger than Pokemon who don&rsquo;t evolve at all, assuming all else is equal. In fact, Pokemon who don&rsquo;t evolve at all hardly outperform Pokemon in their second stage of evolution.
+</p>
+</div>
+
+<h2><a id="show-stats-by-pokemon-type" class="anchor" href="#show-stats-by-pokemon-type">¶</a>Show Stats by Pokemon Type</h2><div class="outline-text-2" id="text-org13729e7">
+<p>
+I&rsquo;m curious how many Pokemon of each type there are. I suspect most Pokemon will be water or grass type Pokemon.
+</p>
+
+<p>
+Of note here, some Pokemon have multiple, up to three, different types. Those are stored in <code>Type.1</code>, <code>Type.2</code>, and <code>Type.3</code>. To count the Pokemon of each type, we&rsquo;ll need to either only count up the Pokemon of
+<code>Type.1</code>, or we can pivot to a longer table and Pokemon with multiple types will have multiple entries. I&rsquo;ll pivot to a longer table, and then count the Pokemon of each type.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get a count of of each type </span>
+type_count <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Type) <span class="org-ess-XopX">%&gt;%</span>
+  count() <span class="org-ess-XopX">%&gt;%</span>
+  arrange(desc(n))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show a bar plot of type counts</span>
+ggplot(type_count, aes(x = reorder(Type, -n),y=n, ymin=0)) + 
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) + 
+  ggtitle(label=<span class="org-string">"Count of Pokemon for Each Type"</span>) +
+  xlab(<span class="org-string">"Type"</span>) + 
+  ylab(<span class="org-string">"Count"</span>) + 
+  scale_alpha(guide = <span class="org-string">'none'</span>) +
+  theme_minimal() +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/type-counts-1.png" alt="type-counts-1.png" />
+</p>
+</div>
+
+<p>
+As expected, water and grass are among the most frequent classes. I figured &ldquo;Normal&rdquo; Pokemon would make an appearance up top, but I didn&rsquo;t quite expect it to be the second most common type. I definitely didn&rsquo;t expect psychic Pokemon to be so common either.
+</p>
+
+<p>
+Now, I&rsquo;d like to view the average stats of each Pokemon to see which types of Pokemon are typically the strongest. I&rsquo;d expect that dragon type and steel type are among the top, from my experience with the game. Again, I&rsquo;ll pivot the table so that Pokemon with multiple types have those multiple types represented.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Calculate mean stats by Pokemon type</span>
+type_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Type) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Specify Stat as a factor and set order</span>
+type_stats$Stat <span class="org-ess-assignment">&lt;-</span> factor(type_stats$Stat, 
+                          levels=c(<span class="org-string">"HP"</span>,
+                                   <span class="org-string">"Attack"</span>,
+                                   <span class="org-string">"Defense"</span>,
+                                   <span class="org-string">"Sp..Atk"</span>,
+                                   <span class="org-string">"Sp..Def"</span>,
+                                   <span class="org-string">"Speed"</span>))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot Pokemon Stats as a stacked bar</span>
+ggplot(data = type_stats, aes(x=Type, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"stack"</span>,width=0.7) +
+  labs(title = <span class="org-string">"Average Base Stats by Type"</span>,
+       y = <span class="org-string">"Stat Value"</span>, 
+       x = <span class="org-string">"Type"</span>) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/type-stats-1.png" alt="type-stats-1.png" />
+</p>
+</div>
+
+<p>
+Dragon and steel Pokemon did indeed come out among the top, but dark, fighting, and ice Pokemon are also quite strong in terms of their average total base stats. Bug, normal, and poison Pokemon are among the weakest, which is not terribly surprising.
+</p>
+
+<p>
+Rather than plotting this as a stacked bar chart, I&rsquo;d like to see the different stats all separated out. I could make a clustered bar chart, but with as many types as we have here, that would be a very wide, messy chart. Let&rsquo;s instead make subplots using <code>facet_wrap</code>.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Plot each Pokemon Stat on an individual bar chart</span>
+ggplot(data = type_stats, aes(x=Type, y=Value, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) + 
+  labs(title = <span class="org-string">"Average Base Stats by Type"</span>,
+       y = <span class="org-string">"Stat Value"</span>, x = <span class="org-string">"Type"</span>) + 
+  facet_wrap(~Stat,ncol=2) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/type-stats-2-1.png" alt="type-stats-2-1.png" />
+</p>
+</div>
+
+<p>
+Now we can better see the distributions of stats for different types.
+</p>
+
+<ul class="org-ul">
+<li>Dragon Pokemon have the highest HP.</li>
+<li>Fighting type Pokemon have the highest attack.</li>
+<li>Rock and steel Pokemon have the highest defense.</li>
+<li>Psychic, dragon, fire, and electric Pokemon have the highest special attack.</li>
+<li>Psychic, fairy, steel, and ghost Pokemon have the highest special defense.</li>
+<li>Flying, electric, dragon, and dark Pokemon have the highest speed.</li>
+</ul>
+
+<p>
+Next up, I&rsquo;m curious how legendary Pokemon of a certain type compare against other Pokemon of the same type. Of course, I&rsquo;d expect that for each type, legendary are among the top Pokemon, but I want to see how
+often non-legendary Pokemon are comparable in total base stats to legendary Pokemon.
+</p>
+
+<pre>type_longer_pokedex <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show a scatter plot of total base stats, shade by legendary status</span>
+ggplot(type_longer_pokedex, aes(x=Type,y=Total,color=Legendary.Status, alpha=0.5)) +
+  geom_point() +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Total Base Stat for All Pokemon"</span>) +
+  xlab(<span class="org-string">"Type"</span>) + 
+  ylab(<span class="org-string">"Total Stat"</span>) + 
+  labs(color=<span class="org-string">'Legendary Status'</span>) +
+  scale_alpha(guide = <span class="org-string">'none'</span>) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/legendary-scatter-1.png" alt="legendary-scatter-1.png" />
+</p>
+</div>
+
+<p>
+The legendary, sub-legendary, and mythical Pokemon are of course towards to top of the distribution. There are some non-legendary Pokemon that rank up there with them. This chart makes the gap between purely legendary and all others, including mythical and sub-legendary Pokemon, much more apparent! There are a couple of legendary Pokemon that are mixed in towards the middle and even bottom of the total base stats distribution, which I wasn&rsquo;t really expecting. The weakest of them all is &ldquo;Cosmog&rdquo;, a legendary psychic Pokemon, ranking at or near the weakest of the psychic Pokemon. However, this Pokemon evolves twice, so it&rsquo;s not to surprising that the first Pokemon in the evolutionary chain is so weak.
+</p>
+
+<p>
+Lastly, I want to show a similar chart, but shade by where in the Evolution chain the Pokemon is. Again, I&rsquo;ll need to filter where <code>Evolution.Place &lt;= 3</code>, and I&rsquo;ll remove the legendary Pokemon since those are typically non-evolving and strongest.
+</p>
+
+<pre>evolution_type_longer_pokedex <span class="org-ess-assignment">&lt;-</span> type_longer_pokedex <span class="org-ess-XopX">%&gt;%</span>
+  filter(as.numeric(Evolution.Place) &lt;= 3 | is.na(Evolution.Place)) <span class="org-ess-XopX">%&gt;%</span>
+  filter(is.na(Legendary.Status))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show a scatter plot of total base stats, shade by legendary status</span>
+ggplot(evolution_type_longer_pokedex, aes(x=Type,y=Total,color=Evolution.Place, alpha=0.5)) +
+  geom_point() +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) + 
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Total Base Stat for All Pokemon"</span>) +
+  xlab(<span class="org-string">"Type"</span>) + 
+  ylab(<span class="org-string">"Total Stat"</span>) + 
+  labs(color=<span class="org-string">'Evolution Place'</span>) +
+  scale_alpha(guide = <span class="org-string">'none'</span>) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))</pre>
+
+
+<div class="figure">
+<p><img src="stats_eda_files/figure-gfm/evolution-scatter-1.png" alt="evolution-scatter-1.png" />
+</p>
+</div>
+
+<p>
+Naturally, the chart shows well that weaker Pokemon tend to be those in the first phase of their evolution, getting progressively stronger with later phases. Normal Pokemon are mixed among the top half of the chart here. We again see the same information as before, but not showing just the average base stats for each evolution makes the comparison between Pokemon who don&rsquo;t evolve and Pokemon in their third stage of evolution a little more nuanced. According to base stats alone, some non-evolving Pokemon are just as strong as some third-phase evolved Pokemon, but the distribution is more skewed towards lower stats for non-evolving Pokemon, so they are on average lower in total stats.
+</p>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

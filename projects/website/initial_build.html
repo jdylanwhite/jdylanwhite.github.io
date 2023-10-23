@@ -1,18 +1,18 @@
-<!-- Generated from 3956d14 on 2023-10-04 @ 12:03 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 0ee47b0 on 2023-10-23 @ 16:22 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Initial Build - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Initial Build</h1><p class="site-post-meta">September 23, 2023</p><div id="content">
-<h2><a id="initial-build-of-a-minimal-site" class="anchor" href="#initial-build-of-a-minimal-site">¶</a>Initial Build of a Minimal Site</h2><div class="outline-text-2" id="text-org6b29c31">
+<h2><a id="initial-build-of-a-minimal-site" class="anchor" href="#initial-build-of-a-minimal-site">¶</a>Initial Build of a Minimal Site</h2><div class="outline-text-2" id="text-orge440232">
 <p>
 This is the first step in building my website. Looking forward, I want to rely on typing the content of my page using <a href="https://orgmode.org/">Org Mode</a>. This is a sort of markdown that comes built into <a href="https://www.gnu.org/software/emacs/">Emacs</a> that really goes far beyond a &ldquo;sort of markdown&rdquo; that I unfairly stated. It&rsquo;s pretty awesome and has more functionality that I could begin to imagine, let along describe. I also want to be able to convert <a href="https://jupyter.org/">Jupyter Notebooks</a>, but I&rsquo;m going to figure that part out later. The output here will be far from a finished product, but this is a solid first step.
 </p>
 </div>
 
-<h2><a id="setting-up-emacs-and-org-mode-publishing" class="anchor" href="#setting-up-emacs-and-org-mode-publishing">¶</a>Setting Up Emacs and Org Mode Publishing</h2><div class="outline-text-2" id="text-org5f07e19">
+<h2><a id="setting-up-emacs-and-org-mode-publishing" class="anchor" href="#setting-up-emacs-and-org-mode-publishing">¶</a>Setting Up Emacs and Org Mode Publishing</h2><div class="outline-text-2" id="text-orge011cea">
 <p>
 Following this guide, <a href="https://www.youtube.com/watch?v=AfkrzFodoNw">Build Your Website with Org Mode</a> by <a href="https://systemcrafters.net/">SystemCrafters</a>, it&rsquo;s easy to get started. The idea here is that you write each of your site&rsquo;s pages as individual Org Mode documents, and then you use Org Mode&rsquo;s publishing system to convert those documents into individual HTML files in a stucture that mirrors the Org Mode content.
 </p>
 </div>
 
-<h3><a id="creating-the-build-site-script" class="anchor" href="#creating-the-build-site-script">¶</a>Creating the Build Site Script</h3><div class="outline-text-3" id="text-org87c43b9">
+<h3><a id="creating-the-build-site-script" class="anchor" href="#creating-the-build-site-script">¶</a>Creating the Build Site Script</h3><div class="outline-text-3" id="text-orgd3a5606">
 <p>
 We start off by building the Elisp script that we will run with base Emacs (no configuration loaded). This is built to be used anywhere by anyone with Emacs 25 or higher installed. This is important because later, we&rsquo;ll use a virtual machine to run our script from scratch each time we push a commit. This section won&rsquo;t be vastly different from David&rsquo;s very helpful SystemCrafters video, but I want to include it because it&rsquo;s where I am starting, and I&rsquo;ll on from there quite a bit.
 </p>
@@ -105,7 +105,7 @@ And then, just as a sanity check, we&rsquo;ll print a message letting us know we
 <pre>(message <span class="org-string">"Build complete!"</span>)</pre>
 </div>
 
-<h3><a id="calling-the-build-script" class="anchor" href="#calling-the-build-script">¶</a>Calling the Build Script</h3><div class="outline-text-3" id="text-orgacb3c98">
+<h3><a id="calling-the-build-script" class="anchor" href="#calling-the-build-script">¶</a>Calling the Build Script</h3><div class="outline-text-3" id="text-orgb5b97f0">
 <p>
 Lastly, we just need to call Emacs to run this script in the shell. That&rsquo;s pretty quickly done in one line in a shell script, <code>build.sh</code>:
 </p>
