@@ -6,7 +6,7 @@ I'd like to be able to have a count of all of the different tags I've added to d
 
 #+begin_src elisp
 
-(setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))
+;; (setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))
 
 #+end_src
 
