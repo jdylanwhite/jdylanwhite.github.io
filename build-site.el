@@ -128,29 +128,22 @@
     (format "<pre>%s</pre>" (string-trim code))))
 
 (defun dw/org-html-table (table contents info)
-  "Transcode a TABLE element from Org to HTML.
-CONTENTS is the contents of the table.  INFO is a plist holding
-contextual information."
   (if (eq (org-element-property :type table) 'table.el)
-      ;; "table.el" table.  Convert it using appropriate tools.
       (org-html-table--table.el-table table info)
-    ;; Standard table.
     (let* ((caption (org-export-get-caption table))
-	   (number (org-export-get-ordinal
-		    table info nil #'org-html--has-caption-p))
-           (format "<div class=table-wrapper><table%s>\n%s\n%s\n%s</table></div>"
-                   (if (not caption) ""
-                     (format (if (plist-get info :html-table-caption-above)
-                                 "<caption class=\"t-above\">%s</caption>"
-			         "<caption class=\"t-bottom\">%s</caption>")
-                             (concat
-                              "<span class=\"table-number\">"
-                              (format (org-html--translate "Table %d:" info) number)
-                              "</span> " (org-export-data caption info))))
-                   (funcall table-column-specs table info)
-                   contents))))
-
-
+           (number (org-export-get-ordinal
+                    table info nil #'org-html--has-caption-p)))
+      (format "<div class=table-wrapper><table%s>\n%s\n%s\n%s</table></div>">
+              (if (not caption) ""
+                (format (if (plist-get info :html-table-caption-above)
+                            "<caption class=\"t-above\">%s</caption>"
+                          "<caption class=\"t-bottom\">%s</caption>")
+                          (concat
+                           "<span class=\"table-number\">"
+                           (format (org-html--translate "Table %d:" info) number)
+                           "</span> " (org-export-data caption info))))
+                (funcall table-column-specs table info)
+                contents))))
 
 (defun dw/make-heading-anchor-name (headline-text)
   (thread-last headline-text
@@ -194,8 +187,8 @@ contextual information."
   :translate-alist
   '((template . dw/org-html-template)
     (headline . dw/org-html-headline)
-    (src-block . dw/org-html-src-block)
-    (table . dw/org-html-table)))
+    (src-block . dw/org-html-src-block)))
+    ;;(table . dw/org-html-table)))
 
 (defun org-html-publish-to-html (plist filename pub-dir)
   "Publish an org file to HTML.
