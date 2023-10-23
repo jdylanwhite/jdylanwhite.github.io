@@ -1,10 +1,14 @@
 #+title: Pokedex
+#+category: pokedex
 
 Since I was a kid, I've played several games in the Pokemon series. It's an iconic franchise, and one that I and many others have a lot of familiarity with. The Pokedex dataset is a fun dataset that gives me the opportunity to practice data science skills I've learned, and the dataset generally follows some intuition developed with experience with the series.
 
 * Scraping the Pokedex data
 
-The [[https://pokemondb.net/][PokemonDB]] site is a fantastic resource for getting information about various Pokemon. Whether you're just trying to casually play through any of the games or competitively build a team, this page has a lot of valuable information. From a data scraping perspective, there's an information page for each Pokemon generated from the games and other source material, and the information is often provided on the page in a structured way through various tables and containers on each page. I've written code using R to scrape data from this site to build a Pokedex dataset so that we can explore the data and gain any interesting insights/
+The [[https://pokemondb.net/][PokemonDB]] site is a fantastic resource for getting information about various Pokemon. Whether you're just trying to casually play through any of the games or competitively build a team, this page has a lot of valuable information. From a data scraping perspective, there's an information page for each Pokemon generated from the games and other source material, and the information is often provided on the page in a structured way through various tables and containers on each page. I've written code using R to scrape data from this site to build a Pokedex dataset so that we can explore the data and gain any interesting insights.
 
-- [[file:scrape_specific_pokemon_data.org][Scraping individual Pokemon data]] - investigating how to scrape Pokemon data for one specific Pokemon
-- [[file:scrape_initial_pokedex.org][Scrape initial Pokedex]] - scraping the entire Pokedex, but just the names, numbers, and URLs
+- [[file:scrape_specific_pokemon_data.org][Scraping individual Pokemon data]] - investigating how to scrape Pokemon data for one specific Pokemon.
+- [[file:scrape_initial_pokedex.org][Scrape initial Pokedex]] - scraping the entire Pokedex, but just the names, numbers, and URLs.
+- [[file:scraping-all-pokemon-data.org][Scraping all Pokemon data]] - scraping stats and evolutionary data for all Pokemon.
+- [[file:adding-extra-pokedex-information.org][Adding extra Pokemon information]] - adding generation and legendary status to existing Pokemon data.
+- [[file:stats_exploratory_data_analysis.org][Exploratory data analysis]] - investigating aspects of Pokemon stats and other information.

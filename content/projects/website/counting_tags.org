@@ -1,0 +1,10 @@
+#+title: Counting Tags
+
+#+begin_src elisp
+
+(setq content-org-files (directory-files-recursively "~/Projects/org-publish-website/content/" "\.org$"))
+
+#+end_src
+
+#+RESULTS:
+| ~/Projects/org-publish-website/content/dotfiles/doom-emacs.org | ~/Projects/org-publish-website/content/dotfiles/index.org | ~/Projects/org-publish-website/content/projects/pokedex/adding-extra-pokedex-information.org | ~/Projects/org-publish-website/content/projects/pokedex/index.org | ~/Projects/org-publish-website/content/projects/pokedex/scrape_initial_pokedex.org | ~/Projects/org-publish-website/content/projects/pokedex/scrape_specific_pokemon_data.org | ~/Projects/org-publish-website/content/projects/pokedex/scraping-all-pokemon-data.org | ~/Projects/org-publish-website/content/projects/tc-finder/index.org | ~/Projects/org-publish-website/content/projects/website/counting_tags.org | ~/Projects/org-publish-website/content/projects/website/creating_nav_bar.org | ~/Projects/org-publish-website/content/projects/website/hosting_on_github.org | ~/Projects/org-publish-website/content/projects/website/index.org | ~/Projects/org-publish-website/content/projects/website/initial_build.org | ~/Projects/org-publish-website/content/projects/website/subdirectory_index.org | ~/Projects/org-publish-website/content/projects/index.org | ~/Projects/org-publish-website/content/404.org | ~/Projects/org-publish-website/content/index.org |

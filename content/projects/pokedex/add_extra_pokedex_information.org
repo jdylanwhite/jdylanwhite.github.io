@@ -1,0 +1,171 @@
+#+title: Adding Extra Pokedex Information
+#+date: <2023-10-04 Wed>
+#+tags: r web-scraping
+#+catgory: pokedex
+#+excerpt:  Add generation and legendary status as additional columns to the existing Pokedex data.
+#+PROPERTY: header-args R :session *R*
+
+We have a pretty fleshed out Pokedex dataset now, but I'd like to add some extra information, such as Pokemon generation and legendary status. This could probably have been done at the scraping stage, but I have already scraped the data and don't want to hit the server again just to add some known data.
+
+* Load Packages
+
+First, let's load what we need to run the code. We'll scrape some additional information to get the list of legendary Pokemon, so we'll again rely on =rvest=.
+
+#+BEGIN_SRC R
+  library(rvest)
+  library(knitr)
+  library(dplyr)
+#+END_SRC
+
+* Read Scraped Pokedex Data
+
+Next, read the Pokedex data from the previous step.
+
+#+BEGIN_SRC R
+  # Read the pokemon data
+  pokedex_data <- read.csv('./data/pokedex.csv',sep=',')
+
+  glimpse(pokedex_data)
+#+END_SRC
+
+#+BEGIN_EXAMPLE
+  ## Rows: 1,010
+  ## Columns: 20
+  ## $ Number                  <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,…
+  ## $ Name                    <chr> "Bulbasaur", "Ivysaur", "Venusaur", "Charmande…
+  ## $ URLs                    <chr> "https://pokemondb.net/pokedex/bulbasaur", "ht…
+  ## $ Type.1                  <chr> "Grass", "Grass", "Grass", "Fire", "Fire", "Fi…
+  ## $ Type.2                  <chr> "Poison", "Poison", "Poison", NA, NA, "Flying"…
+  ## $ Species                 <chr> "Seed Pokémon", "Seed Pokémon", "Seed Pokémon"…
+  ## $ Height                  <dbl> 0.7, 1.0, 2.0, 0.6, 1.1, 1.7, 0.5, 1.0, 1.6, 0…
+  ## $ Weight                  <dbl> 6.9, 13.0, 100.0, 8.5, 19.0, 90.5, 9.0, 22.5, …
+  ## $ HP                      <int> 45, 60, 80, 39, 58, 78, 44, 59, 79, 45, 50, 60…
+  ## $ Attack                  <int> 49, 62, 82, 52, 64, 84, 48, 63, 83, 30, 20, 45…
+  ## $ Defense                 <int> 49, 63, 83, 43, 58, 78, 65, 80, 100, 35, 55, 5…
+  ## $ Sp..Atk                 <int> 65, 80, 100, 60, 80, 109, 50, 65, 85, 20, 25, …
+  ## $ Sp..Def                 <int> 65, 80, 100, 50, 65, 85, 64, 80, 105, 20, 25, …
+  ## $ Speed                   <int> 45, 60, 80, 65, 80, 100, 43, 58, 78, 45, 30, 7…
+  ## $ Total                   <int> 318, 405, 525, 309, 405, 534, 314, 405, 530, 1…
+  ## $ Type.3                  <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+  ## $ Has.Evolution           <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+  ## $ Evolution.Place         <int> 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1…
+  ## $ Maximum.Evolution.Count <int> 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3…
+  ## $ Evolution.Index         <dbl> 0.33, 0.67, 1.00, 0.33, 0.67, 1.00, 0.33, 0.67…
+#+END_EXAMPLE
+
+* Add Generation Data as a Column
+
+Here, we provide the number of Pokemon in each generation, according to PokemonDB, and then use that information to generate a column assigning each Pokemon to their proper generation.
+
+#+BEGIN_SRC R
+  # Specify how many pokemon were in each generation
+  generation_count <- list(151,100,135,107,156,72,88,96,105)
+
+
+  # Build the list of generation IDs for each pokemon
+  generation_id = list()
+  for (i in 1:length(generation_count)) {
+    generation_id <- c(generation_id,rep(i,generation_count[[i]]))
+  }
+
+  # Add the list as a column in the data
+  pokedex_data$Generation <- as.numeric(generation_id)
+
+  # Show a table of the data
+  kable(pokedex_data[148:153,c(1,2,21)])
+#+END_SRC
+
+|     | Number | Name      | Generation |
+|-----+--------+-----------+------------|
+| 148 | 148    | Dragonair | 1          |
+| 149 | 149    | Dragonite | 1          |
+| 150 | 150    | Mewtwo    | 1          |
+| 151 | 151    | Mew       | 1          |
+| 152 | 152    | Chikorita | 2          |
+| 153 | 153    | Bayleef   | 2          |
+
+* Add Legendary Status as a Column
+
+To add legendary status, we'll use the information on Serebii's [[https://www.serebii.net/pokemon/legendary.shtml][Legendary Pokemon List]]. The table their has a thumbnail for each Pokemon and their legendary status. Conveniently, the thumbnail file name is the number of the Pokemon, so we can use that as a key to identify which Pokemon have which legendary status rather than relying on the names in our scraped Pokedex table to match up identically with what's shown in this Serebii table.
+
+*Note*: Serebii provides three unique legendary status categories.
+
+1. Sub-legendary - Pokemon like Articuno, Zapdos, and Moltres
+2. Legendary - Pokemon like Mewtwo
+3. Mythical - Pokemon like Mew
+
+#+BEGIN_SRC R
+
+  url <- "https://www.serebii.net/pokemon/legendary.shtml"
+
+  # Read the body from the page
+  body <- url %>% read_html() %>% html_nodes("body")
+
+  # Get the info cards for each Pokemon
+  tables <- html_nodes(body, "table.trainer")
+
+  # Fetch the Pokemon numbers from the source in the table for sub-legendary
+  sub_legendary_id <- tables[1] %>%
+    html_nodes("img") %>% 
+    html_attr("src")
+  sub_legendary_id <- gsub("\\D", "",
+                           sub_legendary_id[grepl("*[0-9].png", 
+                                                  sub_legendary_id)])
+  sub_legendary_id <- as.numeric(sub_legendary_id)
+
+  # Fetch the Pokemon numbers from the source in the table for legendary
+  legendary_id <- tables[2] %>%
+    html_nodes("img") %>% 
+    html_attr("src")
+  legendary_id <- gsub("\\D", "", legendary_id[grepl("*[0-9].png",legendary_id)])
+  legendary_id <- as.numeric(legendary_id)
+
+  # Fetch the Pokemon numbers from the source in the table for mythical
+  mythical_id <- tables[3] %>%
+    html_nodes("img") %>% 
+    html_attr("src")
+  mythical_id <- gsub("\\D", "", mythical_id[grepl("*[0-9].png", mythical_id)])
+  mythical_id <- as.numeric(mythical_id)
+
+  # Trim off any numbers that exceed our current pokedex. This is happening
+  # because Serebii has additional pokemon from a recent expansion pack that
+  # Pokemon DB did not yet have.
+  sub_legendary_id <- sub_legendary_id[sub_legendary_id < 
+                                         length(pokedex_data$Number)]
+  legendary_id <- legendary_id[legendary_id < length(pokedex_data$Number)]
+  mythical_id <- mythical_id[mythical_id < length(pokedex_data$Number)]
+
+  # Build the column for legendary status
+  legendary_status <- rep(NA,length(pokedex_data$Number))
+  legendary_status[sub_legendary_id] <- "Sub-Legendary"
+  legendary_status[legendary_id] <- "Legendary"
+  legendary_status[mythical_id] <- "Mythical"
+
+  # Add legendary status as a column for the pokedex data
+  pokedex_data$Legendary.Status <- legendary_status
+
+  kable(pokedex_data[145:151,c(1,2,22)])
+
+#+END_SRC
+
+|     | Number | Name      | Legendary.Status |
+|-----+--------+-----------+------------------|
+| 145 | 145    | Zapdos    | Sub-Legendary    |
+| 146 | 146    | Moltres   | Sub-Legendary    |
+| 147 | 147    | Dratini   | NA               |
+| 148 | 148    | Dragonair | NA               |
+| 149 | 149    | Dragonite | NA               |
+| 150 | 150    | Mewtwo    | Legendary        |
+| 151 | 151    | Mew       | Mythical         |
+
+* Write Data to Output File
+
+And finally, now that we are done, let's write the resulting table to an output file.
+
+#+BEGIN_SRC R
+
+  # Write data to CSV
+  write.table(pokedex_data, "~/Projects/pokedex/data/pokedex_ext.csv",
+              sep = ",", row.names = FALSE)
+
+#+END_SRC

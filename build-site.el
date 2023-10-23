@@ -164,11 +164,12 @@
         (when (org-export-last-sibling-p headline info) "</ul>")))
      (when (and container (not (string= "" container)))
        (format "</%s>" (cl-subseq container 0 (cl-search " " container)))))))
+
 (org-export-define-derived-backend 'site-html 'html
   :translate-alist
   '((template . dw/org-html-template)
-     (headline . dw/org-html-headline)
-     (src-block . dw/org-html-src-block)))
+    (headline . dw/org-html-headline)
+    (src-block . dw/org-html-src-block)))
 
 (defun org-html-publish-to-html (plist filename pub-dir)
   "Publish an org file to HTML.
@@ -211,6 +212,12 @@ Return output file name."
               :publishing-function org-html-publish-to-html
               :with-title nil
               :with-timestamps nil)
+            '("images"
+              :recursive t
+              :base-directory "./content"
+              :base-extension "png"
+              :publishing-directory "./public"
+              :publishing-function org-publish-attachment)
             '("assets"
               :base-directory "./assets"
               :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|woff2\\|ttf"

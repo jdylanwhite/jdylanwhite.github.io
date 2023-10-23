@@ -1,0 +1,353 @@
+#+title: Stats Exploratory Data Analysis
+#+date: <2023-10-14 Sat>
+#+FILETAGS: :r:data-visualization:exploratory-data-analysis:
+#+CATEGORY: pokedex
+#+EXCERPT:  Exploring some of the base stats and other information.
+#+PROPERTY: header-args R :session *R*
+
+* Initial Exploratory Data Analysis
+
+Now that we have the data set ready, let's explore the data and answer some key questions.
+
+* Load Libraries
+
+Start off by loading the libraries we need.
+
+#+BEGIN_SRC R
+  # Load libraries
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+  library(knitr)
+#+END_SRC
+
+* Read and Format Data
+
+Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The =Generation= and =Evolution.Place= columns are categorical, and the =Has.Evolution= column is boolean, so we need to specify those column types.
+
+#+BEGIN_SRC R
+  # Read the data
+  pokedex <- read.csv('./data/pokedex_ext.csv',sep=',')
+
+  # Change categorical columns
+  pokedex$Generation <- as.factor(pokedex$Generation)
+  pokedex$Evolution.Place <- as.factor(pokedex$Evolution.Place)
+  pokedex$Has.Evolution <- as.logical(pokedex$Has.Evolution)
+#+END_SRC
+
+* Show Stats by Generation
+
+First, I'm curious if there's any obvious trend on average for each generation. To do so, we group by the =Generation= column and get the mean for the =HP=, =Attack=, =Defense=, =Sp..Atk=, =Sp..Def=, and =Speed= columns. To plot them easily, we'll pivot the data from wide to long for each stat and specify that the new stat column is a factor.
+
+#+BEGIN_SRC R
+  # Get the stats of Pokemon by generation
+  gen_stats <- pokedex %>%
+    group_by(Generation) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Specify Stat as a factor and set order
+  gen_stats$Stat <- factor(gen_stats$Stat, 
+                           levels=c("HP",
+                                    "Attack",
+                                    "Defense",
+                                    "Sp..Atk",
+                                    "Sp..Def",
+                                    "Speed"))
+
+  # Plot the generation stats
+  ggplot(gen_stats, aes(x=Generation, y=Value, fill=Stat, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7) + 
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle("Average Base Stats for Each Generation") +
+    xlab("Generation") + 
+    ylab("Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/stats-generation-1.png]]
+
+While it's not consistently the case for all stats, the mean stats overall appear to increase from generation to generation. Each stat seems to roughly increase with each generation, with the exception of the Special Defense and Speed stats.
+
+Let's look instead at the total of these stats shown in the =Total= column.
+
+#+BEGIN_SRC R
+  gen_stats <- pokedex %>%
+    group_by(Generation) %>%
+    summarize_at(vars(Total),mean)
+
+  # Plot the generation stats
+  ggplot(gen_stats, aes(x=Generation, y=Total)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7,fill="#81a2be") + 
+    scale_fill_brewer(palette="Dark2") + 
+    coord_cartesian(ylim=c(400,450)) +
+    theme_minimal() +
+    ggtitle(label="Average Total Base Stat for Each Generation") +
+    xlab("Generation") + 
+    ylab("Total Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/total-stats-generation-1.png]]
+
+We don't have a ton of generations to make this case, but it does seem to be the case that, generally speaking, Pokemon in later generations are stronger than Pokemon in previous generations. Interestingly though, this wasn't the case for the first three generations, and average total stats for generations 4 and 7 were quite high compared to the generations before and after them.
+
+* Show Stats by Legendary Status
+
+We have four options for the legendary status of Pokemon: non-legendary, sub-legendary, legendary, and mythical. In the games, legendary Pokemon were always a bit over-powered, so I expect the three legendary classes to outshine the non-legendary stats in every category. The mythical Pokemon are usually stronger than non-legendary Pokemon, but I wonder how they will compare to legendary and sub-legendary Pokemon on average.
+
+#+BEGIN_SRC R
+  # Get the stats of Pokemon by legendary status
+  legendary_stats <- pokedex %>%
+    group_by(Legendary.Status) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Plot the legendary status stats
+  ggplot(legendary_stats, aes(x=Legendary.Status, y=Value, fill=Stat, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7) + 
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Average Base Stats for Each Legendary Status") +
+    xlab("Generation") + 
+    ylab("Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/legendary-stats-1.png]]
+
+And of course, non-legendary Pokemon ("NA") are pretty out-classed by legendary, mythical, and sub-legendary Pokemon. Interestingly, mythical Pokemon like Mew are, on average, comparable to sub-legendary Pokemon, but still get over-powered by legendary Pokemon.
+
+Next, I want to group all of the different legendary Pokemon categories and compare them against the non-legendary Pokemon average stats. The results here won't be surprising, of course, but I wanted to add it just to further show how out-classed the non-legendary Pokemon are.
+
+#+BEGIN_SRC R
+  # Add a column identifying if the Pokemon has a legendary status
+  pokedex$Is.Legendary <- !is.na(pokedex$Legendary.Status)
+
+  # Get the stats of Pokemon by legendary status
+  legendary_stats <- pokedex %>%
+    group_by(Is.Legendary) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Plot the legendary status stats
+  ggplot(legendary_stats, aes(x=Is.Legendary, y=Value, fill=Stat, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7) + 
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Average Base Stats for Each Legendary Status") +
+    xlab("Generation") + 
+    ylab("Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/legendary-stats-2-1.png]]
+
+And again of course, legendary Pokemon way out-shine the non-legendary Pokemon.
+
+* Show Stats by Evolution Status
+
+Next, I wanted to look at the average base stats for Pokemon that are first, second, or third in their evolution status and compare them against Pokemon that don't evolve at all. I'm curious how non-evolving Pokemon compare to Pokemon that evolve. Typically, if a Pokemon evolves, it gets stronger with each evolution, and most Pokemon evolve once or twice. I would expect that Pokemon in the third link of the evolution chain would be stronger than Pokemon who don't evolve, but let's have a look.
+
+Before I do that though, I want to address a mistake when I scraped the data. It's ultimately not a big deal, but it's worth highlighting.
+
+|     | Name     | Evolution.Place | Maximum.Evolution.Count |
+|-----+----------+-----------------+-------------------------|
+| 133 | Eevee    | 1               | 9                       |
+| 134 | Vaporeon | 2               | 9                       |
+| 135 | Jolteon  | 3               | 9                       |
+| 136 | Flareon  | 4               | 9                       |
+| 196 | Espeon   | 6               | 9                       |
+| 197 | Umbreon  | 7               | 9                       |
+| 470 | Leafeon  | 9               | 9                       |
+| 471 | Glaceon  | 10              | 9                       |
+| 700 | Sylveon  | 12              | 9                       |
+
+When I scraped this data set from [[https://pokemondb.net/][PokemonDB]], I decided that if the part of the page had an evolution tree, the first Pokemon in the tree was the first of the evolution stage, the next was the second, and so on. This assumption breaks down in rare cases, such as the Pokemon Eevee and its evolutions. Most Pokemon follow a progressive chain of evolution, but Eevee is a Pokemon that can evolve into nine different Pokemon. Between this and inconsistent way this is rendered on the page, my way of scraping Pokemon like Eevee is not so great here. This case is quite rare and won't have much impact, but for
+this reason, I should cut off the plot to only show Pokemon with ~Evolution.Place <= 3~. Also, you can see that =Evolution.Place= skips 5, 8, and 11. This is because Eevee's evolution chart repeats Eevee in the chain multiple times. Again, this is a weird case, and I won't worry about it.
+
+Okay, now let's have a look at the stats for Pokemon in the first, second, third, parts of their evolution cycle compared to the stats for Pokemon that don't evolve.
+
+#+BEGIN_SRC R
+  # Get the stats of Pokemon by evolution place
+  # Exclude any evolution > 3, as most of those were scraped incorrectly
+  evolution_stats <- pokedex %>%
+    filter(as.numeric(Evolution.Place) <= 3 | is.na(Evolution.Place)) %>%
+    group_by(Evolution.Place) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Plot the evolution place stats
+  ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7) + 
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Average Base Stats for Each Evolution Stage") +
+    xlab("Evolution Stage") + 
+    ylab("Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/evolution-stats-1.png]]
+
+Naturally, Pokemon later in their evolutionary cycle are stronger than Pokemon in earlier cycles. Surprisingly though, non-evolving Pokemon appear to be on par with Pokemon who have evolved twice already. That doesn't match my experience with the games. Pokemon that didn't evolve at all were solid, but often didn't compete with Pokemon who'd evolved several times. I wonder if this is because legendary Pokemon typically don't evolve and typically over-power non-evolutionary Pokemon. Let's filter out legendary Pokemon to see if that's the case.
+
+#+BEGIN_SRC R
+  # Get the stats of non-legendary Pokemon by evolution place
+  # Exclude any evolution > 3, as most of those were scraped incorrectly
+  evolution_stats <- pokedex %>%
+    filter(is.na(Legendary.Status)) %>%
+    filter(as.numeric(Evolution.Place) <= 3 | is.na(Evolution.Place)) %>%
+    group_by(Evolution.Place) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Plot the evolution place stats
+  ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7) + 
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Average Base Stats for Each Evolution Stage") +
+    xlab("Evolution Stage") + 
+    ylab("Stat Value")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/non-legendary-evolution-stats-1.png]]
+
+The difference isn't terribly dramatic, but it does confirm that, on average, Pokemon in their third evolution stage are stronger than Pokemon who don't evolve at all, assuming all else is equal. In fact, Pokemon who don't evolve at all hardly outperform Pokemon in their second stage of evolution.
+
+* Show Stats by Pokemon Type
+
+I'm curious how many Pokemon of each type there are. I suspect most Pokemon will be water or grass type Pokemon.
+
+Of note here, some Pokemon have multiple, up to three, different types. Those are stored in =Type.1=, =Type.2=, and =Type.3=. To count the Pokemon of each type, we'll need to either only count up the Pokemon of
+=Type.1=, or we can pivot to a longer table and Pokemon with multiple types will have multiple entries. I'll pivot to a longer table, and then count the Pokemon of each type.
+
+#+BEGIN_SRC R
+  # Get a count of of each type 
+  type_count <- pokedex %>%
+    pivot_longer(c("Type.1","Type.2","Type.3"),names_to="Type.Number",values_to="Type") %>%
+    drop_na("Type") %>%
+    group_by(Type) %>%
+    count() %>%
+    arrange(desc(n))
+
+  # Show a bar plot of type counts
+  ggplot(type_count, aes(x = reorder(Type, -n),y=n, ymin=0)) + 
+    geom_bar(stat="identity",position="dodge",width=0.7,fill="#81a2be") + 
+    ggtitle(label="Count of Pokemon for Each Type") +
+    xlab("Type") + 
+    ylab("Count") + 
+    scale_alpha(guide = 'none') +
+    theme_minimal() +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2))
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/type-counts-1.png]]
+
+As expected, water and grass are among the most frequent classes. I figured "Normal" Pokemon would make an appearance up top, but I didn't quite expect it to be the second most common type. I definitely didn't expect psychic Pokemon to be so common either.
+
+Now, I'd like to view the average stats of each Pokemon to see which types of Pokemon are typically the strongest. I'd expect that dragon type and steel type are among the top, from my experience with the game. Again, I'll pivot the table so that Pokemon with multiple types have those multiple types represented.
+
+#+BEGIN_SRC R
+  # Calculate mean stats by Pokemon type
+  type_stats <- pokedex %>%
+    pivot_longer(c("Type.1","Type.2","Type.3"),names_to="Type.Number",values_to="Type") %>%
+    drop_na("Type") %>%
+    group_by(Type) %>%
+    summarize_at(vars(HP:Speed),mean) %>%
+    pivot_longer(-1,names_to="Stat",values_to="Value")
+
+  # Specify Stat as a factor and set order
+  type_stats$Stat <- factor(type_stats$Stat, 
+                            levels=c("HP",
+                                     "Attack",
+                                     "Defense",
+                                     "Sp..Atk",
+                                     "Sp..Def",
+                                     "Speed"))
+
+  # Plot Pokemon Stats as a stacked bar
+  ggplot(data = type_stats, aes(x=Type, y=Value, fill=Stat, ymin=0)) +
+    geom_bar(stat="identity",position="stack",width=0.7) +
+    labs(title = "Average Base Stats by Type",
+         y = "Stat Value", 
+         x = "Type") +
+    scale_fill_brewer(palette="Dark2") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/type-stats-1.png]]
+
+Dragon and steel Pokemon did indeed come out among the top, but dark, fighting, and ice Pokemon are also quite strong in terms of their average total base stats. Bug, normal, and poison Pokemon are among the weakest, which is not terribly surprising.
+
+Rather than plotting this as a stacked bar chart, I'd like to see the different stats all separated out. I could make a clustered bar chart, but with as many types as we have here, that would be a very wide, messy chart. Let's instead make subplots using =facet_wrap=.
+
+#+BEGIN_SRC R
+  # Plot each Pokemon Stat on an individual bar chart
+  ggplot(data = type_stats, aes(x=Type, y=Value, ymin=0)) +
+    geom_bar(stat="identity",position="dodge",width=0.7,fill="#81a2be") + 
+    labs(title = "Average Base Stats by Type",
+         y = "Stat Value", x = "Type") + 
+    facet_wrap(~Stat,ncol=2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    scale_fill_brewer(palette="Dark2")
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/type-stats-2-1.png]]
+
+Now we can better see the distributions of stats for different types.
+
+- Dragon Pokemon have the highest HP.
+- Fighting type Pokemon have the highest attack.
+- Rock and steel Pokemon have the highest defense.
+- Psychic, dragon, fire, and electric Pokemon have the highest special attack.
+- Psychic, fairy, steel, and ghost Pokemon have the highest special defense.
+- Flying, electric, dragon, and dark Pokemon have the highest speed.
+
+Next up, I'm curious how legendary Pokemon of a certain type compare against other Pokemon of the same type. Of course, I'd expect that for each type, legendary are among the top Pokemon, but I want to see how
+often non-legendary Pokemon are comparable in total base stats to legendary Pokemon.
+
+#+BEGIN_SRC R
+  type_longer_pokedex <- pokedex %>%
+    pivot_longer(c("Type.1","Type.2","Type.3"),names_to="Type.Number",values_to="Type") %>%
+    drop_na("Type")
+
+  # Show a scatter plot of total base stats, shade by legendary status
+  ggplot(type_longer_pokedex, aes(x=Type,y=Total,color=Legendary.Status, alpha=0.5)) +
+    geom_point() +
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Total Base Stat for All Pokemon") +
+    xlab("Type") + 
+    ylab("Total Stat") + 
+    labs(color='Legendary Status') +
+    scale_alpha(guide = 'none') +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2))
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/legendary-scatter-1.png]]
+
+The legendary, sub-legendary, and mythical Pokemon are of course towards to top of the distribution. There are some non-legendary Pokemon that rank up there with them. This chart makes the gap between purely legendary and all others, including mythical and sub-legendary Pokemon, much more apparent! There are a couple of legendary Pokemon that are mixed in towards the middle and even bottom of the total base stats distribution, which I wasn't really expecting. The weakest of them all is "Cosmog", a legendary psychic Pokemon, ranking at or near the weakest of the psychic Pokemon. However, this Pokemon evolves twice, so it's not to surprising that the first Pokemon in the evolutionary chain is so weak.
+
+Lastly, I want to show a similar chart, but shade by where in the Evolution chain the Pokemon is. Again, I'll need to filter where ~Evolution.Place <= 3~, and I'll remove the legendary Pokemon since those are typically non-evolving and strongest.
+
+#+BEGIN_SRC R
+  evolution_type_longer_pokedex <- type_longer_pokedex %>%
+    filter(as.numeric(Evolution.Place) <= 3 | is.na(Evolution.Place)) %>%
+    filter(is.na(Legendary.Status))
+
+  # Show a scatter plot of total base stats, shade by legendary status
+  ggplot(evolution_type_longer_pokedex, aes(x=Type,y=Total,color=Evolution.Place, alpha=0.5)) +
+    geom_point() +
+    scale_fill_brewer(palette="Dark2") + 
+    theme_minimal() +
+    ggtitle(label="Total Base Stat for All Pokemon") +
+    xlab("Type") + 
+    ylab("Total Stat") + 
+    labs(color='Evolution Place') +
+    scale_alpha(guide = 'none') +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2))
+#+END_SRC
+
+[[file:stats_eda_files/figure-gfm/evolution-scatter-1.png]]
+
+Naturally, the chart shows well that weaker Pokemon tend to be those in the first phase of their evolution, getting progressively stronger with later phases. Normal Pokemon are mixed among the top half of the chart here. We again see the same information as before, but not showing just the average base stats for each evolution makes the comparison between Pokemon who don't evolve and Pokemon in their third stage of evolution a little more nuanced. According to base stats alone, some non-evolving Pokemon are just as strong as some third-phase evolved Pokemon, but the distribution is more skewed towards lower stats for non-evolving Pokemon, so they are on average lower in total stats.

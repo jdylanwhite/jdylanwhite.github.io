@@ -1,5 +1,5 @@
 (setq org-publish-cache (make-hash-table :test 'equal :weakness nil :size 100))
 (puthash ":project:" "assets" org-publish-cache)
-(puthash ":cache-file:" "/home/jdylanwhite5/Documents/website/.org-cache/assets.cache" org-publish-cache)
-(puthash "X5a5db1bfb6a072a71c881c1dc4929947776c03a9" '(25878 49029 286810 597000) org-publish-cache)
-(puthash "X868458ff266ad44536da86c7fe382e5848e507d8" '(25879 35005 234594 439000) org-publish-cache)
+(puthash ":cache-file:" "/home/jdylanwhite5/Projects/org-publish-website/.org-cache/assets.cache" org-publish-cache)
+(puthash "Xcd75bbf78cba6e582d59d20f10f262a53dba95ae" '(25898 53193 326454 988000) org-publish-cache)
+(puthash "X1a08e94718c76d348fe17b652725f3a7d0d5ba11" '(25898 52400 206447 450000) org-publish-cache)

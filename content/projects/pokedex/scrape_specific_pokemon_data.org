@@ -1,5 +1,8 @@
 #+title: Scrape Specific Pokemon Data
 #+date: <2023-10-01 Sun>
+#+FILETAGS: :r:web-scraping:
+#+CATEGORY: pokedex
+#+EXCERPT:  Scrape stats and evolution data from a specific Pokemon's page.
 #+PROPERTY: header-args R :session *R*
 
 On each Pokemon's page (for example, [[https://pokemondb.net/pokedex/gengar][Gengar's page]]), there's a consistent and structured data that we can programmatically scrape. Each page has a table showing the Pokemon's "national number", type(s), height, and weight, another table showing base stats for battle such as health points (HP), attack, and defense, and several other tables and information.
