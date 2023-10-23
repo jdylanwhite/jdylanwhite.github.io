@@ -1,10 +1,14 @@
 #+title: Counting Tags
+#+author: J. Dylan white
+#+date: <2023-10-23 Mon>
+
+I'd like to be able to have a count of all of the different tags I've added to different files.
 
 #+begin_src elisp
 
-(setq content-org-files (directory-files-recursively "~/Projects/org-publish-website/content/" "\.org$"))
+(setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))
 
 #+end_src
 
 #+RESULTS:
-| ~/Projects/org-publish-website/content/dotfiles/doom-emacs.org | ~/Projects/org-publish-website/content/dotfiles/index.org | ~/Projects/org-publish-website/content/projects/pokedex/adding-extra-pokedex-information.org | ~/Projects/org-publish-website/content/projects/pokedex/index.org | ~/Projects/org-publish-website/content/projects/pokedex/scrape_initial_pokedex.org | ~/Projects/org-publish-website/content/projects/pokedex/scrape_specific_pokemon_data.org | ~/Projects/org-publish-website/content/projects/pokedex/scraping-all-pokemon-data.org | ~/Projects/org-publish-website/content/projects/tc-finder/index.org | ~/Projects/org-publish-website/content/projects/website/counting_tags.org | ~/Projects/org-publish-website/content/projects/website/creating_nav_bar.org | ~/Projects/org-publish-website/content/projects/website/hosting_on_github.org | ~/Projects/org-publish-website/content/projects/website/index.org | ~/Projects/org-publish-website/content/projects/website/initial_build.org | ~/Projects/org-publish-website/content/projects/website/subdirectory_index.org | ~/Projects/org-publish-website/content/projects/index.org | ~/Projects/org-publish-website/content/404.org | ~/Projects/org-publish-website/content/index.org |
+| ~/Projects/website/content/dotfiles/doom-emacs.org | ~/Projects/website/content/dotfiles/index.org | ~/Projects/website/content/projects/pokedex/add_extra_pokedex_information.org | ~/Projects/website/content/projects/pokedex/eda_physical_stats.org | ~/Projects/website/content/projects/pokedex/eda_stats.org | ~/Projects/website/content/projects/pokedex/index.org | ~/Projects/website/content/projects/pokedex/scrape_all_pokemon_data.org | ~/Projects/website/content/projects/pokedex/scrape_initial_pokedex.org | ~/Projects/website/content/projects/pokedex/scrape_specific_pokemon_data.org | ~/Projects/website/content/projects/tc-finder/index.org | ~/Projects/website/content/projects/website/counting_tags.org | ~/Projects/website/content/projects/website/creating_nav_bar.org | ~/Projects/website/content/projects/website/hosting_on_github.org | ~/Projects/website/content/projects/website/index.org | ~/Projects/website/content/projects/website/initial_build.org | ~/Projects/website/content/projects/website/subdirectory_index.org | ~/Projects/website/content/projects/index.org | ~/Projects/website/content/404.org | ~/Projects/website/content/index.org |
