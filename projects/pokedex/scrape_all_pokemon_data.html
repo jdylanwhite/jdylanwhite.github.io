@@ -1,9 +1,9 @@
-<!-- Generated from 0ee47b0 on 2023-10-23 @ 16:22 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from e2128dd on 2023-10-23 @ 16:34 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape All Pokemon Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape All Pokemon Data</h1><p class="site-post-meta">October  3, 2023</p><div id="content"><p>
 Now that we know how to build the initial Pokedex table and then fill out stats for each Pokemon in the initial table, we can build out the full Pokedex!
 </p>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgbc9c1dd">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org50990f3">
 <p>
 Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with some other libraries for common functions to help get the Pokedex table.
 </p>
@@ -16,7 +16,7 @@ Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with some
 <span class="org-ess-modifiers">library</span>(stringr)</pre>
 </div>
 
-<h2><a id="read-initial-pokedex" class="anchor" href="#read-initial-pokedex">¶</a>Read Initial Pokedex</h2><div class="outline-text-2" id="text-orge6240a7">
+<h2><a id="read-initial-pokedex" class="anchor" href="#read-initial-pokedex">¶</a>Read Initial Pokedex</h2><div class="outline-text-2" id="text-org88a9540">
 <p>
 Just like before, let&rsquo;s read a table consisting of only Pokemon names, numbers, and the URLs to access each Pokemon&rsquo;s page.
 </p>
@@ -412,7 +412,7 @@ pokemon_tbl <span class="org-ess-assignment">&lt;-</span> cbind(pokedex_tbl, pok
 </table>
 </div>
 
-<h2><a id="clean-data" class="anchor" href="#clean-data">¶</a>Clean Data</h2><div class="outline-text-2" id="text-org7e87843">
+<h2><a id="clean-data" class="anchor" href="#clean-data">¶</a>Clean Data</h2><div class="outline-text-2" id="text-orge57b497">
 <p>
 Clean up the Height and Weight fields to just have the metric units.
 </p>
@@ -622,7 +622,7 @@ pokemon_tbl <span class="org-ess-assignment">&lt;-</span> clean_pokemon_data(pok
 </table>
 </div>
 
-<h2><a id="write-pokedex-data-to-output-file" class="anchor" href="#write-pokedex-data-to-output-file">¶</a>Write Pokedex Data to Output File</h2><div class="outline-text-2" id="text-orgbeffb0c">
+<h2><a id="write-pokedex-data-to-output-file" class="anchor" href="#write-pokedex-data-to-output-file">¶</a>Write Pokedex Data to Output File</h2><div class="outline-text-2" id="text-org5447a4f">
 <p>
 Finally, write this data out to a CSV.
 </p>
