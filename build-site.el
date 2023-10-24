@@ -41,6 +41,20 @@
 (setq user-full-name "J. Dylan White")
 (setq user-mail-address "jdylanwhite5@gmail.com")
 
+(setq org-tag-alist '((:startgrouptag)
+                      ("Data Science")
+                      (:grouptags)
+                      ("web-scraping")
+                      ("data-visualization")
+                      (:endgrouptag)
+                      (:startgrouptag)
+                      ("Languages")
+                      (:grouptags)
+                      ("python")
+                      ("r")
+                      ("elisp")
+                      (:endgrouptag)))
+
 (defvar dw/site-url (if (string-equal (getenv "CI") "true")
                         "https://jdylanwhite.github.io"
                         "http://localhost:8080")
@@ -195,8 +209,6 @@ contextual information."
 			 "</span> " (org-export-data caption info))))
 	      (funcall table-column-specs table info)
 	      contents))))
-
-
 
 (defun dw/make-heading-anchor-name (headline-text)
   (thread-last headline-text

@@ -1,6 +1,6 @@
 #+title: Scrape Initial Pokedex
 #+date: <2023-10-02 Mon>
-#+tags: r web-scraping
+#+FILETAGS: :r:web-scraping:
 #+catgory: pokedex
 #+excerpt:  Scrape the initial data (number, name, URL) for the table of all Pokemon
 #+PROPERTY: header-args R :session *R*

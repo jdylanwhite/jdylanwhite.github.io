@@ -11,4 +11,5 @@ The [[https://pokemondb.net/][PokemonDB]] site is a fantastic resource for getti
 - [[file:scrape_initial_pokedex.org][Scraping initial Pokedex]] - scraping the entire Pokedex, but just the names, numbers, and URLs.
 - [[file:scrape_all_pokemon_data.org][Scraping all Pokemon data]] - scraping stats and evolutionary data for all Pokemon.
 - [[file:add_extra_pokedex_information.org][Adding extra Pokemon information]] - adding generation and legendary status to existing Pokemon data.
-- [[file:eda_physical_stats.org][Exploratory data analysis of physical stats]] - investigated relationships associated to Pokemon's physical stats, namely height and weight.
+- [[file:eda_physical_stats.org][Exploratory data analysis of physical stats]] - investigating relationships associated to Pokemon's physical stats, namely height and weight.
+- [[file:eda_types.org][Exploratory data analysis of type stats]] - investigating Pokemon types and how battle stats vary by type.

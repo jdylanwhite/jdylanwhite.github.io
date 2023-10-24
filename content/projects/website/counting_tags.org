@@ -2,12 +2,98 @@
 #+author: J. Dylan white
 #+date: <2023-10-23 Mon>
 
+* Introduction :elisp:website:
+
 I'd like to be able to have a count of all of the different tags I've added to different files.
 
-#+begin_src elisp
+#+begin_src elisp :results silent
 
-;; (setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))
+  (setq org-tag-alist '((:startgrouptag)
+                        ("data-science")
+                        (:grouptags)
+                        ("web-scraping")
+                        ("data-visualization")
+                        (:endgrouptag)
+                        (:startgrouptag)
+                        ("languages")
+                        (:grouptags)
+                        ("python")
+                        ("r")
+                        ("elisp")
+                        (:endgrouptag)
+                        (:startgrouptag)
+                        ("projects")
+                        (:grouptags)
+                        ("pokedex")
+                        ("website")
+                        (:endgrouptag)))
+
+#+end_src
+
+* Count Tag Frequency
+
+#+begin_src emacs-lisp
+
+(defun count-tags ()
+  (let (tags count)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward org-complex-heading-regexp nil t)
+        (dolist (tag (org-get-tags))
+          (push tag tags)))
+      (cl-loop with result
+               for tag in tags
+               do (push (list (cl-count tag tags
+                                        :test #'string=)
+                              tag)
+                        count)
+               collect
+               (setq result (cl-remove-duplicates count
+                                                  :test #'equal))
+               finally return
+               (cl-sort result #'> :key #'car)))))
+
+(count-tags)
 
 #+end_src
 
 #+RESULTS:
+| 1 | elisp   |
+| 1 | website |
+
+#+begin_src elisp
+
+  (let (tags count)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward org-complex-heading-regexp nil t)
+        (dolist (tag (org-get-tags))
+          (push tag tags)))
+      (cl-loop with result
+               for tag in tags
+               do (push (list (cl-count tag tags
+                                        :test #'string=)
+                              tag)
+                        count)
+               collect
+               (setq result (cl-remove-duplicates count
+                                                  :test #'equal))
+               finally return
+               (cl-sort result #'> :key #'car))))
+
+#+end_src
+
+#+begin_src elisp
+
+  (list-tags "~/Projects/website/content/projects/website/counting_tags.org")
+
+#+end_src
+
+#+begin_src elisp
+
+  (setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))
+
+#+end_src
+
+#+RESULTS:
+| ~/Projects/website/content/dotfiles/doom-emacs.org | ~/Projects/website/content/dotfiles/index.org | ~/Projects/website/content/projects/pokedex/add_extra_pokedex_information.org | ~/Projects/website/content/projects/pokedex/eda_physical_stats.org | ~/Projects/website/content/projects/pokedex/eda_stats.org | ~/Projects/website/content/projects/pokedex/index.org | ~/Projects/website/content/projects/pokedex/scrape_all_pokemon_data.org | ~/Projects/website/content/projects/pokedex/scrape_initial_pokedex.org | ~/Projects/website/content/projects/pokedex/scrape_specific_pokemon_data.org | ~/Projects/website/content/projects/tc-finder/index.org | ~/Projects/website/content/projects/website/counting_tags.org | ~/Projects/website/content/projects/website/creating_nav_bar.org | ~/Projects/website/content/projects/website/hosting_on_github.org | ~/Projects/website/content/projects/website/index.org | ~/Projects/website/content/projects/website/initial_build.org | ~/Projects/website/content/projects/website/subdirectory_index.org | ~/Projects/website/content/projects/index.org | ~/Projects/website/content/404.org | ~/Projects/website/content/index.org |
