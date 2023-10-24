@@ -1,9 +1,9 @@
-<!-- Generated from 43d913f on 2023-10-23 @ 19:24 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from c8c9c3f on 2023-10-24 @ 23:01 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape Initial Pokedex - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape Initial Pokedex</h1><p class="site-post-meta">October  2, 2023</p><div id="content"><p>
 Before we scrape all of the Pokemon data, let&rsquo;s start by building the table of just Pokemon and their number, again using the <a href="https://pokemondb.net/">PokemonDB</a> site.
 </p>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org2e8ae86">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org6af78ea">
 <p>
 Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with <code>dplyr</code> and <code>tidyr</code> for some additional common functions.
 </p>
@@ -15,7 +15,7 @@ Again, we&rsquo;ll primarily use the <code>rvest</code> package, along with <cod
 <span class="org-ess-modifiers">library</span>(tidyr)</pre>
 </div>
 
-<h2><a id="load-national-pokedex-page" class="anchor" href="#load-national-pokedex-page">¶</a>Load National Pokedex Page</h2><div class="outline-text-2" id="text-org5a0e346">
+<h2><a id="load-national-pokedex-page" class="anchor" href="#load-national-pokedex-page">¶</a>Load National Pokedex Page</h2><div class="outline-text-2" id="text-org949f577">
 <p>
 Let&rsquo;s load the page data from the <a href="https://pokemondb.net/pokedex/national">National Pokedex</a> page, which has a table of all Pokemon, their number, and a link to their page.
 </p>
@@ -30,7 +30,7 @@ body <span class="org-ess-assignment">&lt;-</span> url <span class="org-ess-XopX
 infocards <span class="org-ess-assignment">&lt;-</span> html_nodes(body, <span class="org-string">"span.infocard-lg-data.text-muted"</span>)</pre>
 </div>
 
-<h2><a id="get-the-initial-pokedex-data" class="anchor" href="#get-the-initial-pokedex-data">¶</a>Get the Initial Pokedex Data</h2><div class="outline-text-2" id="text-org183c5e5">
+<h2><a id="get-the-initial-pokedex-data" class="anchor" href="#get-the-initial-pokedex-data">¶</a>Get the Initial Pokedex Data</h2><div class="outline-text-2" id="text-orgd188fc2">
 <p>
 Using the tags for each &ldquo;infocard&rdquo; which contains the information we want for each Pokemon, get the numbers, names, and URLs for each Pokemon.
 </p>
@@ -52,7 +52,7 @@ urls <span class="org-ess-assignment">&lt;-</span> infocards <span class="org-es
 urls <span class="org-ess-assignment">&lt;-</span> paste0(<span class="org-string">"https://pokemondb.net"</span>, urls)</pre>
 </div>
 
-<h2><a id="assemble-initial-pokedex-dataframe" class="anchor" href="#assemble-initial-pokedex-dataframe">¶</a>Assemble Initial Pokedex Dataframe</h2><div class="outline-text-2" id="text-org3ab8c33">
+<h2><a id="assemble-initial-pokedex-dataframe" class="anchor" href="#assemble-initial-pokedex-dataframe">¶</a>Assemble Initial Pokedex Dataframe</h2><div class="outline-text-2" id="text-org4f70350">
 <p>
 Finally, let&rsquo;s put all of this data into a dataframe.
 </p>

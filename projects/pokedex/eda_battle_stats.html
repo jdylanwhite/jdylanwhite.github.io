@@ -1,0 +1,569 @@
+<!-- Generated from c8c9c3f on 2023-10-24 @ 23:01 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Exploratory Data Analysis of Battle Stats - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Exploratory Data Analysis of Battle Stats</h1><p class="site-post-meta">October 25, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgc9be3ca">
+<p>
+Here, we investigate some of the Pokemon battle stats data.
+</p>
+</div>
+
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org95ee8b4">
+<p>
+Start off by loading the libraries we need.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load libraries</span>
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)
+<span class="org-ess-modifiers">library</span>(ggplot2)</pre>
+</div>
+
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org0e71a90">
+<p>
+Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Read the data</span>
+pokedex <span class="org-ess-assignment">&lt;-</span> read.csv(<span class="org-string">'~/Projects/pokedex/data/pokedex_ext.csv'</span>,sep=<span class="org-string">','</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Change categorical columns</span>
+pokedex$Generation <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Generation)
+pokedex$Evolution.Place <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Evolution.Place)
+pokedex$Has.Evolution <span class="org-ess-assignment">&lt;-</span> as.logical(pokedex$Has.Evolution)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show Pokedex data</span>
+head(pokedex)</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Number</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">URLs</th>
+<th scope="col" class="org-left">Type.1</th>
+<th scope="col" class="org-left">Type.2</th>
+<th scope="col" class="org-left">Species</th>
+<th scope="col" class="org-right">Height</th>
+<th scope="col" class="org-right">Weight</th>
+<th scope="col" class="org-right">HP</th>
+<th scope="col" class="org-right">Attack</th>
+<th scope="col" class="org-right">Defense</th>
+<th scope="col" class="org-right">Sp..Atk</th>
+<th scope="col" class="org-right">Sp..Def</th>
+<th scope="col" class="org-right">Speed</th>
+<th scope="col" class="org-right">Total</th>
+<th scope="col" class="org-left">Type.3</th>
+<th scope="col" class="org-left">Has.Evolution</th>
+<th scope="col" class="org-right">Evolution.Place</th>
+<th scope="col" class="org-right">Maximum.Evolution.Count</th>
+<th scope="col" class="org-right">Evolution.Index</th>
+<th scope="col" class="org-right">Generation</th>
+<th scope="col" class="org-left">Legendary.Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Bulbasaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/bulbasaur">https://pokemondb.net/pokedex/bulbasaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">0.7</td>
+<td class="org-right">6.9</td>
+<td class="org-right">45</td>
+<td class="org-right">49</td>
+<td class="org-right">49</td>
+<td class="org-right">65</td>
+<td class="org-right">65</td>
+<td class="org-right">45</td>
+<td class="org-right">318</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Ivysaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/ivysaur">https://pokemondb.net/pokedex/ivysaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">1</td>
+<td class="org-right">13</td>
+<td class="org-right">60</td>
+<td class="org-right">62</td>
+<td class="org-right">63</td>
+<td class="org-right">80</td>
+<td class="org-right">80</td>
+<td class="org-right">60</td>
+<td class="org-right">405</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Venusaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/venusaur">https://pokemondb.net/pokedex/venusaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">2</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">82</td>
+<td class="org-right">83</td>
+<td class="org-right">100</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">525</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Charmander</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmander">https://pokemondb.net/pokedex/charmander</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Lizard Pokémon</td>
+<td class="org-right">0.6</td>
+<td class="org-right">8.5</td>
+<td class="org-right">39</td>
+<td class="org-right">52</td>
+<td class="org-right">43</td>
+<td class="org-right">60</td>
+<td class="org-right">50</td>
+<td class="org-right">65</td>
+<td class="org-right">309</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Charmeleon</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-right">1.1</td>
+<td class="org-right">19</td>
+<td class="org-right">58</td>
+<td class="org-right">64</td>
+<td class="org-right">58</td>
+<td class="org-right">80</td>
+<td class="org-right">65</td>
+<td class="org-right">80</td>
+<td class="org-right">405</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">6</td>
+<td class="org-left">Charizard</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charizard">https://pokemondb.net/pokedex/charizard</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">Flying</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-right">1.7</td>
+<td class="org-right">90.5</td>
+<td class="org-right">78</td>
+<td class="org-right">84</td>
+<td class="org-right">78</td>
+<td class="org-right">109</td>
+<td class="org-right">85</td>
+<td class="org-right">100</td>
+<td class="org-right">534</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<h2><a id="show-stats-by-generation" class="anchor" href="#show-stats-by-generation">¶</a>Show Stats by Generation</h2><div class="outline-text-2" id="text-org9d0d90e">
+<p>
+First, I&rsquo;m curious if there&rsquo;s any obvious trend on average for each generation. To do so, we group by the <code>Generation</code> column and get the mean for the <code>HP</code>, <code>Attack</code>, <code>Defense</code>, <code>Sp..Atk</code>, <code>Sp..Def</code>, and <code>Speed</code> columns. To plot them easily, we&rsquo;ll pivot the data from wide to long for each stat and specify that the new stat column is a factor.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by generation</span>
+gen_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Generation) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Specify Stat as a factor and set order</span>
+gen_stats$Stat <span class="org-ess-assignment">&lt;-</span> factor(gen_stats$Stat,
+                         levels=c(<span class="org-string">"HP"</span>,
+                                  <span class="org-string">"Attack"</span>,
+                                  <span class="org-string">"Defense"</span>,
+                                  <span class="org-string">"Sp..Atk"</span>,
+                                  <span class="org-string">"Sp..Def"</span>,
+                                  <span class="org-string">"Speed"</span>))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the generation stats</span>
+ggplot(gen_stats, aes(x=Generation, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  ggtitle(<span class="org-string">"Average Base Stats for Each Generation"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) +
+  ylab(<span class="org-string">"Stat Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/stats-generation.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/stats-generation.png" alt="stats-generation.png" />
+</p>
+</div>
+
+<p>
+While it&rsquo;s not consistently the case for all stats, the mean stats overall appear to increase from generation to generation. Each stat seems to roughly increase with each generation, with the exception of the Special Defense and Speed stats.
+</p>
+
+<p>
+Let&rsquo;s look instead at the total of these stats shown in the <code>Total</code> column.
+</p>
+
+<pre>gen_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Generation) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(Total),mean)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the generation stats</span>
+ggplot(gen_stats, aes(x=Generation, y=Total)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  coord_cartesian(ylim=c(400,450)) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Total Base Stat for Each Generation"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) +
+  ylab(<span class="org-string">"Total Stat Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/total-stats-generation.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/total-stats-generation.png" alt="total-stats-generation.png" />
+</p>
+</div>
+
+<p>
+We don&rsquo;t have a ton of generations to make this case, but it does seem to be the case that, generally speaking, Pokemon in later generations are stronger than Pokemon in previous generations. Interestingly though, this wasn&rsquo;t the case for the first three generations, and average total stats for generations 4 and 7 were quite high compared to the generations before and after them.
+</p>
+</div>
+
+<h2><a id="show-stats-by-legendary-status" class="anchor" href="#show-stats-by-legendary-status">¶</a>Show Stats by Legendary Status</h2><div class="outline-text-2" id="text-org09501de">
+<p>
+We have four options for the legendary status of Pokemon: non-legendary, sub-legendary, legendary, and mythical. In the games, legendary Pokemon were always a bit over-powered, so I expect the three legendary classes to outshine the non-legendary stats in every category. The mythical Pokemon are usually stronger than non-legendary Pokemon, but I wonder how they will compare to legendary and sub-legendary Pokemon on average.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by legendary status</span>
+legendary_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Legendary.Status) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the legendary status stats</span>
+ggplot(legendary_stats, aes(x=Legendary.Status, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Legendary Status"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) +
+  ylab(<span class="org-string">"Stat Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/legendary-stats.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/legendary-stats.png" alt="legendary-stats.png" />
+</p>
+</div>
+
+<p>
+And of course, non-legendary Pokemon (&ldquo;NA&rdquo;) are pretty out-classed by legendary, mythical, and sub-legendary Pokemon. Interestingly, mythical Pokemon like Mew are, on average, comparable to sub-legendary Pokemon, but still get over-powered by legendary Pokemon.
+</p>
+
+<p>
+Next, I want to group all of the different legendary Pokemon categories and compare them against the non-legendary Pokemon average stats. The results here won&rsquo;t be surprising, of course, but I wanted to add it just to further show how out-classed the non-legendary Pokemon are.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Add a column identifying if the Pokemon has a legendary status</span>
+pokedex$Is.Legendary <span class="org-ess-assignment">&lt;-</span> !is.na(pokedex$Legendary.Status)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by legendary status</span>
+legendary_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Is.Legendary) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the legendary status stats</span>
+ggplot(legendary_stats, aes(x=Is.Legendary, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Legendary Status"</span>) +
+  xlab(<span class="org-string">"Generation"</span>) +
+  ylab(<span class="org-string">"Stat Value"</span>)
+
+  ggsave(<span class="org-string">"images/legendary_stats_2.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/legendary_stats_2.png" alt="legendary_stats_2.png" />
+</p>
+</div>
+
+<p>
+And again of course, legendary Pokemon way out-shine the non-legendary Pokemon.
+</p>
+</div>
+
+<h2><a id="show-stats-by-evolution-status" class="anchor" href="#show-stats-by-evolution-status">¶</a>Show Stats by Evolution Status</h2><div class="outline-text-2" id="text-orgfd25cac">
+<p>
+Next, I wanted to look at the average base stats for Pokemon that are first, second, or third in their evolution status and compare them against Pokemon that don&rsquo;t evolve at all. I&rsquo;m curious how non-evolving Pokemon compare to Pokemon that evolve. Typically, if a Pokemon evolves, it gets stronger with each evolution, and most Pokemon evolve once or twice. I would expect that Pokemon in the third link of the evolution chain would be stronger than Pokemon who don&rsquo;t evolve, but let&rsquo;s have a look.
+</p>
+
+<p>
+Before I do that though, I want to address a mistake when I scraped the data. It&rsquo;s ultimately not a big deal, but it&rsquo;s worth highlighting.
+</p>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-right">Evolution.Place</th>
+<th scope="col" class="org-right">Maximum.Evolution.Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">133</td>
+<td class="org-left">Eevee</td>
+<td class="org-right">1</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">134</td>
+<td class="org-left">Vaporeon</td>
+<td class="org-right">2</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">135</td>
+<td class="org-left">Jolteon</td>
+<td class="org-right">3</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">136</td>
+<td class="org-left">Flareon</td>
+<td class="org-right">4</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">196</td>
+<td class="org-left">Espeon</td>
+<td class="org-right">6</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">197</td>
+<td class="org-left">Umbreon</td>
+<td class="org-right">7</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">470</td>
+<td class="org-left">Leafeon</td>
+<td class="org-right">9</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">471</td>
+<td class="org-left">Glaceon</td>
+<td class="org-right">10</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">700</td>
+<td class="org-left">Sylveon</td>
+<td class="org-right">12</td>
+<td class="org-right">9</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>
+When I scraped this data set from <a href="https://pokemondb.net/">PokemonDB</a>, I decided that if the part of the page had an evolution tree, the first Pokemon in the tree was the first of the evolution stage, the next was the second, and so on. This assumption breaks down in rare cases, such as the Pokemon Eevee and its evolutions. Most Pokemon follow a progressive chain of evolution, but Eevee is a Pokemon that can evolve into nine different Pokemon. Between this and inconsistent way this is rendered on the page, my way of scraping Pokemon like Eevee is not so great here. This case is quite rare and won&rsquo;t have much impact, but for
+this reason, I should cut off the plot to only show Pokemon with <code>Evolution.Place &lt;= 3</code>. Also, you can see that <code>Evolution.Place</code> skips 5, 8, and 11. This is because Eevee&rsquo;s evolution chart repeats Eevee in the chain multiple times. Again, this is a weird case, and I won&rsquo;t worry about it.
+</p>
+
+<p>
+Okay, now let&rsquo;s have a look at the stats for Pokemon in the first, second, third, parts of their evolution cycle compared to the stats for Pokemon that don&rsquo;t evolve.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of Pokemon by evolution place</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Exclude any evolution &gt; 3, as most of those were scraped incorrectly</span>
+evolution_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  filter(as.numeric(Evolution.Place) &lt;= 3 | is.na(Evolution.Place)) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Evolution.Place) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the evolution place stats</span>
+ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Evolution Stage"</span>) +
+  xlab(<span class="org-string">"Evolution Stage"</span>) +
+  ylab(<span class="org-string">"Stat Value"</span>)
+
+ggsave(<span class="org-string">"images/evolution-stats.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/evolution-stats.png" alt="evolution-stats.png" />
+</p>
+</div>
+
+<p>
+Naturally, Pokemon later in their evolutionary cycle are stronger than Pokemon in earlier cycles. Surprisingly though, non-evolving Pokemon appear to be on par with Pokemon who have evolved twice already. That doesn&rsquo;t match my experience with the games. Pokemon that didn&rsquo;t evolve at all were solid, but often didn&rsquo;t compete with Pokemon who&rsquo;d evolved several times. I wonder if this is because legendary Pokemon typically don&rsquo;t evolve and typically over-power non-evolutionary Pokemon. Let&rsquo;s filter out legendary Pokemon to see if that&rsquo;s the case.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the stats of non-legendary Pokemon by evolution place</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Exclude any evolution &gt; 3, as most of those were scraped incorrectly</span>
+evolution_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  filter(is.na(Legendary.Status)) <span class="org-ess-XopX">%&gt;%</span>
+  filter(as.numeric(Evolution.Place) &lt;= 3 | is.na(Evolution.Place)) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Evolution.Place) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the evolution place stats</span>
+ggplot(evolution_stats, aes(x=Evolution.Place, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  ggtitle(label=<span class="org-string">"Average Base Stats for Each Evolution Stage"</span>) +
+  xlab(<span class="org-string">"Evolution Stage"</span>) +
+  ylab(<span class="org-string">"Stat Value"</span>)
+
+ggsave(<span class="org-string">"images/non-legendary-evolution-stats.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/non-legendary-evolution-stats.png" alt="non-legendary-evolution-stats.png" />
+</p>
+</div>
+
+<p>
+The difference isn&rsquo;t terribly dramatic, but it does confirm that, on average, Pokemon in their third evolution stage are stronger than Pokemon who don&rsquo;t evolve at all, assuming all else is equal. In fact, Pokemon who don&rsquo;t evolve at all hardly outperform Pokemon in their second stage of evolution.
+</p>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

@@ -1,7 +1,161 @@
-<!-- Generated from 43d913f on 2023-10-23 @ 19:24 with Emacs 27.1 (Org mode 9.3) -->
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Counting Tags - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Counting Tags</h1><p class="site-post-meta">October 23, 2023</p><div id="content"><p>
+<!-- Generated from c8c9c3f on 2023-10-24 @ 23:01 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Counting Tags - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Counting Tags</h1><p class="site-post-meta">October 23, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org8468649">
+<p>
 I&rsquo;d like to be able to have a count of all of the different tags I&rsquo;ve added to different files.
 </p>
 
-<pre><span class="org-comment-delimiter">;; </span><span class="org-comment">(setq content-org-files (directory-files-recursively "~/Projects/website/content/" "\.org$"))</span></pre>
+<pre>(<span class="org-keyword">setq</span> org-tag-alist '((<span class="org-builtin">:startgrouptag</span>)
+                      (<span class="org-string">"data-science"</span>)
+                      (<span class="org-builtin">:grouptags</span>)
+                      (<span class="org-string">"web-scraping"</span>)
+                      (<span class="org-string">"data-visualization"</span>)
+                      (<span class="org-builtin">:endgrouptag</span>)
+                      (<span class="org-builtin">:startgrouptag</span>)
+                      (<span class="org-string">"languages"</span>)
+                      (<span class="org-builtin">:grouptags</span>)
+                      (<span class="org-string">"python"</span>)
+                      (<span class="org-string">"r"</span>)
+                      (<span class="org-string">"elisp"</span>)
+                      (<span class="org-builtin">:endgrouptag</span>)
+                      (<span class="org-builtin">:startgrouptag</span>)
+                      (<span class="org-string">"projects"</span>)
+                      (<span class="org-builtin">:grouptags</span>)
+                      (<span class="org-string">"pokedex"</span>)
+                      (<span class="org-string">"website"</span>)
+                      (<span class="org-builtin">:endgrouptag</span>)))</pre>
+</div>
+
+<h2><a id="count-tag-frequency" class="anchor" href="#count-tag-frequency">¶</a>Count Tag Frequency</h2><div class="outline-text-2" id="text-orgf30d3de">
+<pre>(<span class="org-keyword">defun</span> <span class="org-function-name">count-tags</span> ()
+  (<span class="org-keyword">let</span> (tags count)
+    (<span class="org-keyword">save-excursion</span>
+      (goto-char (point-min))
+      (<span class="org-keyword">while</span> (re-search-forward org-complex-heading-regexp nil t)
+        (<span class="org-keyword">dolist</span> (tag (org-get-tags))
+          (<span class="org-keyword">push</span> tag tags)))
+      (<span class="org-keyword">cl-loop</span> with result
+               for tag in tags
+               do (<span class="org-keyword">push</span> (list (cl-count tag tags
+                                        <span class="org-builtin">:test</span> #'string=)
+                              tag)
+                        count)
+               collect
+               (<span class="org-keyword">setq</span> result (cl-remove-duplicates count
+                                                  <span class="org-builtin">:test</span> #'equal))
+               finally return
+               (cl-sort result #'&gt; <span class="org-builtin">:key</span> #'car)))))
+
+(count-tags)</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">elisp</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">website</td>
+</tr>
+</tbody>
+</table></div>
+
+<pre>(<span class="org-keyword">let</span> (tags count)
+  (<span class="org-keyword">save-excursion</span>
+    (goto-char (point-min))
+    (<span class="org-keyword">while</span> (re-search-forward org-complex-heading-regexp nil t)
+      (<span class="org-keyword">dolist</span> (tag (org-get-tags))
+        (<span class="org-keyword">push</span> tag tags)))
+    (<span class="org-keyword">cl-loop</span> with result
+             for tag in tags
+             do (<span class="org-keyword">push</span> (list (cl-count tag tags
+                                      <span class="org-builtin">:test</span> #'string=)
+                            tag)
+                      count)
+             collect
+             (<span class="org-keyword">setq</span> result (cl-remove-duplicates count
+                                                <span class="org-builtin">:test</span> #'equal))
+             finally return
+             (cl-sort result #'&gt; <span class="org-builtin">:key</span> #'car))))</pre>
+
+<pre>(list-tags <span class="org-string">"~/Projects/website/content/projects/website/counting_tags.org"</span>)</pre>
+
+<pre>(<span class="org-keyword">setq</span> content-org-files (directory-files-recursively <span class="org-string">"~/Projects/website/content/"</span> <span class="org-string">"</span><span class="org-string"><span class="org-warning">\</span></span><span class="org-string">.org$"</span>))</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">~/Projects/website/content/dotfiles/doom-emacs.org</td>
+<td class="org-left">~/Projects/website/content/dotfiles/index.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/add_extra_pokedex_information.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/eda_physical_stats.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/eda_stats.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/index.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/scrape_all_pokemon_data.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/scrape_initial_pokedex.org</td>
+<td class="org-left">~/Projects/website/content/projects/pokedex/scrape_specific_pokemon_data.org</td>
+<td class="org-left">~/Projects/website/content/projects/tc-finder/index.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/counting_tags.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/creating_nav_bar.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/hosting_on_github.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/index.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/initial_build.org</td>
+<td class="org-left">~/Projects/website/content/projects/website/subdirectory_index.org</td>
+<td class="org-left">~/Projects/website/content/projects/index.org</td>
+<td class="org-left">~/Projects/website/content/404.org</td>
+<td class="org-left">~/Projects/website/content/index.org</td>
+</tr>
+</tbody>
+</table></div>
+</div>
 </div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

@@ -1,0 +1,451 @@
+<!-- Generated from c8c9c3f on 2023-10-24 @ 23:01 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Exploratory Data Analysis of Pokemon Types - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Exploratory Data Analysis of Pokemon Types</h1><p class="site-post-meta">October 24, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org08d8a1e">
+<p>
+Here, we investigate some of the data as it pertains to Pokemon type.
+</p>
+</div>
+
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgea813bb">
+<p>
+Start off by loading the libraries we need.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Load libraries</span>
+<span class="org-ess-modifiers">library</span>(dplyr)
+<span class="org-ess-modifiers">library</span>(tidyr)
+<span class="org-ess-modifiers">library</span>(ggplot2)</pre>
+</div>
+
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-orgf81e034">
+<p>
+Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Read the data</span>
+pokedex <span class="org-ess-assignment">&lt;-</span> read.csv(<span class="org-string">'~/Projects/pokedex/data/pokedex_ext.csv'</span>,sep=<span class="org-string">','</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Change categorical columns</span>
+pokedex$Generation <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Generation)
+pokedex$Evolution.Place <span class="org-ess-assignment">&lt;-</span> as.factor(pokedex$Evolution.Place)
+pokedex$Has.Evolution <span class="org-ess-assignment">&lt;-</span> as.logical(pokedex$Has.Evolution)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show Pokedex data</span>
+head(pokedex)</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">Number</th>
+<th scope="col" class="org-left">Name</th>
+<th scope="col" class="org-left">URLs</th>
+<th scope="col" class="org-left">Type.1</th>
+<th scope="col" class="org-left">Type.2</th>
+<th scope="col" class="org-left">Species</th>
+<th scope="col" class="org-right">Height</th>
+<th scope="col" class="org-right">Weight</th>
+<th scope="col" class="org-right">HP</th>
+<th scope="col" class="org-right">Attack</th>
+<th scope="col" class="org-right">Defense</th>
+<th scope="col" class="org-right">Sp..Atk</th>
+<th scope="col" class="org-right">Sp..Def</th>
+<th scope="col" class="org-right">Speed</th>
+<th scope="col" class="org-right">Total</th>
+<th scope="col" class="org-left">Type.3</th>
+<th scope="col" class="org-left">Has.Evolution</th>
+<th scope="col" class="org-right">Evolution.Place</th>
+<th scope="col" class="org-right">Maximum.Evolution.Count</th>
+<th scope="col" class="org-right">Evolution.Index</th>
+<th scope="col" class="org-right">Generation</th>
+<th scope="col" class="org-left">Legendary.Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">1</td>
+<td class="org-left">Bulbasaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/bulbasaur">https://pokemondb.net/pokedex/bulbasaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">0.7</td>
+<td class="org-right">6.9</td>
+<td class="org-right">45</td>
+<td class="org-right">49</td>
+<td class="org-right">49</td>
+<td class="org-right">65</td>
+<td class="org-right">65</td>
+<td class="org-right">45</td>
+<td class="org-right">318</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-left">Ivysaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/ivysaur">https://pokemondb.net/pokedex/ivysaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">1</td>
+<td class="org-right">13</td>
+<td class="org-right">60</td>
+<td class="org-right">62</td>
+<td class="org-right">63</td>
+<td class="org-right">80</td>
+<td class="org-right">80</td>
+<td class="org-right">60</td>
+<td class="org-right">405</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-left">Venusaur</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/venusaur">https://pokemondb.net/pokedex/venusaur</a></td>
+<td class="org-left">Grass</td>
+<td class="org-left">Poison</td>
+<td class="org-left">Seed Pokémon</td>
+<td class="org-right">2</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">82</td>
+<td class="org-right">83</td>
+<td class="org-right">100</td>
+<td class="org-right">100</td>
+<td class="org-right">80</td>
+<td class="org-right">525</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">4</td>
+<td class="org-left">Charmander</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmander">https://pokemondb.net/pokedex/charmander</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Lizard Pokémon</td>
+<td class="org-right">0.6</td>
+<td class="org-right">8.5</td>
+<td class="org-right">39</td>
+<td class="org-right">52</td>
+<td class="org-right">43</td>
+<td class="org-right">60</td>
+<td class="org-right">50</td>
+<td class="org-right">65</td>
+<td class="org-right">309</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">1</td>
+<td class="org-right">3</td>
+<td class="org-right">0.33</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">5</td>
+<td class="org-left">Charmeleon</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charmeleon">https://pokemondb.net/pokedex/charmeleon</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-right">1.1</td>
+<td class="org-right">19</td>
+<td class="org-right">58</td>
+<td class="org-right">64</td>
+<td class="org-right">58</td>
+<td class="org-right">80</td>
+<td class="org-right">65</td>
+<td class="org-right">80</td>
+<td class="org-right">405</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">2</td>
+<td class="org-right">3</td>
+<td class="org-right">0.67</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-right">6</td>
+<td class="org-left">Charizard</td>
+<td class="org-left"><a href="https://pokemondb.net/pokedex/charizard">https://pokemondb.net/pokedex/charizard</a></td>
+<td class="org-left">Fire</td>
+<td class="org-left">Flying</td>
+<td class="org-left">Flame Pokémon</td>
+<td class="org-right">1.7</td>
+<td class="org-right">90.5</td>
+<td class="org-right">78</td>
+<td class="org-right">84</td>
+<td class="org-right">78</td>
+<td class="org-right">109</td>
+<td class="org-right">85</td>
+<td class="org-right">100</td>
+<td class="org-right">534</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">TRUE</td>
+<td class="org-right">3</td>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<h2><a id="pokemon-type-frequency" class="anchor" href="#pokemon-type-frequency">¶</a>Pokemon Type Frequency</h2><div class="outline-text-2" id="text-orgdd19aed">
+<p>
+I&rsquo;m curious how many Pokemon of each type there are. I suspect most Pokemon will be water or grass type Pokemon.
+</p>
+
+<p>
+Of note here, some Pokemon have multiple, up to three, different types. Those are stored in <code>Type.1</code>, <code>Type.2</code>, and <code>Type.3</code>. To count the Pokemon of each type, we&rsquo;ll need to either only count up the Pokemon of
+<code>Type.1</code>, or we can pivot to a longer table and Pokemon with multiple types will have multiple entries. I&rsquo;ll pivot to a longer table, and then count the Pokemon of each type.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get a count of of each type</span>
+type_count <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Type) <span class="org-ess-XopX">%&gt;%</span>
+  count() <span class="org-ess-XopX">%&gt;%</span>
+  arrange(desc(n))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show a bar plot of type counts</span>
+ggplot(type_count, aes(x = reorder(Type, -n),y=n, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) +
+  ggtitle(label=<span class="org-string">"Count of Pokemon for Each Type"</span>) +
+  xlab(<span class="org-string">"Type"</span>) +
+  ylab(<span class="org-string">"Count"</span>) +
+  scale_alpha(guide = <span class="org-string">'none'</span>) +
+  theme_minimal() +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/type-counts.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/type-counts.png" alt="type-counts.png" />
+</p>
+</div>
+
+<p>
+As expected, water and grass are among the most frequent classes. I figured &ldquo;Normal&rdquo; Pokemon would make an appearance up top, but I didn&rsquo;t quite expect it to be the second most common type. I definitely didn&rsquo;t expect psychic Pokemon to be so common either.
+</p>
+</div>
+
+<h2><a id="mean-base-stats-by-type" class="anchor" href="#mean-base-stats-by-type">¶</a>Mean Base Stats by Type</h2><div class="outline-text-2" id="text-org96dcf83">
+<p>
+Now, I&rsquo;d like to view the average stats of each Pokemon to see which types of Pokemon are typically the strongest. I&rsquo;d expect that dragon type and steel type are among the top, from my experience with the game. Again, I&rsquo;ll pivot the table so that Pokemon with multiple types have those multiple types represented.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Calculate mean stats by Pokemon type</span>
+type_stats <span class="org-ess-assignment">&lt;-</span> pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  group_by(Type) <span class="org-ess-XopX">%&gt;%</span>
+  summarize_at(vars(HP:Speed),mean) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(-1,names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Specify Stat as a factor and set order</span>
+type_stats$Stat <span class="org-ess-assignment">&lt;-</span> factor(type_stats$Stat,
+                          levels=c(<span class="org-string">"HP"</span>,
+                                   <span class="org-string">"Attack"</span>,
+                                   <span class="org-string">"Defense"</span>,
+                                   <span class="org-string">"Sp..Atk"</span>,
+                                   <span class="org-string">"Sp..Def"</span>,
+                                   <span class="org-string">"Speed"</span>))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot Pokemon Stats as a stacked bar</span>
+ggplot(data = type_stats, aes(x=Type, y=Value, fill=Stat, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"stack"</span>,width=0.7) +
+  labs(title = <span class="org-string">"Average Base Stats by Type"</span>,
+       y = <span class="org-string">"Stat Value"</span>,
+       x = <span class="org-string">"Type"</span>) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/type-stats.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/type-stats.png" alt="type-stats.png" />
+</p>
+</div>
+
+<p>
+Dragon and steel Pokemon did indeed come out among the top, but dark, fighting, and ice Pokemon are also quite strong in terms of their average total base stats. Bug, normal, and poison Pokemon are among the weakest, which is not terribly surprising.
+</p>
+
+<p>
+Rather than plotting this as a stacked bar chart, I&rsquo;d like to see the different stats all separated out. I could make a clustered bar chart, but with as many types as we have here, that would be a very wide, messy chart. Let&rsquo;s instead make subplots using <code>facet_wrap</code>.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Plot each Pokemon Stat on an individual bar chart</span>
+ggplot(data = type_stats, aes(x=Type, y=Value, ymin=0)) +
+  geom_bar(stat=<span class="org-string">"identity"</span>,position=<span class="org-string">"dodge"</span>,width=0.7,fill=<span class="org-string">"#81a2be"</span>) +
+  labs(title = <span class="org-string">"Average Base Stats by Type"</span>,
+       y = <span class="org-string">"Stat Value"</span>, x = <span class="org-string">"Type"</span>) +
+  facet_wrap(~Stat,ncol=2) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/type-stats-2.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/type-stats-2.png" alt="type-stats-2.png" />
+</p>
+</div>
+
+<p>
+Now we can better see the distributions of stats for different types.
+</p>
+
+<ul class="org-ul">
+<li>Dragon Pokemon have the highest HP.</li>
+<li>Fighting type Pokemon have the highest attack.</li>
+<li>Rock and steel Pokemon have the highest defense.</li>
+<li>Psychic, dragon, fire, and electric Pokemon have the highest special attack.</li>
+<li>Psychic, fairy, steel, and ghost Pokemon have the highest special defense.</li>
+<li>Flying, electric, dragon, and dark Pokemon have the highest speed.</li>
+</ul>
+</div>
+
+<h2><a id="base-stats-distribution" class="anchor" href="#base-stats-distribution">¶</a>Base Stats Distribution</h2><div class="outline-text-2" id="text-org890e7e3">
+<p>
+Rather than looking at only the means, let&rsquo;s also look at how the stats are distributed for each Pokemon, stating with the total base stats.
+</p>
+
+<pre>pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  ggplot(aes(x=Type,y=Total)) +
+    geom_violin(width=0.8,fill=<span class="org-string">"#81a2be"</span>) +
+    geom_boxplot(width=0.1, color=<span class="org-string">"black"</span>, alpha=0.5) +
+    scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>) +
+    ggtitle(<span class="org-string">"Distribution of Total Stats by Type"</span>) +
+    xlab(<span class="org-string">"Type"</span>) +
+    ylab(<span class="org-string">"Total Stats"</span>) +
+    theme_minimal() +
+    scale_x_discrete(guide = guide_axis(n.dodge = 2))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/type-total-stats-violin.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/type-total-stats-violin.png" alt="type-total-stats-violin.png" />
+</p>
+</div>
+
+<p>
+Almost every type has an hourglass distrubution, likely because many Pokemon are relatively weak or strong depending on where they are in their evolution chain. The box and violin plot indicates again that dark, ragon, fighting, ice, psychic, rock, and steel Pokemon are not only among the strongest Pokemon on average but that there are many Pokemon with total base stats towards the stronger end of the distribution.
+</p>
+
+<p>
+Finally, let&rsquo;s look at each different stat separately, rather than just the total stats.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Calculate mean stats by Pokemon type</span>
+pokedex <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(<span class="org-string">"Type.1"</span>,<span class="org-string">"Type.2"</span>,<span class="org-string">"Type.3"</span>),names_to=<span class="org-string">"Type.Number"</span>,values_to=<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  drop_na(<span class="org-string">"Type"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  pivot_longer(c(HP:Speed),names_to=<span class="org-string">"Stat"</span>,values_to=<span class="org-string">"Value"</span>) <span class="org-ess-XopX">%&gt;%</span>
+  ggplot(aes(x=Type, y=Value, ymin=0)) +
+    geom_violin(width=0.8,fill=<span class="org-string">"#81a2be"</span>) +
+    geom_boxplot(width=0.1, color=<span class="org-string">"black"</span>, alpha=0.5) +
+    labs(title = <span class="org-string">"Distribution of Base Stats by Type"</span>,
+         y = <span class="org-string">"Stat Value"</span>, x = <span class="org-string">"Type"</span>) +
+    facet_wrap(~Stat,ncol=2) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    scale_fill_brewer(palette=<span class="org-string">"Dark2"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save image</span>
+ggsave(<span class="org-string">"images/type-stats-violin.png"</span>,bg=<span class="org-string">"white"</span>)</pre>
+
+
+<div class="figure">
+<p><img src="images/type-stats-violin.png" alt="type-stats-violin.png" />
+</p>
+</div>
+
+<p>
+Nothing here is incredibly new from what we showed with the mean stats before. There&rsquo;s a lot going on here, but it really just accentuates the information from the mean stats. I do prefer this view of the stats though, as it shows just how much more attack fighting Pokemon have, defense rock and steel Pokemon have, and how much Special Attack psychic Pokemon have, and how often that is the case.
+</p>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
