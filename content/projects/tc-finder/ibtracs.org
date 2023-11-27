@@ -108,7 +108,6 @@ df.tail()
 | 127141 | 2023294N10279 |   2023 |     76 | NOT_NAMED | 2023-10-24 06:00:00 | TS     | 13.0000 | -83.8000 |          |          | PROVISIONAL |         0 |        0 | O_____________ |           9 |       322 |
 | 127142 | 2023294N10279 |   2023 |     76 | NOT_NAMED | 2023-10-24 09:00:00 | TS     | 13.2800 | -84.1025 |          |          | PROVISIONAL |         0 |        0 | P_____________ |           8 |       311 |
 | 127143 | 2023294N10279 |   2023 |     76 | NOT_NAMED | 2023-10-24 12:00:00 | DS     | 13.5000 | -84.4000 |          |          | PROVISIONAL |         0 |          | O_____________ |           7 |       307 |
-|        |               |        |        |           |                     |        |         |          |          |          |             |           |          |                |             |           |
 
 We can query the dataframe to make data analysis a bit easier. For example, let's see how many named storms are in each season.
 
@@ -138,7 +137,7 @@ filePath
 #+end_src
 
 #+RESULTS:
-[[file:../images/named_storm_count.png]]
+[[file:images/named_storm_count.png]]
 
 We can also query seasons. Let's see the unique named storms this year.
 
@@ -214,7 +213,7 @@ filePath
 #+end_src
 
 #+RESULTS:
-[[file:../images/named_storm_tracks.png]]
+[[file:images/named_storm_tracks.png]]
 
 ** Accumulated Cyclone Energy
 
@@ -258,7 +257,7 @@ filePath
 #+end_src
 
 #+RESULTS:
-[[file:../images/ace.png]]
+[[file:images/ace.png]]
 
 Let's have a look at the years with the largest ACE.
 
