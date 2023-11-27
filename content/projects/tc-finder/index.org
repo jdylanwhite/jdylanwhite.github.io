@@ -1,5 +1,8 @@
 #+title: Tropical Cyclone Classifier
+#+category: tc-finder
+
+When I went through several courses on machine learning, I was always provided with neatly packaged datasets to learn and train models with, but that's not usually how it works in real life. Starting with a binary image classification model, I wanted to build my own computer vision models centered around finding tropical cyclones from satellite imagery. Over time, I'd like to make this more sophisticated, but there are several steps involved in getting even a simple binary image classifier established, at least with the workflow I have established.
 
 * Exploratory Data Analysis
 
-* Classification Models
+- [[file:ibtracs.org][Exploring the IBTrACS storm track data]] - investigating a human-derived dataset showing time, location, and other meteorological variables for tropical storms.
