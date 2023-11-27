@@ -1,0 +1,646 @@
+<!-- Generated from 8a6c1b5 on 2023-11-27 @ 11:01 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>IBTrACS Tropical Cyclone Tracks - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">IBTrACS Tropical Cyclone Tracks</h1><p class="site-post-meta">November  6, 2023</p><div id="content">
+<h2><a id="ibtracs-data" class="anchor" href="#ibtracs-data">¶</a>IBTrACS Data</h2><div class="outline-text-2" id="text-org1607d76">
+<p>
+The IBTrACS, or International Best Track Archive for Climate Stewardship (IBTrACS) data contains a history of tropical storm data. It is stored by <a href="https://www.ncdc.noaa.gov/ibtracs/">NOAA&rsquo;s National Climatic Data Center (NCDC)</a>. Let&rsquo;s load the data and explore it in Python.
+</p>
+</div>
+
+<h3><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h3><div class="outline-text-3" id="text-org61cf8b0">
+<p>
+Let&rsquo;s start by importing the modules we need.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Import modules</span>
+<span class="org-keyword">from</span> urllib <span class="org-keyword">import</span> request
+<span class="org-keyword">import</span> os
+<span class="org-keyword">import</span> pandas <span class="org-keyword">as</span> pd
+<span class="org-keyword">import</span> numpy <span class="org-keyword">as</span> np
+<span class="org-keyword">import</span> matplotlib.pyplot <span class="org-keyword">as</span> plt
+<span class="org-keyword">from</span> mpl_toolkits.basemap <span class="org-keyword">import</span> Basemap</pre>
+</div>
+
+<h3><a id="download-the-data" class="anchor" href="#download-the-data">¶</a>Download the Data</h3><div class="outline-text-3" id="text-org6054e55">
+<p>
+Now we need to download the IBTrACS data. It isn&rsquo;t very large, so it shouldn&rsquo;t take too long.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the basin to download</span>
+<span class="org-variable-name">basin</span> = <span class="org-string">'NA'</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Set the URL</span>
+<span class="org-variable-name">url</span> = <span class="org-string">'https://www.ncei.noaa.gov/data/'</span>
+<span class="org-variable-name">url</span> += <span class="org-string">'international-best-track-archive-for-climate-stewardship-ibtracs/'</span>
+<span class="org-variable-name">url</span> += <span class="org-string">'v04r00/access/csv/ibtracs.'</span>+basin+<span class="org-string">'.list.v04r00.csv'</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Set the file path</span>
+<span class="org-variable-name">filePath</span> = <span class="org-string">'../data/ibtracs.'</span>+basin+<span class="org-string">'.nc'</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Download the file if it doesn't already exists</span>
+<span class="org-keyword">if</span> <span class="org-keyword">not</span> os.path.exists(filePath):
+    request.urlretrieve(url,filePath)</pre>
+</div>
+
+<h3><a id="explore-the-data" class="anchor" href="#explore-the-data">¶</a>Explore the Data</h3><div class="outline-text-3" id="text-org1892532">
+<p>
+There are a lot of variables here, but we will only need a handful. Some of the pertinent variables and their descriptions are provided below (from the IBTrACS documentation):
+</p>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Variable Name</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>numobs</code></td>
+<td class="org-left">the number of observations for each storm</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>sid</code></td>
+<td class="org-left">a unique storm identifier (SID) assigned by IBTrACS algorithm</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>season</code></td>
+<td class="org-left">year the storm began</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>number</code></td>
+<td class="org-left">number of the storm for the year (restarts at 1 for each year)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>basin</code></td>
+<td class="org-left">basin of the current storm position</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>subbasin</code></td>
+<td class="org-left">sub-basin of the current storm position</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>name</code></td>
+<td class="org-left">name of system give by source (if available)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>iso_time</code></td>
+<td class="org-left">time of the observation in ISO format (YYYY-MM-DD hh:mm:ss)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>nature</code></td>
+<td class="org-left">type of storm (a combination of the various types from the available sources)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>lat</code></td>
+<td class="org-left">mean position - latitude (a combination of the available positions)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>lon</code></td>
+<td class="org-left">mean position - longitude (a combination of the available positions)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>wmo_wind</code></td>
+<td class="org-left">maximum sustained wind speed assigned by the responsible WMO agency</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>wmo_pres</code></td>
+<td class="org-left">minimum central pressure assigned by the responsible WMO agnecy</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>track_type</code></td>
+<td class="org-left">track type (main or spur).</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>dist2land</code></td>
+<td class="org-left">current distance to land from current position</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>landfall</code></td>
+<td class="org-left">minimum distance to land over next 3 hours (=0 means landfall)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>iflag</code></td>
+<td class="org-left">a flag identifying the type of interpolation used to fill the value at the given time</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>storm_speed</code></td>
+<td class="org-left">storm translation speed (knots)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>storm_dir</code></td>
+<td class="org-left">storm translation direction (in degrees east of north)</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>
+We won&rsquo;t necessarily keep all of these, but it&rsquo;s good to know what these are. Now let&rsquo;s read in the data and have a look at the last few values.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Read the data from the CSV</span>
+<span class="org-variable-name">df</span> = pd.read_csv(filePath,low_memory=<span class="org-constant">False</span>,skiprows=<span class="org-builtin">range</span>(1,2))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Only keep a handful of columns</span>
+<span class="org-variable-name">keepColumns</span> = [<span class="org-string">'SID'</span>,<span class="org-string">'SEASON'</span>,<span class="org-string">'NUMBER'</span>,<span class="org-string">'NAME'</span>,<span class="org-string">'ISO_TIME'</span>,
+               <span class="org-string">'NATURE'</span>,<span class="org-string">'LAT'</span>,<span class="org-string">'LON'</span>,<span class="org-string">'WMO_WIND'</span>,<span class="org-string">'WMO_PRES'</span>,<span class="org-string">'TRACK_TYPE'</span>,
+               <span class="org-string">'DIST2LAND'</span>,<span class="org-string">'LANDFALL'</span>,<span class="org-string">'IFLAG'</span>,<span class="org-string">'STORM_SPEED'</span>,<span class="org-string">'STORM_DIR'</span>]
+<span class="org-variable-name">df</span> = df[keepColumns]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Convert time strings to datetimes for better querying</span>
+<span class="org-variable-name">df</span>[<span class="org-string">'ISO_TIME'</span>] = pd.to_datetime(df[<span class="org-string">'ISO_TIME'</span>])
+<span class="org-variable-name">df</span>[<span class="org-string">'SEASON'</span>] = pd.to_numeric(df[<span class="org-string">'SEASON'</span>])
+<span class="org-variable-name">df</span>[<span class="org-string">'NUMBER'</span>] = pd.to_numeric(df[<span class="org-string">'NUMBER'</span>])
+<span class="org-variable-name">df</span>[<span class="org-string">'LAT'</span>] = pd.to_numeric(df[<span class="org-string">'LAT'</span>])
+<span class="org-variable-name">df</span>[<span class="org-string">'LON'</span>] = pd.to_numeric(df[<span class="org-string">'LON'</span>])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show the last few records</span>
+df.tail()</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-left">SID</th>
+<th scope="col" class="org-right">SEASON</th>
+<th scope="col" class="org-right">NUMBER</th>
+<th scope="col" class="org-left">NAME</th>
+<th scope="col" class="org-left">ISO_TIME</th>
+<th scope="col" class="org-left">NATURE</th>
+<th scope="col" class="org-right">LAT</th>
+<th scope="col" class="org-right">LON</th>
+<th scope="col" class="org-left">WMO_WIND</th>
+<th scope="col" class="org-left">WMO_PRES</th>
+<th scope="col" class="org-left">TRACK_TYPE</th>
+<th scope="col" class="org-right">DIST2LAND</th>
+<th scope="col" class="org-right">LANDFALL</th>
+<th scope="col" class="org-left">IFLAG</th>
+<th scope="col" class="org-right">STORM_SPEED</th>
+<th scope="col" class="org-right">STORM_DIR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">127139</td>
+<td class="org-left">2023294N10279</td>
+<td class="org-right">2023</td>
+<td class="org-right">76</td>
+<td class="org-left">NOT_NAMED</td>
+<td class="org-left">2023-10-24 00:00:00</td>
+<td class="org-left">TS</td>
+<td class="org-right">12.2001</td>
+<td class="org-right">-83.4068</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">PROVISIONAL</td>
+<td class="org-right">24</td>
+<td class="org-right">0</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">9</td>
+<td class="org-right">347</td>
+</tr>
+
+<tr>
+<td class="org-right">127140</td>
+<td class="org-left">2023294N10279</td>
+<td class="org-right">2023</td>
+<td class="org-right">76</td>
+<td class="org-left">NOT_NAMED</td>
+<td class="org-left">2023-10-24 03:00:00</td>
+<td class="org-left">TS</td>
+<td class="org-right">12.6150</td>
+<td class="org-right">-83.5614</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">PROVISIONAL</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">9</td>
+<td class="org-right">334</td>
+</tr>
+
+<tr>
+<td class="org-right">127141</td>
+<td class="org-left">2023294N10279</td>
+<td class="org-right">2023</td>
+<td class="org-right">76</td>
+<td class="org-left">NOT_NAMED</td>
+<td class="org-left">2023-10-24 06:00:00</td>
+<td class="org-left">TS</td>
+<td class="org-right">13.0000</td>
+<td class="org-right">-83.8000</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">PROVISIONAL</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">9</td>
+<td class="org-right">322</td>
+</tr>
+
+<tr>
+<td class="org-right">127142</td>
+<td class="org-left">2023294N10279</td>
+<td class="org-right">2023</td>
+<td class="org-right">76</td>
+<td class="org-left">NOT_NAMED</td>
+<td class="org-left">2023-10-24 09:00:00</td>
+<td class="org-left">TS</td>
+<td class="org-right">13.2800</td>
+<td class="org-right">-84.1025</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">PROVISIONAL</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">8</td>
+<td class="org-right">311</td>
+</tr>
+
+<tr>
+<td class="org-right">127143</td>
+<td class="org-left">2023294N10279</td>
+<td class="org-right">2023</td>
+<td class="org-right">76</td>
+<td class="org-left">NOT_NAMED</td>
+<td class="org-left">2023-10-24 12:00:00</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.5000</td>
+<td class="org-right">-84.4000</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">PROVISIONAL</td>
+<td class="org-right">0</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">7</td>
+<td class="org-right">307</td>
+</tr>
+
+<tr>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>
+We can query the dataframe to make data analysis a bit easier. For example, let&rsquo;s see how many named storms are in each season.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Count the number of named storms in a season</span>
+<span class="org-variable-name">dfNamedCounts</span> = df[df[<span class="org-string">'NAME'</span>] != <span class="org-string">'NOT_NAMED'</span>].groupby([<span class="org-string">'SEASON'</span>]).agg({<span class="org-string">'NAME'</span>:<span class="org-string">'nunique'</span>}).reset_index()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Initialize the plot</span>
+<span class="org-variable-name">fig</span>,<span class="org-variable-name">ax</span> = plt.subplots(figsize=(10,6))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot the counts</span>
+ax.bar(dfNamedCounts[<span class="org-string">"SEASON"</span>],dfNamedCounts[<span class="org-string">"NAME"</span>],color=<span class="org-string">"#4271ae"</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Configure the plot</span>
+ax.set_xlabel(<span class="org-string">"Year"</span>,fontsize=12)
+ax.set_ylabel(<span class="org-string">"Count"</span>,fontsize=12)
+ax.set_title(<span class="org-string">"Number of Named Storms Each Season"</span>,fontsize=16)
+ax.set_xlim((dfNamedCounts[<span class="org-string">"SEASON"</span>].<span class="org-builtin">min</span>()-0.75,dfNamedCounts[<span class="org-string">"SEASON"</span>].<span class="org-builtin">max</span>()+0.75))
+plt.tight_layout()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the plot</span>
+<span class="org-variable-name">filePath</span> = <span class="org-string">'../images/named_storm_count.png'</span>
+fig.savefig(filePath)
+filePath</pre>
+
+
+<div class="figure">
+<p><img src="../images/named_storm_count.png" alt="named_storm_count.png" />
+</p>
+</div>
+
+<p>
+We can also query seasons. Let&rsquo;s see the unique named storms this year.
+</p>
+
+<pre>df[(df[<span class="org-string">'SEASON'</span>]==df[<span class="org-string">'SEASON'</span>].<span class="org-builtin">max</span>()) &amp;
+   (df[<span class="org-string">'NAME'</span>]!=<span class="org-string">'NOT_NAMED'</span>)].groupby(<span class="org-string">"NAME"</span>).agg({<span class="org-string">"ISO_TIME"</span>:[<span class="org-string">"first"</span>,<span class="org-string">"last"</span>]})</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">NAME</th>
+<th scope="col" class="org-left">first</th>
+<th scope="col" class="org-left">last</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">ARLENE</td>
+<td class="org-left">2023-05-30 18:00:00</td>
+<td class="org-left">2023-06-03 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">BRET</td>
+<td class="org-left">2023-06-16 00:00:00</td>
+<td class="org-left">2023-06-24 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">CINDY</td>
+<td class="org-left">2023-06-18 18:00:00</td>
+<td class="org-left">2023-06-27 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">DON</td>
+<td class="org-left">2023-07-10 12:00:00</td>
+<td class="org-left">2023-07-24 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">EMILY</td>
+<td class="org-left">2023-08-16 00:00:00</td>
+<td class="org-left">2023-08-25 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">FRANKLIN</td>
+<td class="org-left">2023-08-18 06:00:00</td>
+<td class="org-left">2023-09-01 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">GERT</td>
+<td class="org-left">2023-08-16 00:00:00</td>
+<td class="org-left">2023-09-04 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">HAROLD</td>
+<td class="org-left">2023-08-19 12:00:00</td>
+<td class="org-left">2023-08-23 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">IDALIA</td>
+<td class="org-left">2023-08-24 18:00:00</td>
+<td class="org-left">2023-09-02 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">JOSE</td>
+<td class="org-left">2023-08-20 12:00:00</td>
+<td class="org-left">2023-09-02 00:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">KATIA</td>
+<td class="org-left">2023-08-29 00:00:00</td>
+<td class="org-left">2023-09-04 18:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">LEE</td>
+<td class="org-left">2023-09-01 12:00:00</td>
+<td class="org-left">2023-09-17 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">MARGOT</td>
+<td class="org-left">2023-09-04 18:00:00</td>
+<td class="org-left">2023-09-17 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">NIGEL</td>
+<td class="org-left">2023-09-09 00:00:00</td>
+<td class="org-left">2023-09-22 06:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">OPHELIA</td>
+<td class="org-left">2023-09-21 00:00:00</td>
+<td class="org-left">2023-09-24 06:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">PHILIPPE</td>
+<td class="org-left">2023-09-20 18:00:00</td>
+<td class="org-left">2023-10-06 12:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">RINA</td>
+<td class="org-left">2023-09-23 18:00:00</td>
+<td class="org-left">2023-10-02 00:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">SEAN</td>
+<td class="org-left">2023-10-07 06:00:00</td>
+<td class="org-left">2023-10-16 00:00:00</td>
+</tr>
+
+<tr>
+<td class="org-left">TAMMY</td>
+<td class="org-left">2023-10-10 12:00:00</td>
+<td class="org-left">2023-10-29 06:00:00</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<h3><a id="plot-tracks-on-a-map" class="anchor" href="#plot-tracks-on-a-map">¶</a>Plot Tracks on a Map</h3><div class="outline-text-3" id="text-orga18b423">
+<p>
+Now let&rsquo;s plot the tracks over the past 20 years.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the of the basemap projection</span>
+<span class="org-variable-name">m</span> = Basemap(projection=<span class="org-string">'cyl'</span>,llcrnrlat=1,urcrnrlat=70,\
+            llcrnrlon=-109,urcrnrlon=9,resolution=<span class="org-string">'c'</span>)
+
+plt.figure(figsize=(10,6))
+m.fillcontinents(color=<span class="org-string">'grey'</span>)
+m.drawparallels(np.arange(-0.,71.,20.),labels=[1,0,0,0])
+m.drawmeridians(np.arange(-120.,31.,20.),labels=[0,0,0,1])
+plt.title(<span class="org-string">"Named Tropical Storms over the North Atlantic, 2003-2023"</span>,fontsize=16)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get all of the named storms in the last 20 years</span>
+<span class="org-variable-name">df2</span> =  df.loc[(df[<span class="org-string">'SEASON'</span>] &gt;= 2003) &amp; (df[<span class="org-string">'NAME'</span>] != <span class="org-string">"NOT_NAMED"</span>)]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Aggregate all of the latitudes and longitudes in a list</span>
+<span class="org-variable-name">aggDict</span> = {
+  <span class="org-string">"LAT"</span>: <span class="org-builtin">list</span>,
+  <span class="org-string">"LON"</span>: <span class="org-builtin">list</span>
+}
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Group by and aggregate</span>
+<span class="org-variable-name">df2</span> = df2.groupby([<span class="org-string">"SEASON"</span>,<span class="org-string">"NAME"</span>]).agg(aggDict).reset_index()
+
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Add each track to the basemap plot</span>
+<span class="org-keyword">for</span> i,row <span class="org-keyword">in</span> df2.iterrows():
+  m.plot(row[<span class="org-string">"LON"</span>],row[<span class="org-string">"LAT"</span>],linewidth=1,color=<span class="org-string">'#4271ae90'</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the plot</span>
+<span class="org-variable-name">filePath</span> = <span class="org-string">'../images/named_storm_tracks.png'</span>
+plt.tight_layout()
+plt.savefig(filePath)
+filePath</pre>
+
+
+<div class="figure">
+<p><img src="../images/named_storm_tracks.png" alt="named_storm_tracks.png" />
+</p>
+</div>
+</div>
+
+<h3><a id="accumulated-cyclone-energy" class="anchor" href="#accumulated-cyclone-energy">¶</a>Accumulated Cyclone Energy</h3><div class="outline-text-3" id="text-org0469b88">
+<p>
+Let&rsquo;s explore the data a bit more. Accumulated Cyclone Energy (ACE) is defined as the cummulative kinetic energy over the storm for every six hours when the winds are above 35 knots. As these numbers are often quite large, they are scaled down by a factor of 10000. Let&rsquo;s subset the whole IBTrACS to six-hourly data which winds below this threshold. It&rsquo;s a little more nuanced than what I&rsquo;m doing here, but it&rsquo;s still roughly the same idea.
+</p>
+
+<pre><span class="org-variable-name">df</span> = df[df[<span class="org-string">'ISO_TIME'</span>].dt.hour.isin([0,6,12,18])]
+<span class="org-variable-name">df</span>[<span class="org-string">"WMO_WIND"</span>] = pd.to_numeric(df[df[<span class="org-string">'WMO_WIND'</span>]!=<span class="org-string">" "</span>][<span class="org-string">"WMO_WIND"</span>])
+<span class="org-variable-name">df</span> = df[df[<span class="org-string">"WMO_WIND"</span>]&gt;=35]</pre>
+
+<p>
+Now let&rsquo;s subset the data and calculate the ACE based on the formula.
+</p>
+
+<pre><span class="org-variable-name">years</span> = [i <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(df[<span class="org-string">'SEASON'</span>].<span class="org-builtin">min</span>(),df[<span class="org-string">'SEASON'</span>].<span class="org-builtin">max</span>()+1)]
+<span class="org-variable-name">ace</span> = [(df[df[<span class="org-string">"SEASON"</span>]==year][<span class="org-string">'WMO_WIND'</span>]**2).<span class="org-builtin">sum</span>()/10000. <span class="org-keyword">for</span> year <span class="org-keyword">in</span> years]</pre>
+
+<p>
+And now we can plot the results.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Plot the ACE data</span>
+<span class="org-variable-name">fig</span>,<span class="org-variable-name">ax</span> = plt.subplots(figsize=(10,6));
+ax.bar(years,ace,color=<span class="org-string">"#4271ae"</span>);
+ax.set_xlabel(<span class="org-string">"Year"</span>,fontsize=12);
+ax.set_ylabel(<span class="org-string">"ACE"</span>,fontsize=12);
+ax.set_title(<span class="org-string">"Accumulated Cyclone Energy"</span>,fontsize=16);
+ax.set_xlim(<span class="org-builtin">min</span>(years)-0.75,<span class="org-builtin">max</span>(years)+0.75);
+plt.tight_layout()
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the plot</span>
+<span class="org-variable-name">filePath</span> = <span class="org-string">'../images/ace.png'</span>
+fig.savefig(filePath)
+filePath</pre>
+
+
+<div class="figure">
+<p><img src="../images/ace.png" alt="ace.png" />
+</p>
+</div>
+
+<p>
+Let&rsquo;s have a look at the years with the largest ACE.
+</p>
+
+<pre><span class="org-variable-name">aceSorted</span> = <span class="org-builtin">sorted</span>(ace,reverse=<span class="org-constant">True</span>)
+<span class="org-variable-name">yearsSorted</span> = [year <span class="org-keyword">for</span> _,year <span class="org-keyword">in</span> <span class="org-builtin">sorted</span>(<span class="org-builtin">zip</span>(ace,years),reverse=<span class="org-constant">True</span>)]
+<span class="org-keyword">for</span> aceValue,year <span class="org-keyword">in</span> <span class="org-builtin">zip</span>(aceSorted[:10],yearsSorted[:10]):
+    <span class="org-keyword">print</span>(<span class="org-string">"Year"</span>,year,<span class="org-string">"\t Ace:"</span>,aceValue)</pre>
+
+<pre class="example">
+Year 1933 	 Ace: 272.635
+Year 2005 	 Ace: 271.1
+Year 1995 	 Ace: 248.14
+Year 1893 	 Ace: 244.5925
+Year 2004 	 Ace: 235.9775
+Year 2017 	 Ace: 235.735
+Year 1926 	 Ace: 234.5325
+Year 1950 	 Ace: 231.21
+Year 1961 	 Ace: 210.8725
+Year 1887 	 Ace: 202.505
+</pre>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
