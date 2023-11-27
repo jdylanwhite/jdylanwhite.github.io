@@ -1,4 +1,4 @@
-<!-- Generated from e3ec2ea on 2023-11-27 @ 11:10 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from fbf7e9e on 2023-11-27 @ 11:12 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Scrape Specific Pokemon Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Scrape Specific Pokemon Data</h1><p class="site-post-meta">October  1, 2023</p><div id="content"><p>
 On each Pokemon&rsquo;s page (for example, <a href="https://pokemondb.net/pokedex/gengar">Gengar&rsquo;s page</a>), there&rsquo;s a consistent and structured data that we can programmatically scrape. Each page has a table showing the Pokemon&rsquo;s &ldquo;national number&rdquo;, type(s), height, and weight, another table showing base stats for battle such as health points (HP), attack, and defense, and several other tables and information.
 </p>
@@ -7,7 +7,7 @@ On each Pokemon&rsquo;s page (for example, <a href="https://pokemondb.net/pokede
 To scrape the data using R, I&rsquo;ll rely on the <code>rvest</code> package to extract data from different parts of the site. Looking at the site&rsquo;s source HTML is a helpful part of this process in knowing what to extract.
 </p>
 
-<h2><a id="load-packages" class="anchor" href="#load-packages">¶</a>Load Packages</h2><div class="outline-text-2" id="text-org23640ef">
+<h2><a id="load-packages" class="anchor" href="#load-packages">¶</a>Load Packages</h2><div class="outline-text-2" id="text-orgc7ae972">
 <p>
 Let&rsquo;s start by loading all of the packages we&rsquo;ll need.
 </p>
@@ -19,7 +19,7 @@ Let&rsquo;s start by loading all of the packages we&rsquo;ll need.
 <span class="org-ess-modifiers">library</span>(tibble)</pre>
 </div>
 
-<h2><a id="specify-parameters" class="anchor" href="#specify-parameters">¶</a>Specify Parameters</h2><div class="outline-text-2" id="text-orgf49778f">
+<h2><a id="specify-parameters" class="anchor" href="#specify-parameters">¶</a>Specify Parameters</h2><div class="outline-text-2" id="text-orgeac48b2">
 <p>
 Next, we&rsquo;ll specify the Pokemon we want to look up and the URL from which to scrape. Let&rsquo;s stick with Gengar for now.
 </p>
@@ -34,7 +34,7 @@ name <span class="org-ess-assignment">&lt;-</span> tolower(name)
 url <span class="org-ess-assignment">&lt;-</span> paste0(<span class="org-string">"https://pokemondb.net/pokedex/"</span>, name)</pre>
 </div>
 
-<h2><a id="get-tables-from-page" class="anchor" href="#get-tables-from-page">¶</a>Get Tables From Page</h2><div class="outline-text-2" id="text-org46cd25d">
+<h2><a id="get-tables-from-page" class="anchor" href="#get-tables-from-page">¶</a>Get Tables From Page</h2><div class="outline-text-2" id="text-orgfeaea55">
 <p>
 Now that we&rsquo;ve got the URL to scrape, we need to fetch the tables storing the Pokemon&rsquo;s data we want to scrape.
 </p>
@@ -62,7 +62,7 @@ This gives a pretty messy table, but it&rsquo;s definitely something we can use.
 </p>
 </div>
 
-<h2><a id="getting-stats-from-the-table" class="anchor" href="#getting-stats-from-the-table">¶</a>Getting Stats From the Table</h2><div class="outline-text-2" id="text-org64d2f70">
+<h2><a id="getting-stats-from-the-table" class="anchor" href="#getting-stats-from-the-table">¶</a>Getting Stats From the Table</h2><div class="outline-text-2" id="text-org6b75c00">
 <p>
 Ultimately, we&rsquo;re going to want to pull all of this data into one structured table, so let&rsquo;s accumulate all of this data into one row. We&rsquo;ll need to tweak the table to make it easier to extract data from, then we&rsquo;ll put together the Pokemon information and base battle stats.
 </p>
@@ -113,7 +113,7 @@ This gives us a little more of a cleaned up table now, but there&rsquo;s still s
 </p>
 </div>
 
-<h2><a id="clean-up-scraped-data" class="anchor" href="#clean-up-scraped-data">¶</a>Clean Up Scraped Data</h2><div class="outline-text-2" id="text-orgadc86b9">
+<h2><a id="clean-up-scraped-data" class="anchor" href="#clean-up-scraped-data">¶</a>Clean Up Scraped Data</h2><div class="outline-text-2" id="text-orgd7ad941">
 <p>
 One thing I&rsquo;d like to fix at this stage is that there are two different &ldquo;Types&rdquo;, Poison and Ghost, that are getting placed into one column. We want to break this up into multiple columns instead such that &ldquo;Type 1&rdquo; is Ghost and &ldquo;Type 2&rdquo; is Poison. We can do this mostly with <code>strsplit</code> and <code>separate</code> and a little bit of manipulation to make sure we always get up to three different types. No Pokemon so far has more than three types, so this is good for now.
 </p>
@@ -158,7 +158,7 @@ $ `Type 3`  &lt;chr&gt; NA
 </pre>
 </div>
 
-<h2><a id="add-evolution-data" class="anchor" href="#add-evolution-data">¶</a>Add Evolution Data</h2><div class="outline-text-2" id="text-orgb3a0cef">
+<h2><a id="add-evolution-data" class="anchor" href="#add-evolution-data">¶</a>Add Evolution Data</h2><div class="outline-text-2" id="text-orga3a8c55">
 <p>
 Finally, let&rsquo;s add some evolution data to our data row. In particular, let&rsquo;s add the following:
 </p>

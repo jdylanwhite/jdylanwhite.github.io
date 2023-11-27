@@ -1,12 +1,12 @@
-<!-- Generated from e3ec2ea on 2023-11-27 @ 11:10 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from fbf7e9e on 2023-11-27 @ 11:12 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Exploratory Data Analysis of Pokemon Types - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Exploratory Data Analysis of Pokemon Types</h1><p class="site-post-meta">October 24, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgf96d9fa">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgf765b69">
 <p>
 Here, we investigate some of the data as it pertains to Pokemon type.
 </p>
 </div>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orge691bec">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-orgf5ae631">
 <p>
 Start off by loading the libraries we need.
 </p>
@@ -17,7 +17,7 @@ Start off by loading the libraries we need.
 <span class="org-ess-modifiers">library</span>(ggplot2)</pre>
 </div>
 
-<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-orge83874b">
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org7548b37">
 <p>
 Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
 </p>
@@ -261,7 +261,7 @@ head(pokedex)</pre>
 </table></div>
 </div>
 
-<h2><a id="pokemon-type-frequency" class="anchor" href="#pokemon-type-frequency">¶</a>Pokemon Type Frequency</h2><div class="outline-text-2" id="text-orgdeccf82">
+<h2><a id="pokemon-type-frequency" class="anchor" href="#pokemon-type-frequency">¶</a>Pokemon Type Frequency</h2><div class="outline-text-2" id="text-org704fa90">
 <p>
 I&rsquo;m curious how many Pokemon of each type there are. I suspect most Pokemon will be water or grass type Pokemon.
 </p>
@@ -303,7 +303,7 @@ As expected, water and grass are among the most frequent classes. I figured &ldq
 </p>
 </div>
 
-<h2><a id="mean-base-stats-by-type" class="anchor" href="#mean-base-stats-by-type">¶</a>Mean Base Stats by Type</h2><div class="outline-text-2" id="text-org93acb57">
+<h2><a id="mean-base-stats-by-type" class="anchor" href="#mean-base-stats-by-type">¶</a>Mean Base Stats by Type</h2><div class="outline-text-2" id="text-org20400f5">
 <p>
 Now, I&rsquo;d like to view the average stats of each Pokemon to see which types of Pokemon are typically the strongest. I&rsquo;d expect that dragon type and steel type are among the top, from my experience with the game. Again, I&rsquo;ll pivot the table so that Pokemon with multiple types have those multiple types represented.
 </p>
@@ -385,7 +385,7 @@ Now we can better see the distributions of stats for different types.
 </ul>
 </div>
 
-<h2><a id="base-stats-distribution" class="anchor" href="#base-stats-distribution">¶</a>Base Stats Distribution</h2><div class="outline-text-2" id="text-orgb767636">
+<h2><a id="base-stats-distribution" class="anchor" href="#base-stats-distribution">¶</a>Base Stats Distribution</h2><div class="outline-text-2" id="text-org9888dab">
 <p>
 Rather than looking at only the means, let&rsquo;s also look at how the stats are distributed for each Pokemon, stating with the total base stats.
 </p>
