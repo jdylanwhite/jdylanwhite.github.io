@@ -1,0 +1,221 @@
+#+title: GOES Satellite Data
+#+date: <2023-11-09 Thu>
+#+FILETAGS: :python:data-visualization:exploratory-data-analysis:
+#+CATEGORY: tc-finder
+#+EXCERPT:  Exploring the GOES satellite imagery data.
+#+PROPERTY: header-args python :session *py*
+
+* Introduction
+
+GOES, or Geostationary Operational Environmental Satellite, is a meteorological satellite operated by NOAA. There are two GOES positions, GOES-East, and GOES-West that image weather conditions over the continental U.S. and Eastern Pacific and Northern Atlantic basins. The current satellites in the east and west positions are GOES-16 and GOES-17, respectively.
+
+There is a lot of information available about their satellites, data, and file structure. When it comes to automated GOES data retrieval, as is the goal of this notebook, one thing that is important to note is that the /scan mode/ [[https://cimss.ssec.wisc.edu/satellite-blog/archives/32657][has changed]], and this is likely not the only change over the years. Scan mode 3 was the original default, but in order to obtain more frequent full-disk images, scan mode 6 became the default in April 2019. This change is reflected in the file name, so I initially was unable to get more recent data.
+
+The data can be obtained from Amazon Web Services. To access the data, we can use Amazon S3 or Amazon "Simple Storage Service". Python has a package, =boto3=, which is the AWS software development kit that we can use to get the data. In order to access the data, we have to know how it is stored. The files are stored in netCDF format in three AWS buckets, =noaa-goes16=, =noaa-goes17=, and =noaa-goes18=. They are then stored in folders of the format
+
+#+begin_example
+
+{Product}/{Year}/{Day of Year}/{Hour}/{Filename}.
+
+#+end_example
+
+The product here will just be =ABI-L1b-RadF=. This is the full-disc radiance from Level-1b (L1b) data generated from Advanced Baseline Imager (ABI). More specifics about L1b products can be found in the [[https://www.goes-r.gov/users/docs/PUG-L1b-vol3.pdf][public user's guide]]. The ABI has 16 bands, but we'll choose band 2. This band has a central wavelength of 0.64 $\mu$m, corresponding to the visible, red band. The filename has a somewhat complicated structure. Here's an example from [[https://docs.opendata.aws/noaa-goes16/cics-readme.html][NOAA's GOES on AWS readme]]:
+
+#+begin_example
+
+OR_ABI-L1b-RadF-M3C02_G16_s20171671145342_e20171671156109_c20171671156144.nc
+
+#+end_example
+
+Each segment of the file name and its description are shown below:
+
+| File Name Segment | Description                       |
+|-------------------+-----------------------------------|
+| =OR=                | Operational system real-time data |
+| =ABI=               | ABI Sensor                        |
+| =L1b=               | processing level                  |
+| =Rad=               | radiances                         |
+| =F=                 | full disk                         |
+| =M3=                | mode 3 (scan operation)           |
+| =C02=               | channel or band 02                |
+| =G16=               | satellite id for GOES-16          |
+| =s20171671145342=   | start of scan time                |
+| =e20171671156109=   | end of scan time                  |
+| =c20171671156144=   | netCDF4 file creation time        |
+| =.nc=               | netCDF file extension             |
+
+With the [[https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html#cliv2-windows-prereq][AWS client]], we can search for an image via a command like =aws s3 ls s3://noaa-goes16/ABI-L1b-RadF/2018/271/12/ --no-sign-request=. This lists all of the ABI-L1b-RadF products from GOES16 on the 271st day of 2018 at 1200Z. This is a quick way to explore available imagery, rather than iteratively running this code or something similar.
+
+* Import Modules
+
+Let's first import the modules we need to run the code.
+
+#+begin_src python :results silent
+
+import xarray as xr
+import requests
+import netCDF4
+import boto3
+import matplotlib.pyplot as plt
+import datetime
+
+#+end_src
+
+* Define Custom Functions
+
+We need to create a few custom functions. We need the following:
+
+- =day_of_year= - a function that takes a date and converts how many days since January 1 of that year have passed
+- =read_aws_creds= - a function that reads my AWS credentials downloaded directly from AWS
+- =get_s3_keys= - a function that lists all objects in a bucket that start with a prefix string
+
+#+begin_src python :results silent
+
+def day_of_year(date):
+    '''
+    Take a datetime date and get the number of days since Jan 1 of that same year
+    '''
+
+    year = date.year
+    firstDay = datetime.datetime(year,1,1)
+    return (date-firstDay).days+1
+
+def read_aws_creds(credPath):
+    '''
+    Read AWS credentials stored at ~/rootkey.csv
+    '''
+
+    with open(credPath,'r') as f:
+        creds = f.read()
+
+    return creds.split('\n')[1].split(',')
+
+def get_s3_keys(bucket, s3Client, prefix = ''):
+    """
+    Generate the keys in an S3 bucket.
+    """
+
+    # Build arguments dictionary
+    kwargs = {'Bucket': bucket}
+    if isinstance(prefix, str):
+        kwargs['Prefix'] = prefix
+
+    while True:
+
+        resp = s3Client.list_objects_v2(**kwargs)
+        for obj in resp['Contents']:
+            key = obj['Key']
+            if key.startswith(prefix):
+                yield key
+
+        try:
+            kwargs['ContinuationToken'] = resp['NextContinuationToken']
+        except KeyError:
+            break
+
+#+end_src
+
+* Set Image Parameters
+
+Now we set the parameters specifying the image and data we want. Let's set the date for the image to be 30 days ago from today at time 1800Z. Additionally, I want to see GOES-16 and GOES-17/18 around the same time, just to compare the two, so let's define both bucket names.
+
+#+begin_src python :results silent
+
+# Set image specific parameters
+bucketNameEast = 'noaa-goes16'
+bucketNameWest1 = 'noaa-goes17'
+bucketNameWest2 = 'noaa-goes18'
+productName = 'ABI-L1b-RadF'
+band = 2
+
+# Set date of image
+date = datetime.datetime.now()-datetime.timedelta(days=30)
+year = date.year
+day = day_of_year(date)
+hour = 18
+
+# GOES West switched from 17 to 18 on Jan 10, 2023
+if date > datetime.datetime(2023,1,10):
+    bucketNameWest = bucketNameWest2
+else:
+    bucketNameWest = bucketNameWest1
+
+# Identify scan mode based on satellite/date
+if date < datetime.datetime(2019,4,2,16):
+    scanMode = "M3"
+else:
+    scanMode = "M6"
+
+#+end_src
+
+* GOES East
+
+Rather than go through both the east and the west, let's just go through the process of downloading and displaying the GOES East full-disk image. This is also partly because running both in one Jupyter notebook causes my kernel to crash.
+
+** Fetch Images from AWS
+
+Now we need to initialize the S3 client with our credentials. Then, we set the file name prefix for the parameters described above and query the bucket for any objects that begins with our file name prefix. Since the ABI images multiple times per hour, there will be several options, but we'll just grab the first image available for each hour.
+
+#+begin_src python :results silent
+
+# Initialize S3 client with credentials
+keyID,key = read_aws_creds("../secrets.csv")
+s3Client = boto3.client('s3',aws_access_key_id=keyID,aws_secret_access_key=key)
+
+# Set the file prefix string
+prefix = f'{productName}/{year}/{day:03.0f}/{hour:02.0f}/OR_{productName}-{scanMode}C{band:02.0f}'
+
+# Get the keys from the S3 bucket
+keys = get_s3_keys(bucketNameEast,s3Client,prefix)
+
+# Selecting the first measurement taken within the hour
+key = [key for key in keys][0]
+
+# Send a request to the bucket
+response = requests.get(f'https://{bucketNameEast}.s3.amazonaws.com/{key}')
+
+#+end_src
+
+** Load the NetCDF File
+
+Now we use netCDF to load the file from the AWS request.
+
+#+begin_src python :results silent
+
+# Open the GOES 16 image
+fileNameEast = key.split('/')[-1].split('.')[0]
+nc4 = netCDF4.Dataset(fileNameEast,memory=response.content)
+store = xr.backends.NetCDF4DataStore(nc4)
+ds = xr.open_dataset(store)
+
+#+end_src
+
+** Plot the Image
+
+Lastly, let's plot our resulting image.
+
+#+begin_src python :results file
+
+# Create subplots
+fig, ax = plt.subplots(1,1,figsize=(15,15));
+
+# Fill plot data
+ax.imshow(ds.Rad, cmap='gray');
+
+# Add titles
+fig.suptitle(date.strftime("%m/%d/%Y")+" at "+str(hour)+"Z", fontsize=24);
+ax.set_title('GOES East',fontsize=18);
+
+# Turn off axes
+ax.axis('off');
+
+# Save the figure
+plt.tight_layout()
+filePath = '../images/goes_east_example.png'
+plt.savefig(filePath)
+filePath
+
+#+end_src
+
+#+RESULTS:
+[[file:../images/goes_east_example.png]]
