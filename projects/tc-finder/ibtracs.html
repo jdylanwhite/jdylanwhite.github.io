@@ -1,12 +1,12 @@
-<!-- Generated from 55e7a90 on 2023-11-28 @ 12:29 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 79b337b on 2023-11-28 @ 12:33 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>IBTrACS Tropical Cyclone Tracks - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">IBTrACS Tropical Cyclone Tracks</h1><p class="site-post-meta">November  6, 2023</p><div id="content">
-<h2><a id="ibtracs-data" class="anchor" href="#ibtracs-data">¶</a>IBTrACS Data</h2><div class="outline-text-2" id="text-org898dddc">
+<h2><a id="ibtracs-data" class="anchor" href="#ibtracs-data">¶</a>IBTrACS Data</h2><div class="outline-text-2" id="text-org6efd4c9">
 <p>
 The IBTrACS, or International Best Track Archive for Climate Stewardship (IBTrACS) data contains a history of tropical storm data. It is stored by <a href="https://www.ncdc.noaa.gov/ibtracs/">NOAA&rsquo;s National Climatic Data Center (NCDC)</a>. Let&rsquo;s load the data and explore it in Python.
 </p>
 </div>
 
-<h3><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h3><div class="outline-text-3" id="text-org94f99bb">
+<h3><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h3><div class="outline-text-3" id="text-orgc901304">
 <p>
 Let&rsquo;s start by importing the modules we need.
 </p>
@@ -20,7 +20,7 @@ Let&rsquo;s start by importing the modules we need.
 <span class="org-keyword">from</span> mpl_toolkits.basemap <span class="org-keyword">import</span> Basemap</pre>
 </div>
 
-<h3><a id="download-the-data" class="anchor" href="#download-the-data">¶</a>Download the Data</h3><div class="outline-text-3" id="text-org83105f7">
+<h3><a id="download-the-data" class="anchor" href="#download-the-data">¶</a>Download the Data</h3><div class="outline-text-3" id="text-orge0805e3">
 <p>
 Now we need to download the IBTrACS data. It isn&rsquo;t very large, so it shouldn&rsquo;t take too long.
 </p>
@@ -41,7 +41,7 @@ Now we need to download the IBTrACS data. It isn&rsquo;t very large, so it shoul
     request.urlretrieve(url,filePath)</pre>
 </div>
 
-<h3><a id="explore-the-data" class="anchor" href="#explore-the-data">¶</a>Explore the Data</h3><div class="outline-text-3" id="text-orgf828cb9">
+<h3><a id="explore-the-data" class="anchor" href="#explore-the-data">¶</a>Explore the Data</h3><div class="outline-text-3" id="text-org4dcdaf1">
 <p>
 There are a lot of variables here, but we will only need a handful. Some of the pertinent variables and their descriptions are provided below (from the IBTrACS documentation):
 </p>
@@ -516,7 +516,7 @@ We can also query seasons. Let&rsquo;s see the unique named storms this year.
 </table></div>
 </div>
 
-<h3><a id="plot-tracks-on-a-map" class="anchor" href="#plot-tracks-on-a-map">¶</a>Plot Tracks on a Map</h3><div class="outline-text-3" id="text-org9435b33">
+<h3><a id="plot-tracks-on-a-map" class="anchor" href="#plot-tracks-on-a-map">¶</a>Plot Tracks on a Map</h3><div class="outline-text-3" id="text-orgdb68093">
 <p>
 Now let&rsquo;s plot the tracks over the past 20 years.
 </p>
@@ -561,7 +561,7 @@ filePath</pre>
 </div>
 </div>
 
-<h3><a id="accumulated-cyclone-energy" class="anchor" href="#accumulated-cyclone-energy">¶</a>Accumulated Cyclone Energy</h3><div class="outline-text-3" id="text-org2bb88f9">
+<h3><a id="accumulated-cyclone-energy" class="anchor" href="#accumulated-cyclone-energy">¶</a>Accumulated Cyclone Energy</h3><div class="outline-text-3" id="text-orgf32be28">
 <p>
 Let&rsquo;s explore the data a bit more. Accumulated Cyclone Energy (ACE) is defined as the cummulative kinetic energy over the storm for every six hours when the winds are above 35 knots. As these numbers are often quite large, they are scaled down by a factor of 10000. Let&rsquo;s subset the whole IBTrACS to six-hourly data which winds below this threshold. It&rsquo;s a little more nuanced than what I&rsquo;m doing here, but it&rsquo;s still roughly the same idea.
 </p>
