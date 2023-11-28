@@ -1,0 +1,286 @@
+<!-- Generated from 55e7a90 on 2023-11-28 @ 12:29 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>GOES Satellite Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">GOES Satellite Data</h1><p class="site-post-meta">November  9, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org4a61937">
+<p>
+GOES, or Geostationary Operational Environmental Satellite, is a meteorological satellite operated by NOAA. There are two GOES positions, GOES-East, and GOES-West that image weather conditions over the continental U.S. and Eastern Pacific and Northern Atlantic basins. The current satellites in the east and west positions are GOES-16 and GOES-17, respectively.
+</p>
+
+<p>
+There is a lot of information available about their satellites, data, and file structure. When it comes to automated GOES data retrieval, as is the goal of this notebook, one thing that is important to note is that the <i>scan mode</i> <a href="https://cimss.ssec.wisc.edu/satellite-blog/archives/32657">has changed</a>, and this is likely not the only change over the years. Scan mode 3 was the original default, but in order to obtain more frequent full-disk images, scan mode 6 became the default in April 2019. This change is reflected in the file name, so I initially was unable to get more recent data.
+</p>
+
+<p>
+The data can be obtained from Amazon Web Services. To access the data, we can use Amazon S3 or Amazon &ldquo;Simple Storage Service&rdquo;. Python has a package, <code>boto3</code>, which is the AWS software development kit that we can use to get the data. In order to access the data, we have to know how it is stored. The files are stored in netCDF format in three AWS buckets, <code>noaa-goes16</code>, <code>noaa-goes17</code>, and <code>noaa-goes18</code>. They are then stored in folders of the format
+</p>
+
+<pre class="example">
+
+{Product}/{Year}/{Day of Year}/{Hour}/{Filename}.
+
+</pre>
+
+<p>
+The product here will just be <code>ABI-L1b-RadF</code>. This is the full-disc radiance from Level-1b (L1b) data generated from Advanced Baseline Imager (ABI). More specifics about L1b products can be found in the <a href="https://www.goes-r.gov/users/docs/PUG-L1b-vol3.pdf">public user&rsquo;s guide</a>. The ABI has 16 bands, but we&rsquo;ll choose band 2. This band has a central wavelength of 0.64 $&mu;$m, corresponding to the visible, red band. The filename has a somewhat complicated structure. Here&rsquo;s an example from <a href="https://docs.opendata.aws/noaa-goes16/cics-readme.html">NOAA&rsquo;s GOES on AWS readme</a>:
+</p>
+
+<pre class="example">
+
+OR_ABI-L1b-RadF-M3C02_G16_s20171671145342_e20171671156109_c20171671156144.nc
+
+</pre>
+
+<p>
+Each segment of the file name and its description are shown below:
+</p>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">File Name Segment</th>
+<th scope="col" class="org-left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>OR</code></td>
+<td class="org-left">Operational system real-time data</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>ABI</code></td>
+<td class="org-left">ABI Sensor</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>L1b</code></td>
+<td class="org-left">processing level</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>Rad</code></td>
+<td class="org-left">radiances</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>F</code></td>
+<td class="org-left">full disk</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>M3</code></td>
+<td class="org-left">mode 3 (scan operation)</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>C02</code></td>
+<td class="org-left">channel or band 02</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>G16</code></td>
+<td class="org-left">satellite id for GOES-16</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>s20171671145342</code></td>
+<td class="org-left">start of scan time</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>e20171671156109</code></td>
+<td class="org-left">end of scan time</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>c20171671156144</code></td>
+<td class="org-left">netCDF4 file creation time</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>.nc</code></td>
+<td class="org-left">netCDF file extension</td>
+</tr>
+</tbody>
+</table></div>
+
+<p>
+With the <a href="https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html#cliv2-windows-prereq">AWS client</a>, we can search for an image via a command like <code>aws s3 ls s3://noaa-goes16/ABI-L1b-RadF/2018/271/12/ --no-sign-request</code>. This lists all of the ABI-L1b-RadF products from GOES16 on the 271st day of 2018 at 1200Z. This is a quick way to explore available imagery, rather than iteratively running this code or something similar.
+</p>
+</div>
+
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-org50dd037">
+<p>
+Let&rsquo;s first import the modules we need to run the code.
+</p>
+
+<pre><span class="org-keyword">import</span> xarray <span class="org-keyword">as</span> xr
+<span class="org-keyword">import</span> requests
+<span class="org-keyword">import</span> netCDF4
+<span class="org-keyword">import</span> boto3
+<span class="org-keyword">import</span> matplotlib.pyplot <span class="org-keyword">as</span> plt
+<span class="org-keyword">import</span> datetime</pre>
+</div>
+
+<h2><a id="define-custom-functions" class="anchor" href="#define-custom-functions">¶</a>Define Custom Functions</h2><div class="outline-text-2" id="text-org3ffa50d">
+<p>
+We need to create a few custom functions. We need the following:
+</p>
+
+<ul class="org-ul">
+<li><code>day_of_year</code> - a function that takes a date and converts how many days since January 1 of that year have passed</li>
+<li><code>read_aws_creds</code> - a function that reads my AWS credentials downloaded directly from AWS</li>
+<li><code>get_s3_keys</code> - a function that lists all objects in a bucket that start with a prefix string</li>
+</ul>
+
+<pre><span class="org-keyword">def</span> <span class="org-function-name">day_of_year</span>(date):
+    <span class="org-doc">'''</span>
+<span class="org-doc">    Take a datetime date and get the number of days since Jan 1 of that same year</span>
+<span class="org-doc">    '''</span>
+
+    <span class="org-variable-name">year</span> = date.year
+    <span class="org-variable-name">firstDay</span> = datetime.datetime(year,1,1)
+    <span class="org-keyword">return</span> (date-firstDay).days+1
+
+<span class="org-keyword">def</span> <span class="org-function-name">read_aws_creds</span>(credPath):
+    <span class="org-doc">'''</span>
+<span class="org-doc">    Read AWS credentials stored at ~/rootkey.csv</span>
+<span class="org-doc">    '''</span>
+
+    <span class="org-keyword">with</span> <span class="org-builtin">open</span>(credPath,<span class="org-string">'r'</span>) <span class="org-keyword">as</span> f:
+        <span class="org-variable-name">creds</span> = f.read()
+
+    <span class="org-keyword">return</span> creds.split(<span class="org-string">'\n'</span>)[1].split(<span class="org-string">','</span>)
+
+<span class="org-keyword">def</span> <span class="org-function-name">get_s3_keys</span>(bucket, s3Client, prefix = <span class="org-string">''</span>):
+    <span class="org-doc">"""</span>
+<span class="org-doc">    Generate the keys in an S3 bucket.</span>
+<span class="org-doc">    """</span>
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Build arguments dictionary</span>
+    <span class="org-variable-name">kwargs</span> = {<span class="org-string">'Bucket'</span>: bucket}
+    <span class="org-keyword">if</span> <span class="org-builtin">isinstance</span>(prefix, <span class="org-builtin">str</span>):
+        <span class="org-variable-name">kwargs</span>[<span class="org-string">'Prefix'</span>] = prefix
+
+    <span class="org-keyword">while</span> <span class="org-constant">True</span>:
+
+        <span class="org-variable-name">resp</span> = s3Client.list_objects_v2(**kwargs)
+        <span class="org-keyword">for</span> obj <span class="org-keyword">in</span> resp[<span class="org-string">'Contents'</span>]:
+            <span class="org-variable-name">key</span> = obj[<span class="org-string">'Key'</span>]
+            <span class="org-keyword">if</span> key.startswith(prefix):
+                <span class="org-keyword">yield</span> key
+
+        <span class="org-keyword">try</span>:
+            <span class="org-variable-name">kwargs</span>[<span class="org-string">'ContinuationToken'</span>] = resp[<span class="org-string">'NextContinuationToken'</span>]
+        <span class="org-keyword">except</span> <span class="org-type">KeyError</span>:
+            <span class="org-keyword">break</span></pre>
+</div>
+
+<h2><a id="set-image-parameters" class="anchor" href="#set-image-parameters">¶</a>Set Image Parameters</h2><div class="outline-text-2" id="text-orgfead592">
+<p>
+Now we set the parameters specifying the image and data we want. Let&rsquo;s set the date for the image to be 30 days ago from today at time 1800Z. Additionally, I want to see GOES-16 and GOES-17/18 around the same time, just to compare the two, so let&rsquo;s define both bucket names.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set image specific parameters</span>
+<span class="org-variable-name">bucketNameEast</span> = <span class="org-string">'noaa-goes16'</span>
+<span class="org-variable-name">bucketNameWest1</span> = <span class="org-string">'noaa-goes17'</span>
+<span class="org-variable-name">bucketNameWest2</span> = <span class="org-string">'noaa-goes18'</span>
+<span class="org-variable-name">productName</span> = <span class="org-string">'ABI-L1b-RadF'</span>
+<span class="org-variable-name">band</span> = 2
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Set date of image</span>
+<span class="org-variable-name">date</span> = datetime.datetime.now()-datetime.timedelta(days=30)
+<span class="org-variable-name">year</span> = date.year
+<span class="org-variable-name">day</span> = day_of_year(date)
+<span class="org-variable-name">hour</span> = 18
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">GOES West switched from 17 to 18 on Jan 10, 2023</span>
+<span class="org-keyword">if</span> date &gt; datetime.datetime(2023,1,10):
+    <span class="org-variable-name">bucketNameWest</span> = bucketNameWest2
+<span class="org-keyword">else</span>:
+    <span class="org-variable-name">bucketNameWest</span> = bucketNameWest1
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Identify scan mode based on satellite/date</span>
+<span class="org-keyword">if</span> date &lt; datetime.datetime(2019,4,2,16):
+    <span class="org-variable-name">scanMode</span> = <span class="org-string">"M3"</span>
+<span class="org-keyword">else</span>:
+    <span class="org-variable-name">scanMode</span> = <span class="org-string">"M6"</span></pre>
+</div>
+
+<h2><a id="goes-east" class="anchor" href="#goes-east">¶</a>GOES East</h2><div class="outline-text-2" id="text-orgb1f1ae7">
+<p>
+Rather than go through both the east and the west, let&rsquo;s just go through the process of downloading and displaying the GOES East full-disk image. This is also partly because running both in one Jupyter notebook causes my kernel to crash.
+</p>
+</div>
+
+<h3><a id="fetch-images-from-aws" class="anchor" href="#fetch-images-from-aws">¶</a>Fetch Images from AWS</h3><div class="outline-text-3" id="text-orgb111932">
+<p>
+Now we need to initialize the S3 client with our credentials. Then, we set the file name prefix for the parameters described above and query the bucket for any objects that begins with our file name prefix. Since the ABI images multiple times per hour, there will be several options, but we&rsquo;ll just grab the first image available for each hour.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Initialize S3 client with credentials</span>
+<span class="org-variable-name">keyID</span>,<span class="org-variable-name">key</span> = read_aws_creds(<span class="org-string">"../secrets.csv"</span>)
+<span class="org-variable-name">s3Client</span> = boto3.client(<span class="org-string">'s3'</span>,aws_access_key_id=keyID,aws_secret_access_key=key)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Set the file prefix string</span>
+<span class="org-variable-name">prefix</span> = f<span class="org-string">'{productName}/{year}/{day:03.0f}/{hour:02.0f}/OR_{productName}-{scanMode}C{band:02.0f}'</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the keys from the S3 bucket</span>
+<span class="org-variable-name">keys</span> = get_s3_keys(bucketNameEast,s3Client,prefix)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Selecting the first measurement taken within the hour</span>
+<span class="org-variable-name">key</span> = [key <span class="org-keyword">for</span> key <span class="org-keyword">in</span> keys][0]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Send a request to the bucket</span>
+<span class="org-variable-name">response</span> = requests.get(f<span class="org-string">'https://{bucketNameEast}.s3.amazonaws.com/{key}'</span>)</pre>
+</div>
+
+<h3><a id="load-the-netcdf-file" class="anchor" href="#load-the-netcdf-file">¶</a>Load the NetCDF File</h3><div class="outline-text-3" id="text-org4591412">
+<p>
+Now we use netCDF to load the file from the AWS request.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Open the GOES 16 image</span>
+<span class="org-variable-name">fileNameEast</span> = key.split(<span class="org-string">'/'</span>)[-1].split(<span class="org-string">'.'</span>)[0]
+<span class="org-variable-name">nc4</span> = netCDF4.Dataset(fileNameEast,memory=response.content)
+<span class="org-variable-name">store</span> = xr.backends.NetCDF4DataStore(nc4)
+<span class="org-variable-name">ds</span> = xr.open_dataset(store)</pre>
+</div>
+
+<h3><a id="plot-the-image" class="anchor" href="#plot-the-image">¶</a>Plot the Image</h3><div class="outline-text-3" id="text-orgbafd568">
+<p>
+Lastly, let&rsquo;s plot our resulting image.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Create subplots</span>
+<span class="org-variable-name">fig</span>, <span class="org-variable-name">ax</span> = plt.subplots(1,1,figsize=(15,15));
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Fill plot data</span>
+ax.imshow(ds.Rad, cmap=<span class="org-string">'gray'</span>);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Add titles</span>
+fig.suptitle(date.strftime(<span class="org-string">"%m/%d/%Y"</span>)+<span class="org-string">" at "</span>+<span class="org-builtin">str</span>(hour)+<span class="org-string">"Z"</span>, fontsize=24);
+ax.set_title(<span class="org-string">'GOES East'</span>,fontsize=18);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Turn off axes</span>
+ax.axis(<span class="org-string">'off'</span>);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the figure</span>
+plt.tight_layout()
+<span class="org-variable-name">filePath</span> = <span class="org-string">'../images/goes_east_example.png'</span>
+plt.savefig(filePath)
+filePath</pre>
+
+
+<div class="figure">
+<p><img src="../images/goes_east_example.png" alt="goes_east_example.png" />
+</p>
+</div>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
