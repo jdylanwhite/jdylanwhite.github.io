@@ -218,4 +218,4 @@ filePath
 #+end_src
 
 #+RESULTS:
-[[file:../images/goes_east_example.png]]
+[[file:images/goes_east_example.png]]
