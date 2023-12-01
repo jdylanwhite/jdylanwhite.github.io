@@ -7,3 +7,4 @@ When I went through several courses on machine learning, I was always provided w
 
 - [[file:ibtracs.org][Exploring the IBTrACS storm track data]] - investigating a human-derived dataset showing time, location, and other meteorological variables for tropical storms.
 - [[file:goes.org][Exploring the GOES satellite imagery]] - investigating how to access, read, and visualize GOES satellite imagery.
+- [[file:goes_and_ibtracs.org][Projecting IBTrACS storm track data onto GOES satellite imagery]] - invesitigating how to perform projections using Python's =pyproj= package.
