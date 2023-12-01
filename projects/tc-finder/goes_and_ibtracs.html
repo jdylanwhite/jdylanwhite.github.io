@@ -1,0 +1,347 @@
+<!-- Generated from 9b14faa on 2023-12-01 @ 14:59 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>GOES and IBTrACS Data with Projections - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">GOES and IBTrACS Data with Projections</h1><p class="site-post-meta">November 13, 2023</p><div id="content">
+<h2><a id="introductions" class="anchor" href="#introductions">¶</a>Introductions</h2><div class="outline-text-2" id="text-org610c1a3">
+<p>
+Now that we&rsquo;ve explored the GOES satellite data and the IBTrACS data in Python, let&rsquo;s put them both together. In order to do so, we&rsquo;ll have to obtain the projection data of the GOES imagery, project the IBTrACS latitudes/longitudes using the GOES projection data, and then overlay the track on the GOES imagery.
+</p>
+
+<p>
+Rather than using the entirety of the IBTrACS data, we focus specifically on the track of <a href="https://en.wikipedia.org/wiki/Hurricane_Harvey">Hurricane Harvey in 2017</a>. This was a devastating storm that first made landfall in Texas. I chose this storm because I&rsquo;m pretty familiar with it and know roughly what to expect for the imagery and the track.
+</p>
+</div>
+
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-org2e96e58">
+<p>
+Let&rsquo;s first import the modules we need to run the code. I&rsquo;ve written some functions for getting the IBTrACS and GOES data, so let&rsquo;s import those functions now too.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Import modules</span>
+<span class="org-keyword">import</span> matplotlib.pyplot <span class="org-keyword">as</span> plt
+<span class="org-keyword">import</span> os
+<span class="org-keyword">import</span> datetime
+<span class="org-keyword">from</span> pyproj <span class="org-keyword">import</span> Proj
+<span class="org-keyword">from</span> mpl_toolkits.basemap <span class="org-keyword">import</span> Basemap
+<span class="org-keyword">import</span> numpy <span class="org-keyword">as</span> np
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Import functions I've written</span>
+os.chdir(<span class="org-string">".."</span>)
+<span class="org-keyword">import</span> goes
+<span class="org-keyword">import</span> ibtracs</pre>
+</div>
+
+<h2><a id="retrieve-ibtracs-data" class="anchor" href="#retrieve-ibtracs-data">¶</a>Retrieve IBTrACS Data</h2><div class="outline-text-2" id="text-org3311412">
+<p>
+Now let&rsquo;s load up the IBTrACS data, as we did in a previous notebook, and then drill down on the track for Hurricane Harvey in 2017.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the file path for the IBTrACS data</span>
+<span class="org-variable-name">filePath</span> = ibtracs.download_data(basin=<span class="org-string">"NA"</span>,overwrite=<span class="org-constant">False</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Read the data from the CSV</span>
+<span class="org-variable-name">df</span> = ibtracs.read_data(filePath)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Keep only the Hurricane Harvey (2017) track</span>
+<span class="org-variable-name">df</span> = df[df[<span class="org-string">'SEASON'</span>] == 2017]
+<span class="org-variable-name">df</span> = df[df[<span class="org-string">'NAME'</span>] == <span class="org-string">'HARVEY'</span>]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Show a preview</span>
+df.head()</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-left">SID</th>
+<th scope="col" class="org-right">SEASON</th>
+<th scope="col" class="org-right">NUMBER</th>
+<th scope="col" class="org-left">NAME</th>
+<th scope="col" class="org-left">ISO_TIME</th>
+<th scope="col" class="org-left">NATURE</th>
+<th scope="col" class="org-left">LAT</th>
+<th scope="col" class="org-right">LON</th>
+<th scope="col" class="org-right">WMO_WIND</th>
+<th scope="col" class="org-right">WMO_PRES</th>
+<th scope="col" class="org-right">TRACK_TYPE</th>
+<th scope="col" class="org-left">DIST2LAND</th>
+<th scope="col" class="org-right">LANDFALL</th>
+<th scope="col" class="org-right">IFLAG</th>
+<th scope="col" class="org-left">STORM_SPEED</th>
+<th scope="col" class="org-right">STORM_DIR</th>
+<th scope="col" class="org-right">&#xa0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">118592</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 06:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.7</td>
+<td class="org-right">-45.8</td>
+<td class="org-right">25</td>
+<td class="org-right">1013</td>
+<td class="org-left">main</td>
+<td class="org-right">1209</td>
+<td class="org-right">1157</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">271</td>
+</tr>
+
+<tr>
+<td class="org-right">118593</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 09:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.713</td>
+<td class="org-right">-46.5999</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">main</td>
+<td class="org-right">1157</td>
+<td class="org-right">1109</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">270</td>
+</tr>
+
+<tr>
+<td class="org-right">118594</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 12:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.7</td>
+<td class="org-right">-47.4</td>
+<td class="org-right">25</td>
+<td class="org-right">1010</td>
+<td class="org-left">main</td>
+<td class="org-right">1109</td>
+<td class="org-right">1067</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">268</td>
+</tr>
+
+<tr>
+<td class="org-right">118595</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 15:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.6497</td>
+<td class="org-right">-48.2001</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">main</td>
+<td class="org-right">1057</td>
+<td class="org-right">1018</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">266</td>
+</tr>
+
+<tr>
+<td class="org-right">118596</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 18:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.6</td>
+<td class="org-right">-49.0</td>
+<td class="org-right">25</td>
+<td class="org-right">1009</td>
+<td class="org-left">main</td>
+<td class="org-right">1018</td>
+<td class="org-right">986</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">268</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<h2><a id="retrieve-goes16-image" class="anchor" href="#retrieve-goes16-image">¶</a>Retrieve GOES16 Image</h2><div class="outline-text-2" id="text-orgdd32dc4">
+<p>
+Now let&rsquo;s grab a GOES16 image corresponding to Hurricane Harvey. It made landfall in Texas around August 25, 2017, so we&rsquo;ll set the date for the image to be that day.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set image specific parameters</span>
+<span class="org-variable-name">bucketName</span> = <span class="org-string">'noaa-goes16'</span>
+<span class="org-variable-name">date</span> = datetime.datetime(2017,8,25,18)
+<span class="org-variable-name">product</span> = <span class="org-string">'ABI-L1b-RadF'</span>
+<span class="org-variable-name">credPath</span> = <span class="org-string">"secrets.csv"</span>
+<span class="org-variable-name">band</span> = 3
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the GOES data</span>
+<span class="org-variable-name">ds</span> = goes.download_data(date,credPath,bucketName,product,band)</pre>
+
+<p>
+Next, let&rsquo;s plot the GOES full disk image.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Create plot</span>
+<span class="org-variable-name">fig</span>, <span class="org-variable-name">ax</span> = plt.subplots(figsize=(10,10));
+ax.imshow(ds.Rad, cmap=<span class="org-string">'gray'</span>);
+ax.set_title(<span class="org-string">'GOES-16, '</span>+date.isoformat(),fontsize=22);
+ax.axis(<span class="org-string">'off'</span>);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the figure</span>
+plt.tight_layout()
+<span class="org-variable-name">filePath</span> = <span class="org-string">'./images/goes_harvey_example.png'</span>
+plt.savefig(filePath)</pre>
+
+
+<div class="figure">
+<p><img src="./images/goes_harvey_example.png" alt="goes_harvey_example.png" />
+</p>
+</div>
+</div>
+
+<h2><a id="overlay-state-and-country-borders-with-basemap" class="anchor" href="#overlay-state-and-country-borders-with-basemap">¶</a>Overlay State and Country Borders with Basemap</h2><div class="outline-text-2" id="text-org6fef3f2">
+<p>
+Now let&rsquo;s experiment with projections. To make sure we&rsquo;ve got the projection right, we start by overlaying the boundaries of states, countries, and coastlines on the GOES imagery. In order to do so, we need to get the projection of the GOES data. This information is stored in the netCDF metadata, primarily as attributes for the variable <code>goes_imager_projection</code>. So once we get the projection data, we&rsquo;ll load this into the base map, and then the borders should be easily drawn using the base map utilities.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get dataset projection data</span>
+<span class="org-variable-name">satHeight</span> = ds.goes_imager_projection.perspective_point_height
+<span class="org-variable-name">satLon</span> = ds.goes_imager_projection.longitude_of_projection_origin
+<span class="org-variable-name">satSweep</span> = ds.goes_imager_projection.sweep_angle_axis
+<span class="org-variable-name">majorMinorAxes</span> = (ds.goes_imager_projection.semi_major_axis,ds.goes_imager_projection.semi_minor_axis)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The projection x and y coordinates equals the scanning angle (in radians) multiplied by the satellite height</span>
+<span class="org-variable-name">x</span> = ds.variables[<span class="org-string">'x'</span>][:] * satHeight
+<span class="org-variable-name">y</span> = ds.variables[<span class="org-string">'y'</span>][:] * satHeight
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Set the geostationary projection</span>
+<span class="org-variable-name">m</span> = Basemap(projection=<span class="org-string">'geos'</span>, lon_0=satLon,
+            rsphere=majorMinorAxes,
+            resolution=<span class="org-string">'i'</span>, area_thresh=5000,
+            llcrnrx=x.<span class="org-builtin">min</span>(),llcrnry=y.<span class="org-builtin">min</span>(),
+            urcrnrx=x.<span class="org-builtin">max</span>(),urcrnry=y.<span class="org-builtin">max</span>())
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Create the plot</span>
+plt.figure(figsize=(10,10))
+m.imshow(np.flipud(ds.Rad), cmap=<span class="org-string">'gray'</span>);
+m.drawcoastlines();
+m.drawcountries();
+m.drawstates();
+plt.axis(<span class="org-string">'off'</span>);
+plt.title(<span class="org-string">'GOES-16, '</span>+date.isoformat(),fontsize=22);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the figure</span>
+plt.tight_layout()
+<span class="org-variable-name">filePath</span> = <span class="org-string">'./images/goes_harvey_projection_example.png'</span>
+plt.savefig(filePath)</pre>
+
+
+<div class="figure">
+<p><img src="./images/goes_harvey_projection_example.png" alt="goes_harvey_projection_example.png" />
+</p>
+</div>
+</div>
+
+<h2><a id="overlay-ibtracs-data" class="anchor" href="#overlay-ibtracs-data">¶</a>Overlay IBTRaCS Data</h2><div class="outline-text-2" id="text-org325f516">
+<p>
+Now that we can see the projection is working properly, let&rsquo;s add the Hurricane Harvey track as of August 25, 2017 at 18Z. We first need to grab the latitude longitudes from the IBTRaCS data. We can then use <code>pyproj.Proj</code> to convert longitudes and latitudes to the \(x\) and \(y\) space of the projected GOES image.
+</p>
+
+<p>
+I don&rsquo;t fully understand why this is the case, but the netCDF \(x\) and \(y\) arrays go symmetrically from -5434394 to 5434394, but the basemap seems to span from 0 to 10868788. So to properly draw the tracks, we&rsquo;ll need to add 5434394 to the output \(x\) and \(y\) of <code>pyproj.Proj</code> for each longitude and latitude in the track.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the latitudes/longitudes of the Hurricane Harvey track data</span>
+<span class="org-variable-name">df</span> = df[df[<span class="org-string">'ISO_TIME'</span>]&lt;=date]
+<span class="org-variable-name">latList</span> = <span class="org-builtin">list</span>(df[<span class="org-string">'LAT'</span>])
+<span class="org-variable-name">lonList</span> = <span class="org-builtin">list</span>(df[<span class="org-string">'LON'</span>])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Create a pyproj geostationary map object</span>
+<span class="org-variable-name">p</span> = Proj(proj=<span class="org-string">'geos'</span>, h=satHeight, lon_0=satLon, sweep=satSweep)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Convert lon/lat to x/y</span>
+<span class="org-variable-name">xList</span>,<span class="org-variable-name">yList</span> = p(lonList,latList)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Projected coordinates are negative, but matplotlib starts at 0.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Add half of the image width and height to properly draw on map</span>
+<span class="org-variable-name">xList</span> = [point+<span class="org-builtin">float</span>(x.<span class="org-builtin">max</span>()) <span class="org-keyword">for</span> point <span class="org-keyword">in</span> xList]
+<span class="org-variable-name">yList</span> = [point+<span class="org-builtin">float</span>(y.<span class="org-builtin">max</span>()) <span class="org-keyword">for</span> point <span class="org-keyword">in</span> yList]
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Add track to the basemap plot</span>
+plt.figure(figsize=(10,10))
+m.imshow(np.flipud(ds.Rad), cmap=<span class="org-string">'gray'</span>);
+m.drawcoastlines();
+m.drawcountries();
+m.drawstates();
+m.plot(xList,yList,linewidth=2.5,color=<span class="org-string">'r'</span>)
+plt.axis(<span class="org-string">'off'</span>);
+plt.title(<span class="org-string">'GOES-16, '</span>+date.isoformat(),fontsize=22);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the figure</span>
+plt.tight_layout()
+<span class="org-variable-name">filePath</span> = <span class="org-string">'./images/goes_harvey_projected_storm_track_example.png'</span>
+plt.savefig(filePath)</pre>
+
+
+<div class="figure">
+<p><img src="./images/goes_harvey_projected_storm_track_example.png" alt="goes_harvey_projected_storm_track_example.png" />
+</p>
+</div>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
