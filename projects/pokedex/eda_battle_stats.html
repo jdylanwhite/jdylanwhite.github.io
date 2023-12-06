@@ -1,12 +1,12 @@
-<!-- Generated from 9b14faa on 2023-12-01 @ 14:59 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 68b0f97 on 2023-12-06 @ 01:38 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Exploratory Data Analysis of Battle Stats - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Exploratory Data Analysis of Battle Stats</h1><p class="site-post-meta">October 25, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgb8f3100">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org7df35d3">
 <p>
 Here, we investigate some of the Pokemon battle stats data.
 </p>
 </div>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org0ce94be">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org2ab9d5c">
 <p>
 Start off by loading the libraries we need.
 </p>
@@ -17,7 +17,7 @@ Start off by loading the libraries we need.
 <span class="org-ess-modifiers">library</span>(ggplot2)</pre>
 </div>
 
-<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org5de0def">
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org679bdf1">
 <p>
 Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
 </p>
@@ -261,7 +261,7 @@ head(pokedex)</pre>
 </table></div>
 </div>
 
-<h2><a id="show-stats-by-generation" class="anchor" href="#show-stats-by-generation">¶</a>Show Stats by Generation</h2><div class="outline-text-2" id="text-orgac6b44d">
+<h2><a id="show-stats-by-generation" class="anchor" href="#show-stats-by-generation">¶</a>Show Stats by Generation</h2><div class="outline-text-2" id="text-org5f35ba4">
 <p>
 First, I&rsquo;m curious if there&rsquo;s any obvious trend on average for each generation. To do so, we group by the <code>Generation</code> column and get the mean for the <code>HP</code>, <code>Attack</code>, <code>Defense</code>, <code>Sp..Atk</code>, <code>Sp..Def</code>, and <code>Speed</code> columns. To plot them easily, we&rsquo;ll pivot the data from wide to long for each stat and specify that the new stat column is a factor.
 </p>
@@ -335,7 +335,7 @@ We don&rsquo;t have a ton of generations to make this case, but it does seem to 
 </p>
 </div>
 
-<h2><a id="show-stats-by-legendary-status" class="anchor" href="#show-stats-by-legendary-status">¶</a>Show Stats by Legendary Status</h2><div class="outline-text-2" id="text-org9d21b46">
+<h2><a id="show-stats-by-legendary-status" class="anchor" href="#show-stats-by-legendary-status">¶</a>Show Stats by Legendary Status</h2><div class="outline-text-2" id="text-orgfaabc22">
 <p>
 We have four options for the legendary status of Pokemon: non-legendary, sub-legendary, legendary, and mythical. In the games, legendary Pokemon were always a bit over-powered, so I expect the three legendary classes to outshine the non-legendary stats in every category. The mythical Pokemon are usually stronger than non-legendary Pokemon, but I wonder how they will compare to legendary and sub-legendary Pokemon on average.
 </p>
@@ -403,7 +403,7 @@ And again of course, legendary Pokemon way out-shine the non-legendary Pokemon.
 </p>
 </div>
 
-<h2><a id="show-stats-by-evolution-status" class="anchor" href="#show-stats-by-evolution-status">¶</a>Show Stats by Evolution Status</h2><div class="outline-text-2" id="text-orgd8bbac7">
+<h2><a id="show-stats-by-evolution-status" class="anchor" href="#show-stats-by-evolution-status">¶</a>Show Stats by Evolution Status</h2><div class="outline-text-2" id="text-orgd805086">
 <p>
 Next, I wanted to look at the average base stats for Pokemon that are first, second, or third in their evolution status and compare them against Pokemon that don&rsquo;t evolve at all. I&rsquo;m curious how non-evolving Pokemon compare to Pokemon that evolve. Typically, if a Pokemon evolves, it gets stronger with each evolution, and most Pokemon evolve once or twice. I would expect that Pokemon in the third link of the evolution chain would be stronger than Pokemon who don&rsquo;t evolve, but let&rsquo;s have a look.
 </p>

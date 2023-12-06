@@ -1,0 +1,276 @@
+<!-- Generated from 68b0f97 on 2023-12-06 @ 01:38 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Cropping GOES Imagery from IBTrACS - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Cropping GOES Imagery from IBTrACS</h1><p class="site-post-meta">November 15, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgae2c81e">
+<p>
+Now that we can properly project and cross-reference GOES data, let&rsquo;s try using the IBTrACS data to find where the storm is on an image and crop the image. We&rsquo;ll use the same example, Hurricane Harvey in 2017, to drive the example here again.
+</p>
+
+<p>
+In hindsight, I realize that this isn&rsquo;t very different from the previous notebook. I started this notebook because I need a way to identify if a point in latitude/longitude space in the IBTrACS data was actually on the visible full disc GOES image. I had started this complicated method where I convert every pixel in the GOES image into a meshed grid of latitudes/longitudes, find the closest latitude and logitude in the image to the IBTrACS latitude and longitude, and then use that to determine whether or not the IBTrACS point was on the image. But performing calculations and comparisons on 10000 by 10000 element arrays is quite cumbersome. Then I realized that I can do it the other way - convert the latitude/longitude to the GOES projection and then find its closest point in the much smaller 10000 by 1 \(x\) and \(y\) arrays stored in the GOES netCDF file. I think I&rsquo;ll still have to use the meshed grid to see if the closest point is on the disc, but this will now be a much shorter process, since I don&rsquo;t need to find the closest latitude and longitude on that large array.
+</p>
+</div>
+
+<h2><a id="import-functions" class="anchor" href="#import-functions">¶</a>Import Functions</h2><div class="outline-text-2" id="text-orgaee77f4">
+<p>
+Let&rsquo;s import functions we&rsquo;ll need. I&rsquo;ve also created functions to handle some of the code from the previous steps.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Import modules</span>
+<span class="org-keyword">import</span> datetime
+<span class="org-keyword">import</span> numpy <span class="org-keyword">as</span> np
+<span class="org-keyword">import</span> os
+<span class="org-keyword">from</span> pyproj <span class="org-keyword">import</span> Proj
+<span class="org-keyword">import</span> matplotlib.pyplot <span class="org-keyword">as</span> plt
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Import functions I've written</span>
+os.chdir(<span class="org-string">".."</span>)
+<span class="org-keyword">import</span> goes
+<span class="org-keyword">import</span> ibtracs</pre>
+</div>
+
+<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-org6d517cc">
+<p>
+Now let&rsquo;s read in the IBTrACS data, separating out Hurricane Harvey in 2017.
+</p>
+
+<pre><span class="org-variable-name">ibtracsPath</span> = ibtracs.download_data(basin=<span class="org-string">"NA"</span>,overwrite=<span class="org-constant">False</span>)
+<span class="org-variable-name">dfTracks</span> = ibtracs.read_data(ibtracsPath,<span class="org-constant">True</span>,2017,2017)
+<span class="org-variable-name">dfTracks</span> = dfTracks[dfTracks[<span class="org-string">"NAME"</span>]==<span class="org-string">"HARVEY"</span>]
+dfTracks.head()</pre>
+
+<div class="table-wrapper"><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-left">SID</th>
+<th scope="col" class="org-right">SEASON</th>
+<th scope="col" class="org-right">NUMBER</th>
+<th scope="col" class="org-left">NAME</th>
+<th scope="col" class="org-left">ISO_TIME</th>
+<th scope="col" class="org-left">NATURE</th>
+<th scope="col" class="org-left">LAT</th>
+<th scope="col" class="org-right">LON</th>
+<th scope="col" class="org-right">WMO_WIND</th>
+<th scope="col" class="org-right">WMO_PRES</th>
+<th scope="col" class="org-right">TRACK_TYPE</th>
+<th scope="col" class="org-left">DIST2LAND</th>
+<th scope="col" class="org-right">LANDFALL</th>
+<th scope="col" class="org-right">IFLAG</th>
+<th scope="col" class="org-left">STORM_SPEED</th>
+<th scope="col" class="org-right">STORM_DIR</th>
+<th scope="col" class="org-right">&#xa0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">118592</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 06:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.7</td>
+<td class="org-right">-45.8</td>
+<td class="org-right">25</td>
+<td class="org-right">1013</td>
+<td class="org-left">main</td>
+<td class="org-right">1209</td>
+<td class="org-right">1157</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">271</td>
+</tr>
+
+<tr>
+<td class="org-right">118593</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 09:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.713</td>
+<td class="org-right">-46.5999</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">main</td>
+<td class="org-right">1157</td>
+<td class="org-right">1109</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">270</td>
+</tr>
+
+<tr>
+<td class="org-right">118594</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 12:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.7</td>
+<td class="org-right">-47.4</td>
+<td class="org-right">25</td>
+<td class="org-right">1010</td>
+<td class="org-left">main</td>
+<td class="org-right">1109</td>
+<td class="org-right">1067</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">268</td>
+</tr>
+
+<tr>
+<td class="org-right">118595</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 15:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.6497</td>
+<td class="org-right">-48.2001</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-right">&#xa0;</td>
+<td class="org-left">main</td>
+<td class="org-right">1057</td>
+<td class="org-right">1018</td>
+<td class="org-left">P_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">266</td>
+</tr>
+
+<tr>
+<td class="org-right">118596</td>
+<td class="org-left">2017228N14314</td>
+<td class="org-right">2017</td>
+<td class="org-right">61</td>
+<td class="org-left">HARVEY</td>
+<td class="org-left">Timestamp</td>
+<td class="org-left">(2017-08-16 18:00:00)</td>
+<td class="org-left">DS</td>
+<td class="org-right">13.6</td>
+<td class="org-right">-49.0</td>
+<td class="org-right">25</td>
+<td class="org-right">1009</td>
+<td class="org-left">main</td>
+<td class="org-right">1018</td>
+<td class="org-right">986</td>
+<td class="org-left">O_____________</td>
+<td class="org-right">16</td>
+<td class="org-right">268</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+<h2><a id="fetch-goes16-imagery" class="anchor" href="#fetch-goes16-imagery">¶</a>Fetch GOES16 Imagery</h2><div class="outline-text-2" id="text-org04c5b66">
+<p>
+Now we&rsquo;ll fetch the same GOES16 image as last time.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set image specific parameters</span>
+<span class="org-variable-name">bucketName</span> = <span class="org-string">'noaa-goes16'</span>
+<span class="org-variable-name">date</span> = datetime.datetime(2017,8,25,18)
+<span class="org-variable-name">product</span> = <span class="org-string">'ABI-L1b-RadF'</span>
+<span class="org-variable-name">credPath</span> = <span class="org-string">"secrets.csv"</span>
+<span class="org-variable-name">band</span> = 3
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the GOES data</span>
+<span class="org-variable-name">ds</span> = goes.download_data(date,credPath,bucketName,product,band)</pre>
+</div>
+
+<h2><a id="define-projections-and-locate-the-storm" class="anchor" href="#define-projections-and-locate-the-storm">¶</a>Define Projections and Locate the Storm</h2><div class="outline-text-2" id="text-orgb305bd9">
+<p>
+We need to find the location of the IBTrACS data in the image, so we&rsquo;ll convert the storm&rsquo;s latitude and longitude into the same projection as the GOES imagery, identify the storm center on the image, and then plot a cropped storm with a buffer around the center of the storm.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get the latitudes/longitudes of the Hurricane Harvey track data</span>
+<span class="org-variable-name">dfTracks</span> = dfTracks[dfTracks[<span class="org-string">'ISO_TIME'</span>]==date]
+<span class="org-variable-name">trackLat</span> = dfTracks[<span class="org-string">'LAT'</span>].astype(<span class="org-builtin">float</span>)
+<span class="org-variable-name">trackLon</span> = dfTracks[<span class="org-string">'LON'</span>].astype(<span class="org-builtin">float</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get dataset projection data</span>
+<span class="org-variable-name">satHeight</span> = ds.goes_imager_projection.perspective_point_height
+<span class="org-variable-name">satLon</span> = ds.goes_imager_projection.longitude_of_projection_origin
+<span class="org-variable-name">satSweep</span> = ds.goes_imager_projection.sweep_angle_axis
+<span class="org-variable-name">majorMinorAxes</span> = (ds.goes_imager_projection.semi_major_axis,ds.goes_imager_projection.semi_minor_axis)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Create a pyproj geostationary map object</span>
+<span class="org-variable-name">p</span> = Proj(proj=<span class="org-string">'geos'</span>, h=satHeight, lon_0=satLon, sweep=satSweep)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Convert lon/lat to x/y</span>
+<span class="org-variable-name">trackX</span>,<span class="org-variable-name">trackY</span> = p(trackLon,trackLat)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The projection x and y coordinates equals the scanning angle (in radians) multiplied by the satellite height</span>
+<span class="org-variable-name">x</span> = ds.variables[<span class="org-string">'x'</span>][:] * satHeight
+<span class="org-variable-name">y</span> = ds.variables[<span class="org-string">'y'</span>][:] * satHeight
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the closest point to the IBTrACS data</span>
+<span class="org-variable-name">xInd</span> = np.nanargmin(<span class="org-builtin">abs</span>(x-trackX))
+<span class="org-variable-name">yInd</span> = np.nanargmin(<span class="org-builtin">abs</span>(y-trackY))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Plot a cropped with a buffer around the closest point of the storm</span>
+<span class="org-builtin">buffer</span> = 300
+plt.figure(figsize=(10,10));
+plt.imshow(ds.Rad[yInd-<span class="org-builtin">buffer</span>:yInd+<span class="org-builtin">buffer</span>,xInd-<span class="org-builtin">buffer</span>:xInd+<span class="org-builtin">buffer</span>], cmap=<span class="org-string">'gray'</span>);
+plt.axis(<span class="org-string">'off'</span>);
+plt.title(<span class="org-string">'Hurricane Harvey from GOES-16, '</span>+date.strftime(<span class="org-string">"%m/%d/%Y"</span>)+<span class="org-string">" at "</span>+<span class="org-builtin">str</span>(date.hour)+<span class="org-string">"Z"</span>,fontsize=18);
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Save the figure</span>
+plt.tight_layout()
+<span class="org-variable-name">filePath</span> = <span class="org-string">'./images/goes_harvey_projection_cropped.png'</span>
+plt.savefig(filePath)</pre>
+
+
+<div class="figure">
+<p><img src="./images/goes_harvey_projection_cropped.png" alt="goes_harvey_projection_cropped.png" />
+</p>
+</div>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>

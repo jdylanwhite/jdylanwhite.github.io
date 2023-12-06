@@ -1,12 +1,12 @@
-<!-- Generated from 9b14faa on 2023-12-01 @ 14:59 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 68b0f97 on 2023-12-06 @ 01:38 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Exploratory Data Analysis of Physical Stats - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Exploratory Data Analysis of Physical Stats</h1><p class="site-post-meta">October 17, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org8e0b971">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org116bdef">
 <p>
 Now that we have the data ready, let&rsquo;s explore it. Particularly, let&rsquo;s investigate the physical stats of the Pokemon, namely the height (meters) and weight (kilograms) of the Pokemon, and any relationships that exist with the Pokemon&rsquo;s characteristics.
 </p>
 </div>
 
-<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org68dfd42">
+<h2><a id="load-libraries" class="anchor" href="#load-libraries">¶</a>Load Libraries</h2><div class="outline-text-2" id="text-org9b2fb26">
 <p>
 Start off by loading the libraries we need.
 </p>
@@ -20,7 +20,7 @@ Start off by loading the libraries we need.
 <span class="org-ess-modifiers">library</span>(gridExtra)</pre>
 </div>
 
-<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org45d7303">
+<h2><a id="read-and-format-data" class="anchor" href="#read-and-format-data">¶</a>Read and Format Data</h2><div class="outline-text-2" id="text-org02a852a">
 <p>
 Read in the data we scraped in the previous steps. We also need to make sure to set some column types in order to group and summarize the data. The <code>Generation</code> and <code>Evolution.Place</code> columns are categorical, and the <code>Has.Evolution</code> column is boolean, so we need to specify those column types.
 </p>
@@ -265,7 +265,7 @@ head(pokedex)</pre>
 </table></div>
 </div>
 
-<h2><a id="distribution-of-height-and-weight" class="anchor" href="#distribution-of-height-and-weight">¶</a>Distribution of Height and Weight</h2><div class="outline-text-2" id="text-org8a6c7f8">
+<h2><a id="distribution-of-height-and-weight" class="anchor" href="#distribution-of-height-and-weight">¶</a>Distribution of Height and Weight</h2><div class="outline-text-2" id="text-org174dfd1">
 <p>
 Starting off, let&rsquo;s just look at the distribution of Pokemon height and weight.
 </p>
@@ -301,7 +301,7 @@ Most Pokemon fall between 0 and 3 meters tall and 0 and 100 kilograms, but there
 </p>
 </div>
 
-<h2><a id="height-vs-weight" class="anchor" href="#height-vs-weight">¶</a>Height Vs. Weight</h2><div class="outline-text-2" id="text-orgbf26723">
+<h2><a id="height-vs-weight" class="anchor" href="#height-vs-weight">¶</a>Height Vs. Weight</h2><div class="outline-text-2" id="text-org57770a8">
 <p>
 A pretty obvious relationship we might expect to see is a linear-ish relationship between height and weight of a Pokemon. Let&rsquo;s plot the height and weight of each Pokemon in the data to see if that is indeed the case.
 </p>
@@ -669,13 +669,13 @@ So that&rsquo;s not the case. These are actually just the long and slender Pokem
 </p>
 </div>
 
-<h2><a id="height-vs-weight-vs-battle-stats" class="anchor" href="#height-vs-weight-vs-battle-stats">¶</a>Height vs. Weight vs. Battle Stats</h2><div class="outline-text-2" id="text-orgaf35f55">
+<h2><a id="height-vs-weight-vs-battle-stats" class="anchor" href="#height-vs-weight-vs-battle-stats">¶</a>Height vs. Weight vs. Battle Stats</h2><div class="outline-text-2" id="text-orgd5a6177">
 <p>
 Using that same plot, let&rsquo;s now add another dimension to the plot by shading the points in the scatter plot based on the Pokemon&rsquo;s battle stats: HP (health points), attack, defense, special attack, special defense, and speed.
 </p>
 </div>
 
-<h3><a id="health-points" class="anchor" href="#health-points">¶</a>Health Points</h3><div class="outline-text-3" id="text-orgee5fc1b">
+<h3><a id="health-points" class="anchor" href="#health-points">¶</a>Health Points</h3><div class="outline-text-3" id="text-org27f1943">
 <p>
 Let&rsquo;s start off by comparing height and wieght to each Pokemon&rsquo;s health points.
 </p>
@@ -717,7 +717,7 @@ Generally speaking, the greater the height/weight of the Pokemon the more health
 </p>
 </div>
 
-<h3><a id="attack" class="anchor" href="#attack">¶</a>Attack</h3><div class="outline-text-3" id="text-org948a885">
+<h3><a id="attack" class="anchor" href="#attack">¶</a>Attack</h3><div class="outline-text-3" id="text-orgf3703df">
 <p>
 Next, let&rsquo;s compare height and wieght to each Pokemon&rsquo;s attack.
 </p>
@@ -759,7 +759,7 @@ Again, the heavier and taller the Pokemon, the greater the attack, but there is 
 </p>
 </div>
 
-<h3><a id="defense" class="anchor" href="#defense">¶</a>Defense</h3><div class="outline-text-3" id="text-orgb77aa4c">
+<h3><a id="defense" class="anchor" href="#defense">¶</a>Defense</h3><div class="outline-text-3" id="text-orga3ce0c1">
 <p>
 Now we compare height, weight, and defense.
 </p>
@@ -801,7 +801,7 @@ Unsurprisingly, we see the same thing with defense. Generally, the heavier and t
 </p>
 </div>
 
-<h3><a id="special-attack" class="anchor" href="#special-attack">¶</a>Special Attack</h3><div class="outline-text-3" id="text-org5723ec3">
+<h3><a id="special-attack" class="anchor" href="#special-attack">¶</a>Special Attack</h3><div class="outline-text-3" id="text-orgfaa361f">
 <p>
 Next up, we compare height, weight, and special attack.
 </p>
@@ -843,7 +843,7 @@ This time, special attack seems to positively correlate with height, but there d
 </p>
 </div>
 
-<h3><a id="special-defense" class="anchor" href="#special-defense">¶</a>Special Defense</h3><div class="outline-text-3" id="text-org17c4952">
+<h3><a id="special-defense" class="anchor" href="#special-defense">¶</a>Special Defense</h3><div class="outline-text-3" id="text-orgd29741c">
 <p>
 And now, let&rsquo;s look at height, weight, and special defense.
 </p>
@@ -885,7 +885,7 @@ This trend continues where height and special defense are correlated, but no rel
 </p>
 </div>
 
-<h3><a id="speed" class="anchor" href="#speed">¶</a>Speed</h3><div class="outline-text-3" id="text-org4d2900b">
+<h3><a id="speed" class="anchor" href="#speed">¶</a>Speed</h3><div class="outline-text-3" id="text-orgf526854">
 <p>
 Finally, let&rsquo;s look at height, weight, and speed.
 </p>
