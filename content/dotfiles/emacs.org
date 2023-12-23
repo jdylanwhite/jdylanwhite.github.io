@@ -333,7 +333,7 @@ I kind of like the doom-emacs dashboard, so let's try using out [[https://github
     (dolist (mode '(custom-mode
                     eshell-mode
                     git-rebase-mode
-                    term-mode))
+                    term-mode)) 
       (add-to-list 'evil-emacs-state-modes mode)))
 
   ;; Remind me to get back to the home row of keys
@@ -344,7 +344,10 @@ I kind of like the doom-emacs dashboard, so let's try using out [[https://github
   ;; Use vi-like undo state preservation
   (use-package undo-tree
     :init
-    (global-undo-tree-mode 1))
+    (global-undo-tree-mode 1)
+    :config
+    ;; Prevent undo tree files from polluting your git repo
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
 
   ;; Use evil
   (use-package evil
