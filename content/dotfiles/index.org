@@ -1,0 +1,12 @@
+#+title: Dotfiles
+
+* My Dotfiles
+
+As I build out my various configuration files for my workflow and preferences, I do so using [[https://en.wikipedia.org/wiki/Literate_programming][literate programming]] to build a literate configuration file using [[https://orgmode.org/][Org Mode]] in [[https://www.gnu.org/software/emacs/][Emacs]]. Since the configuration file is tied closely to my personal projects and how I work, I wanted to share them here on my site.
+
+Currently, I am split in a few different directions. I am using my own personally configured vanilla Emacs and [[https://github.com/doomemacs/doomemacs][Doom Emacs]]. Ideally, I'd like to only use my own personally configured vanilla Emacs. Eventually I plan to get there, but for now I'm just trying to use whatever will get the job done the quickest. Here are my current active dotfiles:
+
+- [[file:emacs.org][My Emacs Configuration]]
+- [[./doom-emacs.org][Doom Emacs Configuration]]
+
+I also keep my configuration files in a [[https://github.com/jdylanwhite/dotfiles][GitHub repository]].
