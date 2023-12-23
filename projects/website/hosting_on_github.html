@@ -1,6 +1,6 @@
-<!-- Generated from 68b0f97 on 2023-12-06 @ 01:38 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Hosting On Github - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Hosting On Github</h1><p class="site-post-meta"></p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgf2484bf">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org06af5b2">
 <p>
 Typically, if you wanted to host something on <a href="https://pages.github.com/">GitHub Pages</a>, you&rsquo;d create a repository with the name <code>my_github_username.github.io</code>, write your Markdown or HTML documents as pages or posts, and then commit those changes and push them to the repository. When GitHub realizes the repository is a GitHub Pages repository, it runs some site-building procedures using its &ldquo;continuous integration&rdquo; (CI) to rebuild your website from those Markdown or HTML pages each time you push a new commit to the remote repository.
 </p>
@@ -10,7 +10,7 @@ But I&rsquo;m built different. I am not writing Markdown or HTML documents. I&rs
 </p>
 </div>
 
-<h2><a id="specifying-the-automated-workflow" class="anchor" href="#specifying-the-automated-workflow">¶</a>Specifying the Automated Workflow</h2><div class="outline-text-2" id="text-orgedb4ede">
+<h2><a id="specifying-the-automated-workflow" class="anchor" href="#specifying-the-automated-workflow">¶</a>Specifying the Automated Workflow</h2><div class="outline-text-2" id="text-org3b5cb34">
 <p>
 What we need to do is provide GitHub&rsquo;s continuous integration the specific steps required to build this site. This is done through the file <code>.github/workflows/publish.yml</code> stored in the repository&rsquo;s root directory.
 </p>

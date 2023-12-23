@@ -1,6 +1,6 @@
-<!-- Generated from 68b0f97 on 2023-12-06 @ 01:38 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>GOES Satellite Data - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">GOES Satellite Data</h1><p class="site-post-meta">November  9, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org186df87">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org1049324">
 <p>
 GOES, or Geostationary Operational Environmental Satellite, is a meteorological satellite operated by NOAA. There are two GOES positions, GOES-East, and GOES-West that image weather conditions over the continental U.S. and Eastern Pacific and Northern Atlantic basins. The current satellites in the east and west positions are GOES-16 and GOES-17, respectively.
 </p>
@@ -115,7 +115,7 @@ With the <a href="https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2
 </p>
 </div>
 
-<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-org160bf80">
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-orgca19d82">
 <p>
 Let&rsquo;s first import the modules we need to run the code.
 </p>
@@ -128,7 +128,7 @@ Let&rsquo;s first import the modules we need to run the code.
 <span class="org-keyword">import</span> datetime</pre>
 </div>
 
-<h2><a id="define-custom-functions" class="anchor" href="#define-custom-functions">¶</a>Define Custom Functions</h2><div class="outline-text-2" id="text-org953d079">
+<h2><a id="define-custom-functions" class="anchor" href="#define-custom-functions">¶</a>Define Custom Functions</h2><div class="outline-text-2" id="text-org0953eb3">
 <p>
 We need to create a few custom functions. We need the following:
 </p>
@@ -182,7 +182,7 @@ We need to create a few custom functions. We need the following:
             <span class="org-keyword">break</span></pre>
 </div>
 
-<h2><a id="set-image-parameters" class="anchor" href="#set-image-parameters">¶</a>Set Image Parameters</h2><div class="outline-text-2" id="text-org4521553">
+<h2><a id="set-image-parameters" class="anchor" href="#set-image-parameters">¶</a>Set Image Parameters</h2><div class="outline-text-2" id="text-orgd286321">
 <p>
 Now we set the parameters specifying the image and data we want. Let&rsquo;s set the date for the image to be 30 days ago from today at time 1800Z. Additionally, I want to see GOES-16 and GOES-17/18 around the same time, just to compare the two, so let&rsquo;s define both bucket names.
 </p>
@@ -213,13 +213,13 @@ Now we set the parameters specifying the image and data we want. Let&rsquo;s set
     <span class="org-variable-name">scanMode</span> = <span class="org-string">"M6"</span></pre>
 </div>
 
-<h2><a id="goes-east" class="anchor" href="#goes-east">¶</a>GOES East</h2><div class="outline-text-2" id="text-org9eeda0a">
+<h2><a id="goes-east" class="anchor" href="#goes-east">¶</a>GOES East</h2><div class="outline-text-2" id="text-org4400b26">
 <p>
 Rather than go through both the east and the west, let&rsquo;s just go through the process of downloading and displaying the GOES East full-disk image. This is also partly because running both in one Jupyter notebook causes my kernel to crash.
 </p>
 </div>
 
-<h3><a id="fetch-images-from-aws" class="anchor" href="#fetch-images-from-aws">¶</a>Fetch Images from AWS</h3><div class="outline-text-3" id="text-org417aab1">
+<h3><a id="fetch-images-from-aws" class="anchor" href="#fetch-images-from-aws">¶</a>Fetch Images from AWS</h3><div class="outline-text-3" id="text-org8ebf62c">
 <p>
 Now we need to initialize the S3 client with our credentials. Then, we set the file name prefix for the parameters described above and query the bucket for any objects that begins with our file name prefix. Since the ABI images multiple times per hour, there will be several options, but we&rsquo;ll just grab the first image available for each hour.
 </p>
@@ -241,7 +241,7 @@ Now we need to initialize the S3 client with our credentials. Then, we set the f
 <span class="org-variable-name">response</span> = requests.get(f<span class="org-string">'https://{bucketNameEast}.s3.amazonaws.com/{key}'</span>)</pre>
 </div>
 
-<h3><a id="load-the-netcdf-file" class="anchor" href="#load-the-netcdf-file">¶</a>Load the NetCDF File</h3><div class="outline-text-3" id="text-org7e83b12">
+<h3><a id="load-the-netcdf-file" class="anchor" href="#load-the-netcdf-file">¶</a>Load the NetCDF File</h3><div class="outline-text-3" id="text-orga0fccd4">
 <p>
 Now we use netCDF to load the file from the AWS request.
 </p>
@@ -253,7 +253,7 @@ Now we use netCDF to load the file from the AWS request.
 <span class="org-variable-name">ds</span> = xr.open_dataset(store)</pre>
 </div>
 
-<h3><a id="plot-the-image" class="anchor" href="#plot-the-image">¶</a>Plot the Image</h3><div class="outline-text-3" id="text-org0c6a74c">
+<h3><a id="plot-the-image" class="anchor" href="#plot-the-image">¶</a>Plot the Image</h3><div class="outline-text-3" id="text-org9e1d5e5">
 <p>
 Lastly, let&rsquo;s plot our resulting image.
 </p>

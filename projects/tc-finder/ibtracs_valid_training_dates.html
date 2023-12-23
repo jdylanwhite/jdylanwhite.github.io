@@ -1,0 +1,162 @@
+<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>IBTrACS Valid Training Dates - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">IBTrACS Valid Training Dates</h1><p class="site-post-meta">November 17, 2023</p><div id="content">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgea66b9e">
+<p>
+So far, we&rsquo;ve seen how to pull GOES imagery and how to overlay IBTrACS data on the imagery. We&rsquo;ll use these same ideas now to obtain dates to fetch training data. Some things we&rsquo;ll need to consider are:
+</p>
+
+<ul class="org-ul">
+<li>Some bands aren&rsquo;t visible at night, so we don&rsquo;t want to fetch images that aren&rsquo;t useful. To address this, we can start by using only infrared bands on the imager that capture clouds at night. If more data is needed, we can come back to this point and identify daytime visible bands.</li>
+<li>The geostationary view of the imager has a limited spatial extent, so some IBTrACS data points may not be visible to the imager. We can use the projection data of the GOES image filter out the latitudes and longitudes of the IBTrACS data.</li>
+<li>GOES16 was launched in November 2016, so we&rsquo;ll only be able to use a subset of the IBTrACS data. We just need to make sure we exclude any IBTrACS data outside of the GOES16 imaging window.</li>
+<li>IBTrACS data is every 3 hours, while GOES16 is every 5 minutes. We can assume that if a storm had a track observation at time \(t\) and again at time $t$+3 hours, an image within that time has a storm in it.</li>
+</ul>
+
+<p>
+Each of these points will play a role in how we automatically assess if an image is a positive or negative training sample.
+</p>
+
+<p>
+Additionally, it seems that the first GOES image, at least that I can access on the AWS storage, wasn&rsquo;t available until 10 April, so we need to filter those dates from the final results.
+</p>
+
+<p>
+Downloading the data will take some time, so first, I just want to build a list of dates that, according to the IBTrACS data, correspond to a time when a tropical cyclone was present (\(y=1\)) or was not present (\(y=0\)). At first, I think the goal should be to get an even number of positive and negative training samples, so I think it might be best to randomly pick a time for a positive example, then ensure that the next selection is a negative example, and so on.
+</p>
+</div>
+
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import modules</h2><div class="outline-text-2" id="text-orgdbbfa8a">
+<p>
+First, let&rsquo;s import the modules we&rsquo;ll need. I&rsquo;ve created some functions to do things like read in the IBTrACS and GOES data, which I implemented in previous notebooks.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Import modules</span>
+<span class="org-keyword">import</span> datetime
+<span class="org-keyword">import</span> numpy <span class="org-keyword">as</span> np
+<span class="org-keyword">from</span> pyproj <span class="org-keyword">import</span> Proj
+<span class="org-keyword">import</span> matplotlib.pyplot <span class="org-keyword">as</span> plt
+<span class="org-keyword">import</span> os
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Import functions I've written</span>
+os.chdir(<span class="org-string">".."</span>)
+<span class="org-keyword">import</span> goes
+<span class="org-keyword">import</span> ibtracs</pre>
+</div>
+
+<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-orgded5d12">
+<p>
+Now we read in the IBTrACS data from 2017 until now. Let&rsquo;s get rid of anything else before 10 April.
+</p>
+
+<pre><span class="org-variable-name">ibtracsPath</span> = ibtracs.download_data(basin=<span class="org-string">"ALL"</span>,overwrite=<span class="org-constant">False</span>)
+<span class="org-variable-name">dfTracks</span> = ibtracs.read_data(ibtracsPath,<span class="org-constant">True</span>,2017,2020)
+<span class="org-variable-name">dfTracks</span> = dfTracks[dfTracks[<span class="org-string">'ISO_TIME'</span>]&gt;=datetime.datetime(2017,4,10)]</pre>
+</div>
+
+<h2><a id="read-goes16-image" class="anchor" href="#read-goes16-image">¶</a>Read GOES16 Image</h2><div class="outline-text-2" id="text-org3fb6433">
+<p>
+Next, we&rsquo;ll read in the GOES16 image corresponding to 30 days ago. The image itself doesn&rsquo;t matter yet. Since the imager is geostationary, we can just take any image and use it to make sure our IBTrACS data all falls within the GOES16 full disc array.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Set the parameters to download data</span>
+<span class="org-variable-name">date</span> = datetime.datetime.now()-datetime.timedelta(days=30)
+<span class="org-variable-name">bucketName</span> = <span class="org-string">'noaa-goes16'</span>
+<span class="org-variable-name">product</span> = <span class="org-string">'ABI-L1b-RadF'</span>
+<span class="org-variable-name">credPath</span> = <span class="org-string">"secrets.csv"</span>
+<span class="org-variable-name">band</span> = 13
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get the GOES data</span>
+<span class="org-variable-name">ds</span> = goes.download_data(date,credPath,bucketName,product,band)</pre>
+</div>
+
+<h2><a id="handle-projections" class="anchor" href="#handle-projections">¶</a>Handle Projections</h2><div class="outline-text-2" id="text-org162154c">
+<p>
+In order to get the IBTrACS data relative to the GOES imagery, we need to get the projection of the GOES data.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get dataset projection data</span>
+<span class="org-variable-name">satHeight</span> = ds.goes_imager_projection.perspective_point_height
+<span class="org-variable-name">satLon</span> = ds.goes_imager_projection.longitude_of_projection_origin
+<span class="org-variable-name">satSweep</span> = ds.goes_imager_projection.sweep_angle_axis
+<span class="org-variable-name">majorMinorAxes</span> = (ds.goes_imager_projection.semi_major_axis,ds.goes_imager_projection.semi_minor_axis)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">The projection x and y coordinates equals the scanning angle (in radians) multiplied by the satellite height</span>
+<span class="org-variable-name">x</span> = ds.variables[<span class="org-string">'x'</span>][:] * satHeight
+<span class="org-variable-name">y</span> = ds.variables[<span class="org-string">'y'</span>][:] * satHeight
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Create X and Y meshgrids</span>
+<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span> = np.meshgrid(x, y)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Create a pyproj geostationary map object</span>
+<span class="org-variable-name">p</span> = Proj(proj=<span class="org-string">'geos'</span>, h=satHeight, lon_0=satLon, sweep=satSweep)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Get latitudes and longitudes</span>
+<span class="org-variable-name">lons</span>, <span class="org-variable-name">lats</span> = p(X, Y, inverse=<span class="org-constant">True</span>)</pre>
+</div>
+
+<h2><a id="filter-out-with-bounding-box" class="anchor" href="#filter-out-with-bounding-box">¶</a>Filter Out with Bounding Box</h2><div class="outline-text-2" id="text-org2587727">
+<p>
+A bounding box corresponding to the minimum and maximum latitude and longitudes covers more space than the full-disc, but the only way to really check is to loop through <i>all</i> of the IBTrACS data, project it onto the GOES projection, and then see if it&rsquo;s in the image. That will take a lot of time, where this will not, so let&rsquo;s use a bounding box as a first pass here to avoid unnecessary loopling.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Get a simple bounding box based on min/max lat/lons</span>
+<span class="org-variable-name">lons</span> = np.where(lons==1e+30,np.nan,lons)
+<span class="org-variable-name">lats</span> = np.where(lats==1e+30,np.nan,lats)
+<span class="org-variable-name">minLat</span> = np.nanmin(lats[lats != -np.inf])
+<span class="org-variable-name">maxLat</span> = np.nanmax(lats[lats != np.inf])
+<span class="org-variable-name">minLon</span> = np.nanmin(lons[lons != -np.inf])
+<span class="org-variable-name">maxLon</span> = np.nanmax(lons[lons != np.inf])
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Query IBTraCS data based on bounding box</span>
+<span class="org-variable-name">dfTracks</span> = dfTracks[
+    (dfTracks[<span class="org-string">'LAT'</span>] &gt;= minLat) &amp;
+    (dfTracks[<span class="org-string">'LAT'</span>] &lt;= maxLat) &amp;
+    (dfTracks[<span class="org-string">'LON'</span>] &gt;= minLon) &amp;
+    (dfTracks[<span class="org-string">'LON'</span>] &lt;= maxLon)
+]</pre>
+</div>
+
+<h2><a id="drop-additional-off-disc-samples" class="anchor" href="#drop-additional-off-disc-samples">¶</a>Drop Additional Off-Disc Samples</h2><div class="outline-text-2" id="text-org0cab702">
+<p>
+Now that we&rsquo;ve limited the extent a bit, let&rsquo;s drill down and make sure none of the points are off of the full-disc. First, we find the point on the image that corresponds to the latitude/longitude of the storm. Since the <code>lats</code> and <code>lons</code> arrays have values of <code>NaN</code> where the points are off the disc, we can check if that point in the <code>lat</code> or <code>lon</code> array is missing. We only need to check one array, since it&rsquo;s a meshgrid, we&rsquo;ll check <code>lons</code>. And rather than just checking if that one point is <code>NaN</code>, let&rsquo;s check if any point within a window of size <code>checkSize</code> is <code>NaN</code>. This should avoid any points that are just barely sitting on the edge of the disc.
+</p>
+
+<pre><span class="org-comment-delimiter"># </span><span class="org-comment">Create empty list</span>
+<span class="org-variable-name">dropInds</span> = []
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Reset indices of dataframe</span>
+<span class="org-variable-name">dfTracks</span> = dfTracks.reset_index()
+
+<span class="org-keyword">for</span> dfInd, row <span class="org-keyword">in</span> dfTracks[[<span class="org-string">'LAT'</span>,<span class="org-string">'LON'</span>]].iterrows():
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Cast latitude and longitude to float</span>
+    <span class="org-variable-name">trackLat</span> = <span class="org-builtin">float</span>(row[<span class="org-string">"LAT"</span>])
+    <span class="org-variable-name">trackLon</span> = <span class="org-builtin">float</span>(row[<span class="org-string">"LON"</span>])
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Convert lon/lat to x/y</span>
+    <span class="org-variable-name">trackX</span>,<span class="org-variable-name">trackY</span> = p(trackLon,trackLat)
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Get the closest point to the IBTrACS data</span>
+    <span class="org-variable-name">xInd</span> = np.nanargmin(<span class="org-builtin">abs</span>(x-trackX))
+    <span class="org-variable-name">yInd</span> = np.nanargmin(<span class="org-builtin">abs</span>(y-trackY))
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Check that none of 50 points on any side of the storm are off of the disc</span>
+    <span class="org-variable-name">checkSize</span> = 50
+    <span class="org-variable-name">offDisc</span> = np.isnan(lons[yInd-checkSize:yInd+checkSize,xInd-checkSize:xInd+checkSize]).<span class="org-builtin">any</span>()
+
+    <span class="org-comment-delimiter"># </span><span class="org-comment">If the points are off the disc, append the dataframe index to drop after looping</span>
+    <span class="org-keyword">if</span> offDisc:
+        dropInds.append(dfInd)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Drop any indices that fell off the disc</span>
+<span class="org-variable-name">dfTracks</span> = dfTracks.drop(dfTracks.index[dropInds])</pre>
+</div>
+
+<h2><a id="save-the-output" class="anchor" href="#save-the-output">¶</a>Save the Output</h2><div class="outline-text-2" id="text-orgd51f697">
+<p>
+So now, we&rsquo;ve handled the issues of the imager extent and the IBTrACS extent, both spatially and temporally. Let&rsquo;s save the output now so we can use it to make training data.
+</p>
+
+<pre>dfTracks.to_csv(<span class="org-string">'./data/ibtracs_GOES16.csv'</span>)</pre>
+</div>
+</div></div></div><footer class="site-footer"><div class="container"><div class="row"><div class="column"><p><a href="https://github.com/jdylanwhite">GitHub</a> · <a href="https://www.linkedin.com/in/jdylanwhite5">LinkedIn</a> · <a href="mailto:jdylanwhite5@gmail.com">Email</a></p></div><div class="column align-right"><p><a href="https://github.com/jdylanwhite/jdylanwhite.github.io">Site Source</a></p></div></div></div></footer></body></html>
