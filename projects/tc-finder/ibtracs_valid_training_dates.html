@@ -1,6 +1,6 @@
-<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 99fdb8c on 2023-12-23 @ 19:48 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>IBTrACS Valid Training Dates - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">IBTrACS Valid Training Dates</h1><p class="site-post-meta">November 17, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgea66b9e">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org7ce0660">
 <p>
 So far, we&rsquo;ve seen how to pull GOES imagery and how to overlay IBTrACS data on the imagery. We&rsquo;ll use these same ideas now to obtain dates to fetch training data. Some things we&rsquo;ll need to consider are:
 </p>
@@ -25,7 +25,7 @@ Downloading the data will take some time, so first, I just want to build a list 
 </p>
 </div>
 
-<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import modules</h2><div class="outline-text-2" id="text-orgdbbfa8a">
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import modules</h2><div class="outline-text-2" id="text-org8b31193">
 <p>
 First, let&rsquo;s import the modules we&rsquo;ll need. I&rsquo;ve created some functions to do things like read in the IBTrACS and GOES data, which I implemented in previous notebooks.
 </p>
@@ -43,7 +43,7 @@ os.chdir(<span class="org-string">".."</span>)
 <span class="org-keyword">import</span> ibtracs</pre>
 </div>
 
-<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-orgded5d12">
+<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-org16bf63f">
 <p>
 Now we read in the IBTrACS data from 2017 until now. Let&rsquo;s get rid of anything else before 10 April.
 </p>
@@ -53,7 +53,7 @@ Now we read in the IBTrACS data from 2017 until now. Let&rsquo;s get rid of anyt
 <span class="org-variable-name">dfTracks</span> = dfTracks[dfTracks[<span class="org-string">'ISO_TIME'</span>]&gt;=datetime.datetime(2017,4,10)]</pre>
 </div>
 
-<h2><a id="read-goes16-image" class="anchor" href="#read-goes16-image">¶</a>Read GOES16 Image</h2><div class="outline-text-2" id="text-org3fb6433">
+<h2><a id="read-goes16-image" class="anchor" href="#read-goes16-image">¶</a>Read GOES16 Image</h2><div class="outline-text-2" id="text-org587619d">
 <p>
 Next, we&rsquo;ll read in the GOES16 image corresponding to 30 days ago. The image itself doesn&rsquo;t matter yet. Since the imager is geostationary, we can just take any image and use it to make sure our IBTrACS data all falls within the GOES16 full disc array.
 </p>
@@ -69,7 +69,7 @@ Next, we&rsquo;ll read in the GOES16 image corresponding to 30 days ago. The ima
 <span class="org-variable-name">ds</span> = goes.download_data(date,credPath,bucketName,product,band)</pre>
 </div>
 
-<h2><a id="handle-projections" class="anchor" href="#handle-projections">¶</a>Handle Projections</h2><div class="outline-text-2" id="text-org162154c">
+<h2><a id="handle-projections" class="anchor" href="#handle-projections">¶</a>Handle Projections</h2><div class="outline-text-2" id="text-org01d907e">
 <p>
 In order to get the IBTrACS data relative to the GOES imagery, we need to get the projection of the GOES data.
 </p>
@@ -94,7 +94,7 @@ In order to get the IBTrACS data relative to the GOES imagery, we need to get th
 <span class="org-variable-name">lons</span>, <span class="org-variable-name">lats</span> = p(X, Y, inverse=<span class="org-constant">True</span>)</pre>
 </div>
 
-<h2><a id="filter-out-with-bounding-box" class="anchor" href="#filter-out-with-bounding-box">¶</a>Filter Out with Bounding Box</h2><div class="outline-text-2" id="text-org2587727">
+<h2><a id="filter-out-with-bounding-box" class="anchor" href="#filter-out-with-bounding-box">¶</a>Filter Out with Bounding Box</h2><div class="outline-text-2" id="text-org46a8392">
 <p>
 A bounding box corresponding to the minimum and maximum latitude and longitudes covers more space than the full-disc, but the only way to really check is to loop through <i>all</i> of the IBTrACS data, project it onto the GOES projection, and then see if it&rsquo;s in the image. That will take a lot of time, where this will not, so let&rsquo;s use a bounding box as a first pass here to avoid unnecessary loopling.
 </p>
@@ -116,7 +116,7 @@ A bounding box corresponding to the minimum and maximum latitude and longitudes 
 ]</pre>
 </div>
 
-<h2><a id="drop-additional-off-disc-samples" class="anchor" href="#drop-additional-off-disc-samples">¶</a>Drop Additional Off-Disc Samples</h2><div class="outline-text-2" id="text-org0cab702">
+<h2><a id="drop-additional-off-disc-samples" class="anchor" href="#drop-additional-off-disc-samples">¶</a>Drop Additional Off-Disc Samples</h2><div class="outline-text-2" id="text-orgae482a3">
 <p>
 Now that we&rsquo;ve limited the extent a bit, let&rsquo;s drill down and make sure none of the points are off of the full-disc. First, we find the point on the image that corresponds to the latitude/longitude of the storm. Since the <code>lats</code> and <code>lons</code> arrays have values of <code>NaN</code> where the points are off the disc, we can check if that point in the <code>lat</code> or <code>lon</code> array is missing. We only need to check one array, since it&rsquo;s a meshgrid, we&rsquo;ll check <code>lons</code>. And rather than just checking if that one point is <code>NaN</code>, let&rsquo;s check if any point within a window of size <code>checkSize</code> is <code>NaN</code>. This should avoid any points that are just barely sitting on the edge of the disc.
 </p>
@@ -152,7 +152,7 @@ Now that we&rsquo;ve limited the extent a bit, let&rsquo;s drill down and make s
 <span class="org-variable-name">dfTracks</span> = dfTracks.drop(dfTracks.index[dropInds])</pre>
 </div>
 
-<h2><a id="save-the-output" class="anchor" href="#save-the-output">¶</a>Save the Output</h2><div class="outline-text-2" id="text-orgd51f697">
+<h2><a id="save-the-output" class="anchor" href="#save-the-output">¶</a>Save the Output</h2><div class="outline-text-2" id="text-org0cefc78">
 <p>
 So now, we&rsquo;ve handled the issues of the imager extent and the IBTrACS extent, both spatially and temporally. Let&rsquo;s save the output now so we can use it to make training data.
 </p>

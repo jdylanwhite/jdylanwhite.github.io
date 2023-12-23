@@ -1,6 +1,6 @@
-<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 99fdb8c on 2023-12-23 @ 19:48 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Cropping GOES Imagery from IBTrACS - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Cropping GOES Imagery from IBTrACS</h1><p class="site-post-meta">November 15, 2023</p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgdd6f55a">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgb92f3b3">
 <p>
 Now that we can properly project and cross-reference GOES data, let&rsquo;s try using the IBTrACS data to find where the storm is on an image and crop the image. We&rsquo;ll use the same example, Hurricane Harvey in 2017, to drive the example here again.
 </p>
@@ -10,7 +10,7 @@ In hindsight, I realize that this isn&rsquo;t very different from the previous n
 </p>
 </div>
 
-<h2><a id="import-functions" class="anchor" href="#import-functions">¶</a>Import Functions</h2><div class="outline-text-2" id="text-org41cd92b">
+<h2><a id="import-functions" class="anchor" href="#import-functions">¶</a>Import Functions</h2><div class="outline-text-2" id="text-orgf9b9972">
 <p>
 Let&rsquo;s import functions we&rsquo;ll need. I&rsquo;ve also created functions to handle some of the code from the previous steps.
 </p>
@@ -28,7 +28,7 @@ os.chdir(<span class="org-string">".."</span>)
 <span class="org-keyword">import</span> ibtracs</pre>
 </div>
 
-<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-org3392f5d">
+<h2><a id="read-ibtracs-data" class="anchor" href="#read-ibtracs-data">¶</a>Read IBTrACS Data</h2><div class="outline-text-2" id="text-org5b83731">
 <p>
 Now let&rsquo;s read in the IBTrACS data, separating out Hurricane Harvey in 2017.
 </p>
@@ -209,7 +209,7 @@ dfTracks.head()</pre>
 </table></div>
 </div>
 
-<h2><a id="fetch-goes16-imagery" class="anchor" href="#fetch-goes16-imagery">¶</a>Fetch GOES16 Imagery</h2><div class="outline-text-2" id="text-orgb207097">
+<h2><a id="fetch-goes16-imagery" class="anchor" href="#fetch-goes16-imagery">¶</a>Fetch GOES16 Imagery</h2><div class="outline-text-2" id="text-orgcbf77e9">
 <p>
 Now we&rsquo;ll fetch the same GOES16 image as last time.
 </p>
@@ -225,7 +225,7 @@ Now we&rsquo;ll fetch the same GOES16 image as last time.
 <span class="org-variable-name">ds</span> = goes.download_data(date,credPath,bucketName,product,band)</pre>
 </div>
 
-<h2><a id="define-projections-and-locate-the-storm" class="anchor" href="#define-projections-and-locate-the-storm">¶</a>Define Projections and Locate the Storm</h2><div class="outline-text-2" id="text-orgf6de092">
+<h2><a id="define-projections-and-locate-the-storm" class="anchor" href="#define-projections-and-locate-the-storm">¶</a>Define Projections and Locate the Storm</h2><div class="outline-text-2" id="text-orgb31515d">
 <p>
 We need to find the location of the IBTrACS data in the image, so we&rsquo;ll convert the storm&rsquo;s latitude and longitude into the same projection as the GOES imagery, identify the storm center on the image, and then plot a cropped storm with a buffer around the center of the storm.
 </p>

@@ -1,12 +1,12 @@
-<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 99fdb8c on 2023-12-23 @ 19:48 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>My Emacs Configuration - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">My Emacs Configuration</h1><p class="site-post-meta"></p><div id="content">
-<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-orgd114469">
+<h2><a id="introduction" class="anchor" href="#introduction">¶</a>Introduction</h2><div class="outline-text-2" id="text-org365d132">
 <p>
 This Org Mode document contains my configuration for Emacs, which is currently a work in progress. Changes made to the configuration here are automatically tangled when saved. As such, all configuration changes should be made here.
 </p>
 </div>
 
-<h2><a id="early-init-file" class="anchor" href="#early-init-file">¶</a>Early Init File</h2><div class="outline-text-2" id="text-orgbaf70a5">
+<h2><a id="early-init-file" class="anchor" href="#early-init-file">¶</a>Early Init File</h2><div class="outline-text-2" id="text-org49a7e51">
 <p>
 The configuration here gets placed in an <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Early-Init-File.html">early init</a> file to prevent certain actions from occuring before getting to the main init file.
 </p>
@@ -35,13 +35,13 @@ Here, we make sure we&rsquo;re starting with a minimal user interface.
 (<span class="org-keyword">setq</span> inhibit-splash-screen t)</pre>
 </div>
 
-<h2><a id="primary-init-file" class="anchor" href="#primary-init-file">¶</a>Primary Init File</h2><div class="outline-text-2" id="text-org9f7cba3">
+<h2><a id="primary-init-file" class="anchor" href="#primary-init-file">¶</a>Primary Init File</h2><div class="outline-text-2" id="text-org5db6196">
 <p>
 Here we specify the main Emacs configuration.
 </p>
 </div>
 
-<h3><a id="init-file-header" class="anchor" href="#init-file-header">¶</a>Init File Header</h3><div class="outline-text-3" id="text-orgdce1a6f">
+<h3><a id="init-file-header" class="anchor" href="#init-file-header">¶</a>Init File Header</h3><div class="outline-text-3" id="text-orgcae438e">
 <p>
 Add a note to the header to remind me not to edit that file.
 </p>
@@ -49,7 +49,7 @@ Add a note to the header to remind me not to edit that file.
 <pre><span class="org-comment-delimiter">;; </span><span class="org-comment">NOTE: init.el is generated from emacs.org. Please edit that file instead!</span></pre>
 </div>
 
-<h3><a id="straight-package-management" class="anchor" href="#straight-package-management">¶</a>Straight Package Management</h3><div class="outline-text-3" id="text-org3c99daa">
+<h3><a id="straight-package-management" class="anchor" href="#straight-package-management">¶</a>Straight Package Management</h3><div class="outline-text-3" id="text-org0d2d98f">
 <p>
 I chose to use <a href="https://github.com/radian-software/straight.el">straight.el</a> for my package management. I like the principles of the project, and changing package managers will help me stop simply copying other people&rsquo;s configuration without trying to figure it out myself.
 </p>
@@ -75,7 +75,7 @@ I chose to use <a href="https://github.com/radian-software/straight.el">straight
 (<span class="org-keyword">setq</span> straight-use-package-by-default t)</pre>
 </div>
 
-<h3><a id="clean-up-folders" class="anchor" href="#clean-up-folders">¶</a>Clean Up Folders</h3><div class="outline-text-3" id="text-org4f59e54">
+<h3><a id="clean-up-folders" class="anchor" href="#clean-up-folders">¶</a>Clean Up Folders</h3><div class="outline-text-3" id="text-org82a7808">
 <p>
 <a href="https://github.com/emacscollective/no-littering">no-littering</a> avoids excessive clutter in the user-emacs-directory.
 </p>
@@ -96,7 +96,7 @@ I chose to use <a href="https://github.com/radian-software/straight.el">straight
 (load custom-file t)</pre>
 </div>
 
-<h3><a id="user-interface-configuration" class="anchor" href="#user-interface-configuration">¶</a>User Interface Configuration</h3><h4><a id="basic-setup" class="anchor" href="#basic-setup">¶</a>Basic Setup</h4><div class="outline-text-4" id="text-orgba5a701">
+<h3><a id="user-interface-configuration" class="anchor" href="#user-interface-configuration">¶</a>User Interface Configuration</h3><h4><a id="basic-setup" class="anchor" href="#basic-setup">¶</a>Basic Setup</h4><div class="outline-text-4" id="text-org0722a61">
 <p>
 Here we make some general configuration tweaks to the user interface, such as  transparency, line numbers, etc..
 </p>
@@ -130,7 +130,7 @@ Here we make some general configuration tweaks to the user interface, such as  t
   (add-hook mode (<span class="org-keyword">lambda</span> () (display-line-numbers-mode 0))))</pre>
 </div>
 
-<h4><a id="font-configuration" class="anchor" href="#font-configuration">¶</a>Font Configuration</h4><div class="outline-text-4" id="text-org4931a94">
+<h4><a id="font-configuration" class="anchor" href="#font-configuration">¶</a>Font Configuration</h4><div class="outline-text-4" id="text-orgdc633f7">
 <p>
 I am using the <a href="https://github.com/tonsky/FiraCode">Fira Code</a> fonts. Let&rsquo;s set font sizes for various fonts.
 </p>
@@ -188,7 +188,7 @@ I am using the <a href="https://github.com/tonsky/FiraCode">Fira Code</a> fonts.
   (jdw/set-font-faces))</pre>
 </div>
 
-<h4><a id="color-theme" class="anchor" href="#color-theme">¶</a>Color Theme</h4><div class="outline-text-4" id="text-org0af979d">
+<h4><a id="color-theme" class="anchor" href="#color-theme">¶</a>Color Theme</h4><div class="outline-text-4" id="text-org1d4713e">
 <p>
 <a href="https://github.com/doomemacs/themes">doom-themes</a> is a great set of themes with a lot of variety and support for many different Emacs modes, and the <a href="https://github.com/hlissner/emacs-doom-themes/tree/screenshots">screenshots</a> can help decide without manually booting up each theme to decide.
 </p>
@@ -211,7 +211,7 @@ I am using the <a href="https://github.com/tonsky/FiraCode">Fira Code</a> fonts.
   (doom-themes-org-config))</pre>
 </div>
 
-<h4><a id="modeline" class="anchor" href="#modeline">¶</a>Modeline</h4><div class="outline-text-4" id="text-orgd6d2b4c">
+<h4><a id="modeline" class="anchor" href="#modeline">¶</a>Modeline</h4><div class="outline-text-4" id="text-orgc8fc79f">
 <p>
 <a href="https://github.com/seagle0128/doom-modeline">doom-modeline</a> is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the <a href="https://github.com/seagle0128/doom-modeline#customize">configuration options</a> for more things you can enable or disable.
 </p>
@@ -230,7 +230,7 @@ I am using the <a href="https://github.com/tonsky/FiraCode">Fira Code</a> fonts.
            (doom-modeline-icon t)))</pre>
 </div>
 
-<h4><a id="dashboard" class="anchor" href="#dashboard">¶</a>Dashboard</h4><div class="outline-text-4" id="text-org7c3569a">
+<h4><a id="dashboard" class="anchor" href="#dashboard">¶</a>Dashboard</h4><div class="outline-text-4" id="text-org593ca64">
 <p>
 I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="https://github.com/emacs-dashboard/emacs-dashboard">dashboard</a>.
 </p>
@@ -265,7 +265,7 @@ I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="h
 )</pre>
 </div>
 
-<h4><a id="leader-key-bindings-with-general" class="anchor" href="#leader-key-bindings-with-general">¶</a>Leader Key Bindings with General</h4><div class="outline-text-4" id="text-org9f6ae81">
+<h4><a id="leader-key-bindings-with-general" class="anchor" href="#leader-key-bindings-with-general">¶</a>Leader Key Bindings with General</h4><div class="outline-text-4" id="text-orged64c3f">
 <p>
 <a href="https://github.com/noctuid/general.el">General</a> allows leader key binding, which I will choose as <code>SPC</code>.
 </p>
@@ -301,7 +301,7 @@ I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="h
   <span class="org-string">"tt"</span> '(consult-theme <span class="org-builtin">:which-key</span> <span class="org-string">"choose theme"</span>))</pre>
 </div>
 
-<h4><a id="evil-mode" class="anchor" href="#evil-mode">¶</a>Evil Mode</h4><div class="outline-text-4" id="text-org38093c7">
+<h4><a id="evil-mode" class="anchor" href="#evil-mode">¶</a>Evil Mode</h4><div class="outline-text-4" id="text-org019e3bb">
 <p>
 <a href="https://github.com/emacs-evil/evil">Evil</a> is a vi layer for Emacs. It changes a lot of key bindings and other features to be more like vi. I rarely use vi, but I do prefer the typical key bindings.
 </p>
@@ -399,7 +399,7 @@ I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="h
  <span class="org-string">"ox"</span>  '(org-export-dispatch t <span class="org-builtin">:which-key</span> <span class="org-string">"export"</span>))</pre>
 </div>
 
-<h4><a id="which-key" class="anchor" href="#which-key">¶</a>Which Key</h4><div class="outline-text-4" id="text-org281ad2b">
+<h4><a id="which-key" class="anchor" href="#which-key">¶</a>Which Key</h4><div class="outline-text-4" id="text-org2bf52d7">
 <p>
 <a href="https://github.com/justbur/emacs-which-key">which-key</a> is a useful UI panel that appears when you start pressing any key binding in Emacs to offer you all possible completions for the prefix.  For example, if you press <code>C-c</code> (hold control and press the letter <code>c</code>), a panel will appear at the bottom of the frame displaying all of the bindings under that prefix and which command they run.  This is very useful for learning the possible key bindings in the mode of your current buffer.
 </p>
@@ -412,7 +412,7 @@ I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="h
   (<span class="org-keyword">setq</span> which-key-idle-delay 1))</pre>
 </div>
 
-<h4><a id="completion-system" class="anchor" href="#completion-system">¶</a>Completion System</h4><ul><li>Veritico Completions<div class="outline-text-5" id="text-orgc69cdd4">
+<h4><a id="completion-system" class="anchor" href="#completion-system">¶</a>Completion System</h4><ul><li>Veritico Completions<div class="outline-text-5" id="text-org0f05481">
 <p>
 <a href="https://github.com/minad/vertico">vertico</a> is a minimalist vertical completion interface that plays well with other packages.
 </p>
@@ -443,7 +443,7 @@ I kind of like the doom-emacs dashboard, so let&rsquo;s try using out <a href="h
 </div>
 </li>
 
-<li>Save Mini-Buffer History<div class="outline-text-5" id="text-org2f1c63e">
+<li>Save Mini-Buffer History<div class="outline-text-5" id="text-org42599fe">
 <p>
 Use the internal <code>savehist</code> package to presever the mini-buffer history.
 </p>
@@ -456,7 +456,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li>
 
-<li>Orderless Candidate Matching<div class="outline-text-5" id="text-org7fef033">
+<li>Orderless Candidate Matching<div class="outline-text-5" id="text-org9b9bc89">
 <p>
 <a href="https://github.com/oantolin/orderless">orderless</a> enables space separated candidate matching for all components of the completions.
 </p>
@@ -470,7 +470,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li>
 
-<li>Marginalia Mini-Buffer Annotations<div class="outline-text-5" id="text-org4d3882a">
+<li>Marginalia Mini-Buffer Annotations<div class="outline-text-5" id="text-org30d7081">
 <p>
 <a href="https://github.com/minad/marginalia">marginalia</a> enables completion annotations in the minibuffer.
 </p>
@@ -485,7 +485,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li>
 
-<li>Corfu Region Completion<div class="outline-text-5" id="text-org900b838">
+<li>Corfu Region Completion<div class="outline-text-5" id="text-org5f6f3bf">
 <p>
 <a href="https://github.com/minad/corfu">corfu</a> enhances completion at point in a minimalist approach.
 </p>
@@ -503,7 +503,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li>
 
-<li>Search and Navigation with Consult<div class="outline-text-5" id="text-org562c583">
+<li>Search and Navigation with Consult<div class="outline-text-5" id="text-orgc0e3493">
 <p>
 <a href="https://github.com/minad/consult">consult</a> provides minimal search and navigation commands.
 </p>
@@ -520,7 +520,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li>
 
-<li>Completion Actions with Embark<div class="outline-text-5" id="text-org7ce0f97">
+<li>Completion Actions with Embark<div class="outline-text-5" id="text-org0958b00">
 <p>
 <a href="https://github.com/oantolin/embark">Embark</a> allows completion actions, among other things. There&rsquo;s a <a href="https://www.youtube.com/watch?v=qk2Is_sC8Lk">System Crafters video</a> to get started, and he mentions some other good resources as well:
 </p>
@@ -552,7 +552,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
 </div>
 </li></ul>
 
-<h4><a id="auto-save-changed-files" class="anchor" href="#auto-save-changed-files">¶</a>Auto-Save Changed Files</h4><div class="outline-text-4" id="text-org879e374">
+<h4><a id="auto-save-changed-files" class="anchor" href="#auto-save-changed-files">¶</a>Auto-Save Changed Files</h4><div class="outline-text-4" id="text-orga2eb7be">
 <p>
 <a href="https://github.com/bbatsov/super-save">super-save</a> automatically auto-saves changed files when certain events occur, such as buffer changes.
 </p>
@@ -565,7 +565,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
   (<span class="org-keyword">setq</span> super-save-auto-save-when-idle t))</pre>
 </div>
 
-<h4><a id="highlight-keywords" class="anchor" href="#highlight-keywords">¶</a>Highlight Keywords</h4><div class="outline-text-4" id="text-orgbb46723">
+<h4><a id="highlight-keywords" class="anchor" href="#highlight-keywords">¶</a>Highlight Keywords</h4><div class="outline-text-4" id="text-org6b73a3b">
 <p>
 <a href="https://github.com/tarsius/hl-todo">hl-todo</a> is a useful tool to highlight keywords like TODO or BUG.
 </p>
@@ -576,7 +576,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
   (global-hl-todo-mode))</pre>
 </div>
 
-<h4><a id="rainbow-delimiters" class="anchor" href="#rainbow-delimiters">¶</a>Rainbow Delimiters</h4><div class="outline-text-4" id="text-orga6900db">
+<h4><a id="rainbow-delimiters" class="anchor" href="#rainbow-delimiters">¶</a>Rainbow Delimiters</h4><div class="outline-text-4" id="text-org2b0beff">
 <p>
 <a href="https://github.com/Fanael/rainbow-delimiters">rainbow-delimiters</a> is useful in programming modes because it colorizes nested parentheses and brackets according to their nesting depth.  This makes it a lot easier to visually match parentheses in Emacs Lisp code without having to count them yourself.
 </p>
@@ -586,7 +586,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
   <span class="org-builtin">:hook</span> (prog-mode . rainbow-delimiters-mode))</pre>
 </div>
 
-<h4><a id="rainbow-mode" class="anchor" href="#rainbow-mode">¶</a>Rainbow Mode</h4><div class="outline-text-4" id="text-org7217dd2">
+<h4><a id="rainbow-mode" class="anchor" href="#rainbow-mode">¶</a>Rainbow Mode</h4><div class="outline-text-4" id="text-orgf3dcc47">
 <p>
 <a href="https://elpa.gnu.org/packages/rainbow-mode.html">Rainbow Mode</a> enables visualization of color codes like #BD93F9 in Emacs.
 </p>
@@ -596,7 +596,7 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
   <span class="org-builtin">:hook</span> prog-mode org-mode)</pre>
 </div>
 
-<h4><a id="flycheck-syntax-checking" class="anchor" href="#flycheck-syntax-checking">¶</a>Flycheck Syntax Checking</h4><div class="outline-text-4" id="text-org5ecc524">
+<h4><a id="flycheck-syntax-checking" class="anchor" href="#flycheck-syntax-checking">¶</a>Flycheck Syntax Checking</h4><div class="outline-text-4" id="text-org81322e3">
 <p>
 <a href="https://www.flycheck.org/en/latest/">Flycheck</a> provides on the fly syntax checking.
 </p>
@@ -606,13 +606,13 @@ Use the internal <code>savehist</code> package to presever the mini-buffer histo
   <span class="org-builtin">:hook</span> (lsp-mode . flycheck-mode))</pre>
 </div>
 
-<h3><a id="org-mode" class="anchor" href="#org-mode">¶</a>Org Mode</h3><div class="outline-text-3" id="text-orgc674c96">
+<h3><a id="org-mode" class="anchor" href="#org-mode">¶</a>Org Mode</h3><div class="outline-text-3" id="text-orgb9eea56">
 <p>
 <a href="https://orgmode.org/">Org Mode</a> is one of the hallmark features of Emacs.  It is a rich document editor, project planner, task and time tracker, blogging engine, and literate coding utility all wrapped up in one package.
 </p>
 </div>
 
-<h4><a id="better-font-faces" class="anchor" href="#better-font-faces">¶</a>Better Font Faces</h4><div class="outline-text-4" id="text-orga2fc005">
+<h4><a id="better-font-faces" class="anchor" href="#better-font-faces">¶</a>Better Font Faces</h4><div class="outline-text-4" id="text-org8dc6a19">
 <p>
 The <code>jdw/org-font-setup</code> function configures various text faces to tweak the sizes of headings and use variable width fonts in most cases so that it looks more like we&rsquo;re editing a document in <code>org-mode</code>.  We switch back to fixed width (monospace) fonts for code blocks and tables so that they display correctly.
 </p>
@@ -653,7 +653,7 @@ The <code>jdw/org-font-setup</code> function configures various text faces to tw
   (<span class="org-keyword">setq</span> org-format-latex-options (plist-put org-format-latex-options <span class="org-builtin">:scale</span> 1.5)))</pre>
 </div>
 
-<h4><a id="basic-config" class="anchor" href="#basic-config">¶</a>Basic Config</h4><div class="outline-text-4" id="text-orgf176534">
+<h4><a id="basic-config" class="anchor" href="#basic-config">¶</a>Basic Config</h4><div class="outline-text-4" id="text-orga60562a">
 <p>
 This section contains the basic configuration for <code>org-mode</code>.
 </p>
@@ -725,7 +725,7 @@ This section contains the basic configuration for <code>org-mode</code>.
   (evil-define-key '(normal insert visual) org-mode-map (kbd <span class="org-string">"M-k"</span>) 'org-metaup))</pre>
 </div>
 
-<h4><a id="nicer-heading-bullets" class="anchor" href="#nicer-heading-bullets">¶</a>Nicer Heading Bullets</h4><div class="outline-text-4" id="text-org5a74132">
+<h4><a id="nicer-heading-bullets" class="anchor" href="#nicer-heading-bullets">¶</a>Nicer Heading Bullets</h4><div class="outline-text-4" id="text-orga029e3b">
 <p>
 <a href="https://github.com/sabof/org-bullets">org-bullets</a> replaces the heading stars in <code>org-mode</code> buffers with nicer looking characters that you can control.
 </p>
@@ -739,7 +739,7 @@ This section contains the basic configuration for <code>org-mode</code>.
   (org-bullets-bullet-list '(<span class="org-string">"&#9673;"</span> <span class="org-string">"&#9675;"</span> <span class="org-string">"&#9679;"</span> <span class="org-string">"&#9675;"</span> <span class="org-string">"&#9679;"</span> <span class="org-string">"&#9675;"</span> <span class="org-string">"&#9679;"</span>)))</pre>
 </div>
 
-<h4><a id="center-org-buffers" class="anchor" href="#center-org-buffers">¶</a>Center Org Buffers</h4><div class="outline-text-4" id="text-org744d8c8">
+<h4><a id="center-org-buffers" class="anchor" href="#center-org-buffers">¶</a>Center Org Buffers</h4><div class="outline-text-4" id="text-org6ee68ff">
 <p>
 We use <a href="https://github.com/joostkremers/visual-fill-column">visual-fill-column</a> to center <code>org-mode</code> buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.  This is really a matter of personal preference so you can remove the block below if you don&rsquo;t like the behavior.
 </p>
@@ -761,7 +761,7 @@ We use <a href="https://github.com/joostkremers/visual-fill-column">visual-fill-
           (dashboard-mode . jdw/dashboard-mode-visual-fill)))</pre>
 </div>
 
-<h4><a id="configure-babel-languages" class="anchor" href="#configure-babel-languages">¶</a>Configure Babel Languages</h4><div class="outline-text-4" id="text-orgad352f5">
+<h4><a id="configure-babel-languages" class="anchor" href="#configure-babel-languages">¶</a>Configure Babel Languages</h4><div class="outline-text-4" id="text-org8227609">
 <p>
 To execute or export code in <code>org-mode</code> code blocks, you&rsquo;ll need to set up <code>org-babel-load-languages</code> for each language you&rsquo;d like to use.  <a href="https://orgmode.org/worg/org-contrib/babel/languages.html">This page</a> documents all of the languages that you can use with <code>org-babel</code>.
 </p>
@@ -778,7 +778,7 @@ To execute or export code in <code>org-mode</code> code blocks, you&rsquo;ll nee
   (<span class="org-keyword">push</span> '(<span class="org-string">"conf-unix"</span> . conf-unix) org-src-lang-modes))</pre>
 </div>
 
-<h4><a id="structure-templates" class="anchor" href="#structure-templates">¶</a>Structure Templates</h4><div class="outline-text-4" id="text-orgbe8a5ea">
+<h4><a id="structure-templates" class="anchor" href="#structure-templates">¶</a>Structure Templates</h4><div class="outline-text-4" id="text-org1c35913">
 <p>
 Org Mode&rsquo;s <a href="https://orgmode.org/manual/Structure-Templates.html">structure templates</a> feature enables you to quickly insert code blocks into your Org files in combination with <code>org-tempo</code> by typing <code>&lt;</code> followed by the template name like <code>el</code> or <code>py</code> and then press <code>TAB</code>.  For example, to insert an empty <code>emacs-lisp</code> block below, you can type <code>&lt;el</code> and press <code>TAB</code> to expand into such a block.
 </p>
@@ -801,7 +801,7 @@ You can add more <code>src</code> block templates below by copying one of the li
   (add-to-list 'org-structure-template-alist '(<span class="org-string">"lua"</span> . <span class="org-string">"src lua"</span>)))</pre>
 </div>
 
-<h4><a id="auto-tangle-configuration-files" class="anchor" href="#auto-tangle-configuration-files">¶</a>Auto-tangle Configuration Files</h4><div class="outline-text-4" id="text-org01305d3">
+<h4><a id="auto-tangle-configuration-files" class="anchor" href="#auto-tangle-configuration-files">¶</a>Auto-tangle Configuration Files</h4><div class="outline-text-4" id="text-orgc56664a">
 <p>
 This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-babel-tangle-config</code> gets executed each time such a buffer gets saved.  This function checks to see if the file being saved is in the directory <code>~/.dotfiles/</code>, and if so, tangles the file to the file path specified in the header arguments for the code block to tangle.
 </p>
@@ -821,7 +821,7 @@ This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-
 (add-hook 'org-mode-hook (<span class="org-keyword">lambda</span> () (add-hook 'after-save-hook #'jdw/org-babel-tangle-config)))</pre>
 </div>
 
-<h4><a id="org-roam" class="anchor" href="#org-roam">¶</a>Org-Roam</h4><div class="outline-text-4" id="text-org8361b2f">
+<h4><a id="org-roam" class="anchor" href="#org-roam">¶</a>Org-Roam</h4><div class="outline-text-4" id="text-org787ccbf">
 <p>
 <a href="https://github.com/org-roam/org-roam">Org Roam</a> is an Org Mode extension inspired by <a href="https://roamresearch.com/">Roam</a> and the <a href="https://www.orgroam.com/manual.html#A-Brief-Introduction-to-the-Zettelkasten-Method">Zettelkasten</a> note-taking approach. I particularly like it because it solves the problem of organizing Org files, which has completely stopped several projects or throughts in their tracks before. With this approach, you just make the file, get your thoughts out there, and then move on.
 </p>
@@ -845,7 +845,7 @@ This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-
     <span class="org-string">"ni"</span> '(org-roam-node-insert <span class="org-builtin">:which-key</span> <span class="org-string">"insert node"</span>))</pre>
 </div>
 
-<ul><li>Org-Roam-UI<div class="outline-text-5" id="text-orgb939e8f">
+<ul><li>Org-Roam-UI<div class="outline-text-5" id="text-orgcd432c5">
 <p>
 <a href="https://github.com/org-roam/org-roam-ui">Org-Roam-UI</a> is a graphical front-end showing linkages for the Org-Roam files you&rsquo;ve made.
 </p>
@@ -869,7 +869,7 @@ This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-
 </div>
 </li></ul>
 
-<h3><a id="development" class="anchor" href="#development">¶</a>Development</h3><h4><a id="manage-projects-with-projectile" class="anchor" href="#manage-projects-with-projectile">¶</a>Manage Projects with Projectile</h4><div class="outline-text-4" id="text-orgaa60525">
+<h3><a id="development" class="anchor" href="#development">¶</a>Development</h3><h4><a id="manage-projects-with-projectile" class="anchor" href="#manage-projects-with-projectile">¶</a>Manage Projects with Projectile</h4><div class="outline-text-4" id="text-orgc1f95b5">
 <p>
 <a href="https://github.com/bbatsov/projectile">Projectile</a> is a project interaction library for things like finding project files and navigating through projects.
 </p>
@@ -892,7 +892,7 @@ This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-
   <span class="org-builtin">:bind</span> ((<span class="org-string">"C-M-p"</span> . consult-projectile-find-file)))</pre>
 </div>
 
-<h4><a id="commenting-lines" class="anchor" href="#commenting-lines">¶</a>Commenting Lines</h4><div class="outline-text-4" id="text-orgf368300">
+<h4><a id="commenting-lines" class="anchor" href="#commenting-lines">¶</a>Commenting Lines</h4><div class="outline-text-4" id="text-org07d90b5">
 <p>
 <a href="https://github.com/redguardtoo/evil-nerd-commenter">Evil Nerd Commenter</a> allows for commenting that acts more like I&rsquo;m used to from traditional IDEs, and a bit more.
 </p>
@@ -902,7 +902,7 @@ This snippet adds a hook to <code>org-mode</code> buffers so that <code>jdw/org-
 </div>
 
 
-<h4><a id="ide-features-with-lsp-mode" class="anchor" href="#ide-features-with-lsp-mode">¶</a>IDE Features with lsp-mode</h4><ul><li>lsp-mode<div class="outline-text-5" id="text-orgb72ab4f">
+<h4><a id="ide-features-with-lsp-mode" class="anchor" href="#ide-features-with-lsp-mode">¶</a>IDE Features with lsp-mode</h4><ul><li>lsp-mode<div class="outline-text-5" id="text-orgb57c913">
 <p>
 We use the excellent <a href="https://emacs-lsp.github.io/lsp-mode/">lsp-mode</a> to enable IDE-like functionality for many different programming languages via &ldquo;language servers&rdquo; that speak the <a href="https://microsoft.github.io/language-server-protocol/">Language Server Protocol</a>.  Before trying to set up <code>lsp-mode</code> for a particular language, check out the <a href="https://emacs-lsp.github.io/lsp-mode/page/languages/">documentation for your language</a> so that you can learn which language servers are available and how to install them.
 </p>
@@ -950,7 +950,7 @@ Now we can set up <code>lsp-mode</code>.
 </div>
 </li>
 
-<li>lsp-ui<div class="outline-text-5" id="text-orgc71e834">
+<li>lsp-ui<div class="outline-text-5" id="text-org07a5890">
 <p>
 <a href="https://emacs-lsp.github.io/lsp-ui/">lsp-ui</a> is a set of UI enhancements built on top of <code>lsp-mode</code> which make Emacs feel even more like an IDE.  Check out the screenshots on the <code>lsp-ui</code> homepage (linked at the beginning of this paragraph) to see examples of what it can do.
 </p>
@@ -963,7 +963,7 @@ Now we can set up <code>lsp-mode</code>.
 </div>
 </li>
 
-<li>lsp-treemacs<div class="outline-text-5" id="text-org8329920">
+<li>lsp-treemacs<div class="outline-text-5" id="text-org07010d4">
 <p>
 <a href="https://github.com/emacs-lsp/lsp-treemacs">lsp-treemacs</a> provides nice tree views for different aspects of your code like symbols in a file, references of a symbol, or diagnostic messages (errors and warnings) that are found in your code.
 </p>
@@ -987,7 +987,7 @@ This package is built on the <a href="https://github.com/Alexander-Miller/treema
 </div>
 </li></ul>
 
-<h4><a id="debugging-with-dap-mode" class="anchor" href="#debugging-with-dap-mode">¶</a>Debugging with dap-mode</h4><div class="outline-text-4" id="text-org0d257a9">
+<h4><a id="debugging-with-dap-mode" class="anchor" href="#debugging-with-dap-mode">¶</a>Debugging with dap-mode</h4><div class="outline-text-4" id="text-org73f085c">
 <p>
 <a href="https://emacs-lsp.github.io/dap-mode/">dap-mode</a> is an excellent package for bringing rich debugging capabilities to Emacs via the <a href="https://microsoft.github.io/debug-adapter-protocol/">Debug Adapter Protocol</a>.  You should check out the <a href="https://emacs-lsp.github.io/dap-mode/page/configuration/">configuration docs</a> to learn how to configure the debugger for your language.  Also make sure to check out the documentation for the debug adapter to see what configuration parameters are available to use for your debug templates!
 </p>
@@ -1002,14 +1002,14 @@ This package is built on the <a href="https://github.com/Alexander-Miller/treema
   (dap-node-setup))</pre>
 </div>
 
-<h4><a id="languages" class="anchor" href="#languages">¶</a>Languages</h4><ul><li>C/C++<div class="outline-text-5" id="text-org78a41ed">
+<h4><a id="languages" class="anchor" href="#languages">¶</a>Languages</h4><ul><li>C/C++<div class="outline-text-5" id="text-orgee2e165">
 <pre>(<span class="org-keyword">use-package</span> <span class="org-constant">ccls</span>
   <span class="org-builtin">:hook</span> ((c-mode c++-mode objc-mode cuda-mode) .
          (<span class="org-keyword">lambda</span> () (<span class="org-keyword">require</span> '<span class="org-constant">ccls</span>) (lsp))))</pre>
 </div>
 </li>
 
-<li>Emacs Lisp<div class="outline-text-5" id="text-org209c7bb">
+<li>Emacs Lisp<div class="outline-text-5" id="text-org72c254f">
 <pre>(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 
 (<span class="org-keyword">use-package</span> <span class="org-constant">helpful</span>
@@ -1033,7 +1033,7 @@ This package is built on the <a href="https://github.com/Alexander-Miller/treema
 </div>
 </li>
 
-<li>Lua<div class="outline-text-5" id="text-org60dd48c">
+<li>Lua<div class="outline-text-5" id="text-orgc37bf27">
 <pre><span class="org-comment-delimiter">;; </span><span class="org-comment">Use the Lua major mode for editing Lua code</span>
 (<span class="org-keyword">use-package</span> <span class="org-constant">lua-mode</span>
   <span class="org-builtin">:defer</span> 1
@@ -1049,7 +1049,7 @@ This package is built on the <a href="https://github.com/Alexander-Miller/treema
 </div>
 </li>
 
-<li>Python<div class="outline-text-5" id="text-orgd0d5cc9">
+<li>Python<div class="outline-text-5" id="text-orgabeb852">
 <p>
 We use <code>lsp-mode</code> and <code>dap-mode</code> to provide a more complete development environment for Python in Emacs.
 </p>
@@ -1074,7 +1074,7 @@ There are a number of other language servers for Python so if you find that <cod
 </div>
 </li>
 
-<li>R<div class="outline-text-5" id="text-orgb158981">
+<li>R<div class="outline-text-5" id="text-org50ba126">
 <p>
 <a href="https://ess.r-project.org/">Emacs Speaks Statistics</a> (ESS) is a great add-on built for handling a lot of statistical programs such as R, SAS, and Stata.
 </p>
@@ -1085,7 +1085,7 @@ There are a number of other language servers for Python so if you find that <cod
 </div>
 </li>
 
-<li>Fortran<div class="outline-text-5" id="text-org070f67f">
+<li>Fortran<div class="outline-text-5" id="text-org915a858">
 <p>
 <code>f90-mode</code> is already a mode in base Emacs, but we still need to install the language server.
 </p>
@@ -1094,7 +1094,7 @@ There are a number of other language servers for Python so if you find that <cod
 </div>
 </li></ul>
 
-<h4><a id="anaconda-integration" class="anchor" href="#anaconda-integration">¶</a>Anaconda Integration</h4><div class="outline-text-4" id="text-orgc6faa09">
+<h4><a id="anaconda-integration" class="anchor" href="#anaconda-integration">¶</a>Anaconda Integration</h4><div class="outline-text-4" id="text-org8baa7a3">
 <p>
 I use <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> for my Python and R environment and package management. To integrate it with Emacs, we can use the <a href="https://github.com/necaris/conda.el">conda</a> package.
 </p>
@@ -1106,7 +1106,7 @@ I use <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> for
   (<span class="org-keyword">setq</span> conda-env-home-directory (expand-file-name <span class="org-string">"~/.miniconda/"</span>)))</pre>
 </div>
 
-<h4><a id="magit" class="anchor" href="#magit">¶</a>Magit</h4><div class="outline-text-4" id="text-org5c3f95e">
+<h4><a id="magit" class="anchor" href="#magit">¶</a>Magit</h4><div class="outline-text-4" id="text-org36a2cb9">
 <p>
 <a href="https://magit.vc/">Magit</a> is the best Git interface I&rsquo;ve ever used.  Common Git operations are easy to execute quickly using Magit&rsquo;s command panel system.
 </p>
@@ -1131,7 +1131,7 @@ I use <a href="https://docs.conda.io/en/latest/miniconda.html">Miniconda</a> for
  <span class="org-string">"gr"</span>  'magit-rebase)</pre>
 </div>
 
-<h4><a id="git-gutter" class="anchor" href="#git-gutter">¶</a>Git Gutter</h4><div class="outline-text-4" id="text-orgfbb3208">
+<h4><a id="git-gutter" class="anchor" href="#git-gutter">¶</a>Git Gutter</h4><div class="outline-text-4" id="text-orgdb7006d">
 <p>
 <a href="https://github.com/emacsorphanage/git-gutter-fringe">Git Gutter</a> helps by highlighting changes to the branch.
 </p>

@@ -1,6 +1,6 @@
-<!-- Generated from 25e7b6c on 2023-12-23 @ 19:45 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 99fdb8c on 2023-12-23 @ 19:48 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>GOES and IBTrACS Data with Projections - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">GOES and IBTrACS Data with Projections</h1><p class="site-post-meta">November 13, 2023</p><div id="content">
-<h2><a id="introductions" class="anchor" href="#introductions">¶</a>Introductions</h2><div class="outline-text-2" id="text-orgb9d9c7f">
+<h2><a id="introductions" class="anchor" href="#introductions">¶</a>Introductions</h2><div class="outline-text-2" id="text-org6da1be5">
 <p>
 Now that we&rsquo;ve explored the GOES satellite data and the IBTrACS data in Python, let&rsquo;s put them both together. In order to do so, we&rsquo;ll have to obtain the projection data of the GOES imagery, project the IBTrACS latitudes/longitudes using the GOES projection data, and then overlay the track on the GOES imagery.
 </p>
@@ -10,7 +10,7 @@ Rather than using the entirety of the IBTrACS data, we focus specifically on the
 </p>
 </div>
 
-<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-org2ccd46e">
+<h2><a id="import-modules" class="anchor" href="#import-modules">¶</a>Import Modules</h2><div class="outline-text-2" id="text-orgba07808">
 <p>
 Let&rsquo;s first import the modules we need to run the code. I&rsquo;ve written some functions for getting the IBTrACS and GOES data, so let&rsquo;s import those functions now too.
 </p>
@@ -29,7 +29,7 @@ os.chdir(<span class="org-string">".."</span>)
 <span class="org-keyword">import</span> ibtracs</pre>
 </div>
 
-<h2><a id="retrieve-ibtracs-data" class="anchor" href="#retrieve-ibtracs-data">¶</a>Retrieve IBTrACS Data</h2><div class="outline-text-2" id="text-org49d1961">
+<h2><a id="retrieve-ibtracs-data" class="anchor" href="#retrieve-ibtracs-data">¶</a>Retrieve IBTrACS Data</h2><div class="outline-text-2" id="text-org5bf9479">
 <p>
 Now let&rsquo;s load up the IBTrACS data, as we did in a previous notebook, and then drill down on the track for Hurricane Harvey in 2017.
 </p>
@@ -218,7 +218,7 @@ df.head()</pre>
 </table></div>
 </div>
 
-<h2><a id="retrieve-goes16-image" class="anchor" href="#retrieve-goes16-image">¶</a>Retrieve GOES16 Image</h2><div class="outline-text-2" id="text-orgd529bad">
+<h2><a id="retrieve-goes16-image" class="anchor" href="#retrieve-goes16-image">¶</a>Retrieve GOES16 Image</h2><div class="outline-text-2" id="text-org619909f">
 <p>
 Now let&rsquo;s grab a GOES16 image corresponding to Hurricane Harvey. It made landfall in Texas around August 25, 2017, so we&rsquo;ll set the date for the image to be that day.
 </p>
@@ -255,7 +255,7 @@ plt.savefig(filePath)</pre>
 </div>
 </div>
 
-<h2><a id="overlay-state-and-country-borders-with-basemap" class="anchor" href="#overlay-state-and-country-borders-with-basemap">¶</a>Overlay State and Country Borders with Basemap</h2><div class="outline-text-2" id="text-org96e8258">
+<h2><a id="overlay-state-and-country-borders-with-basemap" class="anchor" href="#overlay-state-and-country-borders-with-basemap">¶</a>Overlay State and Country Borders with Basemap</h2><div class="outline-text-2" id="text-org631073f">
 <p>
 Now let&rsquo;s experiment with projections. To make sure we&rsquo;ve got the projection right, we start by overlaying the boundaries of states, countries, and coastlines on the GOES imagery. In order to do so, we need to get the projection of the GOES data. This information is stored in the netCDF metadata, primarily as attributes for the variable <code>goes_imager_projection</code>. So once we get the projection data, we&rsquo;ll load this into the base map, and then the borders should be easily drawn using the base map utilities.
 </p>
@@ -298,7 +298,7 @@ plt.savefig(filePath)</pre>
 </div>
 </div>
 
-<h2><a id="overlay-ibtracs-data" class="anchor" href="#overlay-ibtracs-data">¶</a>Overlay IBTRaCS Data</h2><div class="outline-text-2" id="text-org92ab438">
+<h2><a id="overlay-ibtracs-data" class="anchor" href="#overlay-ibtracs-data">¶</a>Overlay IBTRaCS Data</h2><div class="outline-text-2" id="text-orgdcee981">
 <p>
 Now that we can see the projection is working properly, let&rsquo;s add the Hurricane Harvey track as of August 25, 2017 at 18Z. We first need to grab the latitude longitudes from the IBTRaCS data. We can then use <code>pyproj.Proj</code> to convert longitudes and latitudes to the \(x\) and \(y\) space of the projected GOES image.
 </p>
