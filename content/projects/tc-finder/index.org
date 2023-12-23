@@ -9,3 +9,7 @@ When I went through several courses on machine learning, I was always provided w
 - [[file:goes.org][Exploring the GOES satellite imagery]] - investigating how to access, read, and visualize GOES satellite imagery.
 - [[file:goes_and_ibtracs.org][Projecting IBTrACS storm track data onto GOES satellite imagery]] - invesitigating how to perform projections using Python's =pyproj= package.
 - [[file:cropping_goes_from_ibtracs.org][Cropping tropical cyclones from GOES imagery using IBTrACS]] - putting it all together to crop images of tropical cyclones.
+
+* Training Data
+
+-[[file:ibtracs_valid_training_dates.org][Valid IBTrACS training dates]] - using IBTrACS data to identify which IBTrACS observations are on GOES imagery. 

@@ -1,0 +1,170 @@
+#+title: IBTrACS Valid Training Dates 
+#+date: <2023-11-17 Fri>
+#+FILETAGS: :python:training-data:
+#+CATEGORY: tc-finder
+#+EXCERPT: Identifying valid dates for GOES imagery based on IBTrACS data
+#+PROPERTY: header-args python :session *py*
+
+* Introduction
+
+So far, we've seen how to pull GOES imagery and how to overlay IBTrACS data on the imagery. We'll use these same ideas now to obtain dates to fetch training data. Some things we'll need to consider are:
+
+- Some bands aren't visible at night, so we don't want to fetch images that aren't useful. To address this, we can start by using only infrared bands on the imager that capture clouds at night. If more data is needed, we can come back to this point and identify daytime visible bands.
+- The geostationary view of the imager has a limited spatial extent, so some IBTrACS data points may not be visible to the imager. We can use the projection data of the GOES image filter out the latitudes and longitudes of the IBTrACS data.
+- GOES16 was launched in November 2016, so we'll only be able to use a subset of the IBTrACS data. We just need to make sure we exclude any IBTrACS data outside of the GOES16 imaging window.
+- IBTrACS data is every 3 hours, while GOES16 is every 5 minutes. We can assume that if a storm had a track observation at time $t$ and again at time $t$+3 hours, an image within that time has a storm in it.
+
+Each of these points will play a role in how we automatically assess if an image is a positive or negative training sample.
+
+Additionally, it seems that the first GOES image, at least that I can access on the AWS storage, wasn't available until 10 April, so we need to filter those dates from the final results.
+
+Downloading the data will take some time, so first, I just want to build a list of dates that, according to the IBTrACS data, correspond to a time when a tropical cyclone was present ($y=1$) or was not present ($y=0$). At first, I think the goal should be to get an even number of positive and negative training samples, so I think it might be best to randomly pick a time for a positive example, then ensure that the next selection is a negative example, and so on.
+
+* Import modules
+
+First, let's import the modules we'll need. I've created some functions to do things like read in the IBTrACS and GOES data, which I implemented in previous notebooks.
+
+#+begin_src python
+
+  # Import modules
+  import datetime
+  import numpy as np
+  from pyproj import Proj
+  import matplotlib.pyplot as plt
+  import os
+
+  # Import functions I've written
+  os.chdir("..")
+  import goes
+  import ibtracs
+  
+#+end_src
+
+* Read IBTrACS Data
+
+Now we read in the IBTrACS data from 2017 until now. Let's get rid of anything else before 10 April.
+
+#+begin_src python
+
+  ibtracsPath = ibtracs.download_data(basin="ALL",overwrite=False)
+  dfTracks = ibtracs.read_data(ibtracsPath,True,2017,2020)
+  dfTracks = dfTracks[dfTracks['ISO_TIME']>=datetime.datetime(2017,4,10)]
+  
+#+end_src
+
+* Read GOES16 Image
+
+Next, we'll read in the GOES16 image corresponding to 30 days ago. The image itself doesn't matter yet. Since the imager is geostationary, we can just take any image and use it to make sure our IBTrACS data all falls within the GOES16 full disc array.
+
+#+begin_src python
+  
+  # Set the parameters to download data
+  date = datetime.datetime.now()-datetime.timedelta(days=30)
+  bucketName = 'noaa-goes16'
+  product = 'ABI-L1b-RadF'
+  credPath = "secrets.csv"
+  band = 13
+
+  # Get the GOES data
+  ds = goes.download_data(date,credPath,bucketName,product,band)
+
+#+end_src
+
+* Handle Projections
+
+In order to get the IBTrACS data relative to the GOES imagery, we need to get the projection of the GOES data.
+
+#+begin_src python
+  
+  # Get dataset projection data
+  satHeight = ds.goes_imager_projection.perspective_point_height
+  satLon = ds.goes_imager_projection.longitude_of_projection_origin
+  satSweep = ds.goes_imager_projection.sweep_angle_axis
+  majorMinorAxes = (ds.goes_imager_projection.semi_major_axis,ds.goes_imager_projection.semi_minor_axis)
+
+  # The projection x and y coordinates equals the scanning angle (in radians) multiplied by the satellite height
+  x = ds.variables['x'][:] * satHeight
+  y = ds.variables['y'][:] * satHeight
+
+  # Create X and Y meshgrids
+  X, Y = np.meshgrid(x, y)
+
+  # Create a pyproj geostationary map object
+  p = Proj(proj='geos', h=satHeight, lon_0=satLon, sweep=satSweep)
+
+  # Get latitudes and longitudes
+  lons, lats = p(X, Y, inverse=True)
+
+#+end_src
+
+* Filter Out with Bounding Box
+
+A bounding box corresponding to the minimum and maximum latitude and longitudes covers more space than the full-disc, but the only way to really check is to loop through /all/ of the IBTrACS data, project it onto the GOES projection, and then see if it's in the image. That will take a lot of time, where this will not, so let's use a bounding box as a first pass here to avoid unnecessary loopling.
+
+#+begin_src python
+
+  # Get a simple bounding box based on min/max lat/lons
+  lons = np.where(lons==1e+30,np.nan,lons)
+  lats = np.where(lats==1e+30,np.nan,lats)
+  minLat = np.nanmin(lats[lats != -np.inf])
+  maxLat = np.nanmax(lats[lats != np.inf])
+  minLon = np.nanmin(lons[lons != -np.inf])
+  maxLon = np.nanmax(lons[lons != np.inf])
+
+  # Query IBTraCS data based on bounding box
+  dfTracks = dfTracks[
+      (dfTracks['LAT'] >= minLat) &
+      (dfTracks['LAT'] <= maxLat) &
+      (dfTracks['LON'] >= minLon) &
+      (dfTracks['LON'] <= maxLon)
+  ]
+  
+#+end_src
+
+* Drop Additional Off-Disc Samples
+
+Now that we've limited the extent a bit, let's drill down and make sure none of the points are off of the full-disc. First, we find the point on the image that corresponds to the latitude/longitude of the storm. Since the =lats= and =lons= arrays have values of =NaN= where the points are off the disc, we can check if that point in the =lat= or =lon= array is missing. We only need to check one array, since it's a meshgrid, we'll check =lons=. And rather than just checking if that one point is =NaN=, let's check if any point within a window of size =checkSize= is =NaN=. This should avoid any points that are just barely sitting on the edge of the disc.
+
+#+begin_src python
+
+  # Create empty list
+  dropInds = []
+
+  # Reset indices of dataframe
+  dfTracks = dfTracks.reset_index()
+
+  for dfInd, row in dfTracks[['LAT','LON']].iterrows():
+      
+      # Cast latitude and longitude to float
+      trackLat = float(row["LAT"])
+      trackLon = float(row["LON"])
+
+      # Convert lon/lat to x/y
+      trackX,trackY = p(trackLon,trackLat)
+
+      # Get the closest point to the IBTrACS data
+      xInd = np.nanargmin(abs(x-trackX))
+      yInd = np.nanargmin(abs(y-trackY))
+
+      # Check that none of 50 points on any side of the storm are off of the disc
+      checkSize = 50
+      offDisc = np.isnan(lons[yInd-checkSize:yInd+checkSize,xInd-checkSize:xInd+checkSize]).any()
+
+      # If the points are off the disc, append the dataframe index to drop after looping
+      if offDisc:
+          dropInds.append(dfInd)
+
+  # Drop any indices that fell off the disc
+  dfTracks = dfTracks.drop(dfTracks.index[dropInds])
+  
+#+end_src
+
+* Save the Output
+
+So now, we've handled the issues of the imager extent and the IBTrACS extent, both spatially and temporally. Let's save the output now so we can use it to make training data.
+
+#+begin_src python
+
+  dfTracks.to_csv('./data/ibtracs_GOES16.csv')
+  
+#+end_src

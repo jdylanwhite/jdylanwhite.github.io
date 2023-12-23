@@ -105,8 +105,8 @@ body {
   font-weight: 300;
   font-size: 1.3rem;
   line-height: 1.5;
-  color: #ebdbb2;
-  background-color: #282828;
+  color: #c5c8c6;
+  background-color: #1d1f21;
 }
 
 p {
@@ -141,81 +141,82 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: "Iosevka Aile Web", sans-serif;
-    font-weight: 600;
-    line-height: 1.2;
-    margin-top: 1.3rem;
-    margin-bottom: 0.5rem;
-    color: #ebdbb2;
+  font-family: "Iosevka Aile Web", sans-serif;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #c5c8c6;
 }
 
 h1 {
-    color: #d3869b;
+  color: #81a2be;
 }
 
 h2 {
-    color: #8ec07c;
+  color: #b294bb;
 }
 
 h3 {
-    color: #b8bb26;
+  color: #b5bd68;
 }
 
 h4 {
-    color: #83a598;
+  color: #de935f;
 }
 
 a {
-    color: #fabd2f;
+  /* color: #b294bb; */
+  color: #81a2be;
 }
 
 a:hover,
 a:focus {
-    color: #fabd2f;
+  color: #81a2be;
 }
 
 .anchor {
-    color: #282828;
-    float: left;
-    padding-right: 4px;
-    margin-left: -23px;
+  color: #1d1f21;
+  float: left;
+  padding-right: 4px;
+  margin-left: -23px;
 }
 
 .anchor:hover {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 h2:hover .anchor,
 h3:hover .anchor,
 h4:hover .anchor {
-    color: inherit;
+  color: inherit;
 }
 
 kbd {
-    font-family: "JetBrains Mono", monospace;
-    font-weight: 200;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 200;
 }
 
 pre {
-    font-family: "JetBrains Mono", monospace;
-    background-color: #3c3836;
-    padding: 1em;
-    overflow-x: scroll;
+  font-family: "JetBrains Mono", monospace;
+  background-color: rgba(0, 0, 0, 0.35);
+  padding: 1em;
+  overflow-x: scroll;
 }
 
 code {
-    color: #fe8019;
+  color: #b294bb;
 }
 
 pre,
 code {
-    font-family: "JetBrains Mono", monospace;
-    font-weight: 200;
-    font-size: 1rem;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 200;
+  font-size: 1rem;
 }
 
 strong {
-    font-weight: 700;
+  font-weight: 700;
 }
 
 /*
@@ -223,7 +224,7 @@ strong {
  */
 
 .container {
-    max-width: 60rem;
+  max-width: 60rem;
 }
 
 /*
@@ -231,49 +232,49 @@ strong {
  */
 
 .site-masthead {
-    margin-bottom: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.35);
-    border-bottom: 0.05rem solid #d3869b;
-    -webkit-box-shadow: inset 0 -0.1rem 0.25rem rgba(0, 0, 0, 0.1);
-    box-shadow: inset 0 -0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-bottom: 0.05rem solid #b294bb;
+  -webkit-box-shadow: inset 0 -0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 -0.1rem 0.25rem rgba(0, 0, 0, 0.1);
 }
 
 .logo {
-    display: block;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+  display: block;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 /* Nav links */
 .nav-link {
-    position: relative;
-    padding: 0rem;
-    font-size: 1.3rem;
-    margin: 0.5rem 1.25rem 0.5rem 0rem;
-    font-weight: bold;
-    color: #8ec07c;
+  position: relative;
+  padding: 0rem;
+  font-size: 1.3rem;
+  margin: 0.5rem 1.25rem 0.5rem 0rem;
+  font-weight: bold;
+  color: #cdddeb;
 }
 .nav-link:hover,
 .nav-link:focus {
-    color:  #fabd2f;
-    background-color: transparent;
+  color: #fff;
+  background-color: transparent;
 }
 
 /* Active state gets a caret at the bottom */
 .nav-link.active {
-    color:  #fabd2f;
-    font-weight: bolder;
+  color: #fff;
+  font-weight: bolder;
 }
 
 .nav-icon {
-    float: right;
+  float: right;
 }
 
 .nav-icons {
-    width: auto;
+  width: auto;
 }
 
 /*
@@ -281,28 +282,25 @@ strong {
  */
 
 .site-header {
-    font-family: "Iosevka Aile Web", sans-serif;
-    font-weight: bold;
+  font-family: "Iosevka Aile Web", sans-serif;
+  font-weight: bold;
 }
 
 .site-title {
-    margin-bottom: 0;
-    font-size: 3rem;
-    font-weight: bold;
-}
-.site-name,
-.site-name:hover {
-    color: #d3869b;
+  margin-bottom: 0;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #81a2be;
 }
 .site-description {
-    font-size: 1.5rem;
-    color: #5a5b5a;
+  font-size: 1.5rem;
+  color: #5a5b5a;;
 }
 
 @media (max-width: 40em) {
-    .site-description {
-	margin-bottom: 1rem;
-    }
+  .site-description {
+    margin-bottom: 1rem;
+  }
 }
 
 /*
@@ -310,24 +308,24 @@ strong {
  */
 
 .site-post {
-    margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 .site-post-title {
-    margin-bottom: 0.75rem;
-    font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 2.5rem;
 }
 
 .site-post-meta {
-    margin-bottom: 1.25rem;
-    color: #928374;;
+  margin-bottom: 1.25rem;
+  color: #5a5b5a;;
 }
 
 .site-post-tags {
-    margin-top: 3rem;
-    margin-bottom: 1.25rem;
-    font-size: 1.1rem;
-    color: #928374;;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  font-size: 1.1rem;
+  color: #5a5b5a;;
 }
 
 /*
@@ -335,12 +333,12 @@ strong {
  */
 
 .site-footer {
-    padding: 1.3rem 0;
-    margin-top: 1rem;
-    color: #d5c4a1;
-    font-size: 1rem;
-    background-color: rgba(0, 0, 0, 0.35);
-    border-top: 0.05rem solid #d3869b;
+  padding: 1.3rem 0;
+  margin-top: 1rem;
+  color: #cdddeb;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-top: 0.05rem solid #b294bb;
 }
 
 .site-footer p:last-child {
@@ -366,25 +364,25 @@ table {
   margin-bottom: 30px;
   width: 100%;
   text-align: left;
-  color: #ebdbb2;
+  color: #c5c8c6;
   border-collapse: collapse;
-  border: 1px solid #d5c4a1;
+  border: 1px solid #44475a;
   overflow: auto
 }
 tbody tr:nth-child(odd) {
   background-color: rgba(0,0,0,0.25);
-  color: #ebdbb2;
+  color: #c5c8c6;
 }
 th, td {
   padding: 10 15;
 }
 th {
-  background-color: lighten(#d5c4a1, 3%);
-  border: 1px solid #d5c4a1;
-  border-bottom-color: darken(#d5c4a1, 12%);
+  background-color: lighten(#44475a, 3%);
+  border: 1px solid #44475a;
+  border-bottom-color: darken(#44475a, 12%);
 }
 td {
-  border: 1px solid #d5c4a1;
+  border: 1px solid #44475a;
   font-size: 1.0rem;
 }
 
