@@ -12,4 +12,4 @@ When I went through several courses on machine learning, I was always provided w
 
 * Training Data
 
--[[file:ibtracs_valid_training_dates.org][Valid IBTrACS training dates]] - using IBTrACS data to identify which IBTrACS observations are on GOES imagery. 
+- [[file:ibtracs_valid_training_dates.org][Valid IBTrACS training dates]] - using IBTrACS data to identify which IBTrACS observations are on GOES imagery. 
