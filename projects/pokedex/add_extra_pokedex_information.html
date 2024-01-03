@@ -1,9 +1,9 @@
-<!-- Generated from 99fdb8c on 2023-12-23 @ 19:48 with Emacs 27.1 (Org mode 9.3) -->
+<!-- Generated from 9a5ff53 on 2024-01-03 @ 01:09 with Emacs 27.1 (Org mode 9.3) -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta author="J. Dylan White"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/code.css"/><link rel="stylesheet" href="https://jdylanwhite.github.io/css/site.css"/><title>Adding Extra Pokedex Information - J. Dylan White</title></head><body><header class="site-header"><div class="container"><div class="site-title"><a class="site-name" href="/">J. Dylan White</a> </div></div><div class="site-masthead"><div class="container"><nav class="nav"><a class="nav-link" href="/">Home</a> <a class="nav-link" href="/projects/">Projects</a> <a class="nav-link" href="/dotfiles/">Dotfiles</a> </nav></div></div></header><div class="container"><div class="site-post"><h1 class="site-post-title">Adding Extra Pokedex Information</h1><p class="site-post-meta">October  4, 2023</p><div id="content"><p>
 We have a pretty fleshed out Pokedex dataset now, but I&rsquo;d like to add some extra information, such as Pokemon generation and legendary status. This could probably have been done at the scraping stage, but I have already scraped the data and don&rsquo;t want to hit the server again just to add some known data.
 </p>
 
-<h2><a id="load-packages" class="anchor" href="#load-packages">¶</a>Load Packages</h2><div class="outline-text-2" id="text-orgfe179ac">
+<h2><a id="load-packages" class="anchor" href="#load-packages">¶</a>Load Packages</h2><div class="outline-text-2" id="text-orgf3691b1">
 <p>
 First, let&rsquo;s load what we need to run the code. We&rsquo;ll scrape some additional information to get the list of legendary Pokemon, so we&rsquo;ll again rely on <code>rvest</code>.
 </p>
@@ -13,7 +13,7 @@ First, let&rsquo;s load what we need to run the code. We&rsquo;ll scrape some ad
 <span class="org-ess-modifiers">library</span>(dplyr)</pre>
 </div>
 
-<h2><a id="read-scraped-pokedex-data" class="anchor" href="#read-scraped-pokedex-data">¶</a>Read Scraped Pokedex Data</h2><div class="outline-text-2" id="text-orgd3f1396">
+<h2><a id="read-scraped-pokedex-data" class="anchor" href="#read-scraped-pokedex-data">¶</a>Read Scraped Pokedex Data</h2><div class="outline-text-2" id="text-org59d863e">
 <p>
 Next, read the Pokedex data from the previous step.
 </p>
@@ -49,7 +49,7 @@ glimpse(pokedex_data)</pre>
 </pre>
 </div>
 
-<h2><a id="add-generation-data-as-a-column" class="anchor" href="#add-generation-data-as-a-column">¶</a>Add Generation Data as a Column</h2><div class="outline-text-2" id="text-orgfd2399c">
+<h2><a id="add-generation-data-as-a-column" class="anchor" href="#add-generation-data-as-a-column">¶</a>Add Generation Data as a Column</h2><div class="outline-text-2" id="text-orgd055005">
 <p>
 Here, we provide the number of Pokemon in each generation, according to PokemonDB, and then use that information to generate a column assigning each Pokemon to their proper generation.
 </p>
@@ -136,7 +136,7 @@ kable(pokedex_data[148:153,c(1,2,21)])</pre>
 </table></div>
 </div>
 
-<h2><a id="add-legendary-status-as-a-column" class="anchor" href="#add-legendary-status-as-a-column">¶</a>Add Legendary Status as a Column</h2><div class="outline-text-2" id="text-org1f2668d">
+<h2><a id="add-legendary-status-as-a-column" class="anchor" href="#add-legendary-status-as-a-column">¶</a>Add Legendary Status as a Column</h2><div class="outline-text-2" id="text-org1a0fc4e">
 <p>
 To add legendary status, we&rsquo;ll use the information on Serebii&rsquo;s <a href="https://www.serebii.net/pokemon/legendary.shtml">Legendary Pokemon List</a>. The table their has a thumbnail for each Pokemon and their legendary status. Conveniently, the thumbnail file name is the number of the Pokemon, so we can use that as a key to identify which Pokemon have which legendary status rather than relying on the names in our scraped Pokedex table to match up identically with what&rsquo;s shown in this Serebii table.
 </p>
@@ -274,7 +274,7 @@ kable(pokedex_data[145:151,c(1,2,22)])</pre>
 </table></div>
 </div>
 
-<h2><a id="write-data-to-output-file" class="anchor" href="#write-data-to-output-file">¶</a>Write Data to Output File</h2><div class="outline-text-2" id="text-org3658053">
+<h2><a id="write-data-to-output-file" class="anchor" href="#write-data-to-output-file">¶</a>Write Data to Output File</h2><div class="outline-text-2" id="text-org3c80ade">
 <p>
 And finally, now that we are done, let&rsquo;s write the resulting table to an output file.
 </p>
